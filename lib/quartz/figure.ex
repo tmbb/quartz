@@ -1,20 +1,27 @@
 defmodule Quartz.Figure do
   alias Dantzig.Problem
   alias Dantzig.Constraint
+  alias Dantzig.Polynomial
+
   alias Quartz.Sketch
+  alias Quartz.Scale
   alias Quartz.Point2D
   alias Quartz.Config
   alias Quartz.Canvas
+  alias Quartz.AxisData
+  alias Quartz.Axis2D
+  alias Quartz.Plot2D
+  alias Quartz.Length
   alias Quartz.Typst.Serializer
   alias Quartz.Typst.Measuring
   alias Quartz.Typst.TypstAst
-  alias Dantzig.Polynomial
 
-  @derive {Inspect, only: [:width, :height, :finalized]}
+  @derive {Inspect, only: [:width, :height, :debug, :finalized]}
 
   defstruct width: nil,
             height: nil,
             problem: %Problem{direction: :maximize},
+            debug: false,
             solution: nil,
             unmeasured: [],
             counter: 0,
@@ -29,9 +36,16 @@ defmodule Quartz.Figure do
     width = Keyword.get(args, :width, 300)
     height = Keyword.get(args, :height, 200)
     config = Keyword.get(args, :config, Config.new())
+    debug = Keyword.get(args, :debug, false)
 
     try do
-      figure = %__MODULE__{width: width, height: height, config: config, store: %{}}
+      figure = %__MODULE__{
+        width: width,
+        height: height,
+        debug: debug,
+        config: config,
+        store: %{}
+      }
 
       Process.put(:"$quartz_figure", figure)
 
@@ -54,8 +68,9 @@ defmodule Quartz.Figure do
 
       figure
       |> get_measurements()
-      |> fix_axes_limits()
+      |> finish_axes()
       |> apply_scales_to_data()
+      |> align_decorations_areas()
       |> draw_plots()
       |> solve_problem()
       |> solve_sketches()
@@ -65,20 +80,154 @@ defmodule Quartz.Figure do
     end
   end
 
-  def render_to_pdf!(figure, path) do
+  def bounds_for_plots_in_grid(opts \\ []) do
+    nr_of_rows = Keyword.fetch!(opts, :nr_of_rows)
+    nr_of_columns = Keyword.fetch!(opts, :nr_of_columns)
+
+    padding = Keyword.get(opts, :padding, Length.pt(8))
+    horizontal_padding = Keyword.get(opts, :horizontal_padding, padding)
+    vertical_padding = Keyword.get(opts, :vertical_padding, padding)
+
+    half_horizontal_padding = horizontal_padding / 2
+    half_vertical_padding = vertical_padding / 2
+
+    x = Keyword.get(opts, :x, 0.0)
+    y = Keyword.get(opts, :y, 0.0)
+    total_width = Keyword.get(opts, :total_width, current_figure_width())
+    total_height = Keyword.get(opts, :total_height, current_figure_height())
+
+    left_bounds =
+      for i <- 0..Kernel.-(nr_of_columns, 1) do
+        if i == 0 do
+          x
+        else
+          x + total_width * (i / nr_of_columns) + half_horizontal_padding
+        end
+      end
+
+    right_bounds =
+      for i <- 0..Kernel.-(nr_of_columns, 1) do
+        if i == Kernel.-(nr_of_columns, 1) do
+          x + total_width
+        else
+          x + total_width * (Kernel.+(i, 1) / nr_of_columns) - half_horizontal_padding
+        end
+      end
+
+    top_bounds =
+      for i <- 0..Kernel.-(nr_of_rows, 1) do
+        if i == 0 do
+          y
+        else
+          y + total_height * (i / nr_of_rows) + half_vertical_padding
+        end
+      end
+
+    bottom_bounds =
+      for i <- 0..Kernel.-(nr_of_rows, 1) do
+        if i == Kernel.-(nr_of_rows, 1) do
+          y + total_height
+        else
+          y + total_height * (Kernel.+(i, 1) / nr_of_rows) - half_vertical_padding
+        end
+      end
+
+    for {top, bottom} <- Enum.zip(top_bounds, bottom_bounds) do
+      for {left, right} <- Enum.zip(left_bounds, right_bounds) do
+        [left: left, right: right, top: top, bottom: bottom]
+      end
+    end
+  end
+
+  defp align_decorations_areas(figure) do
+    align_group_bottom(figure)
+    align_group_top(figure)
+    align_group_left(figure)
+    align_group_right(figure)
+    figure
+  end
+
+  defp align_group_bottom(figure) do
+    align_group_of_plots(figure, fn p -> p.current_bottom_bound end, fn p1, p2 ->
+      assert(p1.bottom_decorations_area.y, :==, p2.bottom_decorations_area.y)
+      assert(p1.bottom_decorations_area.height, :==, p2.bottom_decorations_area.height)
+    end)
+  end
+
+  defp align_group_top(figure) do
+    align_group_of_plots(figure, fn p -> p.current_top_bound end, fn p1, p2 ->
+      assert(p1.top_decorations_area.y, :==, p2.top_decorations_area.y)
+      assert(p1.top_decorations_area.height, :==, p2.top_decorations_area.height)
+    end)
+  end
+
+  defp align_group_left(figure) do
+    align_group_of_plots(figure, fn p -> p.current_left_bound end, fn p1, p2 ->
+      assert(p1.left_decorations_area.x, :==, p2.left_decorations_area.x)
+      assert(p1.left_decorations_area.width, :==, p2.left_decorations_area.width)
+    end)
+  end
+
+  defp align_group_right(figure) do
+    align_group_of_plots(figure, fn p -> p.current_right_bound end, fn p1, p2 ->
+      assert(p1.right_decorations_area.x, :==, p2.right_decorations_area.x)
+      assert(p1.right_decorations_area.width, :==, p2.right_decorations_area.width)
+    end)
+  end
+
+  defp align_group_of_plots(figure, plot_bound_fun, assertions_fun) do
+    groups =
+      Enum.group_by(
+        figure.plots,
+        fn {_plot_id, plot} -> plot_bound_fun.(plot) end,
+        fn {plot_id, _plot} -> plot_id end
+      )
+
+    for {_, plot_ids} <- groups do
+      if length(plot_ids) > 1 do
+        for {p_name1, p_name2} <- pairs(plot_ids) do
+          p1 = figure.plots[p_name1]
+          p2 = figure.plots[p_name2]
+
+          assertions_fun.(p1, p2)
+        end
+      end
+    end
+  end
+
+  defp pairs(sequence) do
+    Enum.zip(sequence, Enum.drop(sequence, 1))
+  end
+
+  def debug?() do
+    get_current_figure().debug
+  end
+
+  def render_to_pdf_binary!(figure) do
+    typst_binary = render_to_standalone_typst_binary!(figure)
+    # Render the typst code into PDF
+    ExTypst.render_to_pdf!(typst_binary, [])
+  end
+
+  def render_to_standalone_typst_binary!(figure) do
     # Convert the figure into Typst AST (easier to manipulate than binaries)
     typst_ast = to_typst(figure)
 
     # Serialize the AST into a binary
-    typst_binary =
-      IO.iodata_to_binary([
-        "#set page(width: auto, height: auto, margin: 0.5cm)\n#",
-        Serializer.serialize(typst_ast)
-      ])
+    IO.iodata_to_binary([
+      "#set page(width: auto, height: auto, margin: 0.5cm)\n#",
+      Serializer.serialize(typst_ast)
+    ])
+  end
 
-    # Render the typst code into PDF
-    pdf_binary = ExTypst.render_to_pdf!(typst_binary, [])
+  def render_to_typst_file!(figure, path) do
+    typst_binary = render_to_standalone_typst_binary!(figure)
+    # Save the Typst binary to a file
+    File.write!(path, typst_binary)
+  end
 
+  def render_to_pdf_file!(figure, path) do
+    pdf_binary = render_to_pdf_binary!(figure)
     # Save the PDF to a file
     File.write!(path, pdf_binary)
   end
@@ -224,12 +373,30 @@ defmodule Quartz.Figure do
     %{figure | finalized: true}
   end
 
-  defp apply_scales_to_data(figure) do
-    figure
+  @doc false
+  def apply_scales_to_data(figure) do
+    sketches = figure.sketches
+    lengths = get_all_lengths(figure)
+    axes = get_all_axes(figure)
+
+    new_sketches = Scale.apply_scales_to_sketches(sketches, lengths, axes)
+    new_figure = %{figure | sketches: new_sketches}
+    put_current_figure(new_figure)
+    new_figure
   end
 
-  defp fix_axes_limits(figure) do
-    figure
+  @doc false
+  def get_all_lengths(figure) do
+    Enum.flat_map(figure.sketches, fn {_id, sketch} ->
+      Sketch.lengths(sketch)
+    end)
+  end
+
+  @doc false
+  def get_all_axes(figure) do
+    Enum.flat_map(figure.plots, fn {_plot_id, plot} ->
+      Map.values(plot.axes)
+    end)
   end
 
   defp solve_sketches(figure) do
@@ -237,7 +404,7 @@ defmodule Quartz.Figure do
 
     solved_sketches =
       for {id, sketch} <- figure.sketches, into: %{} do
-        {id, Sketch.solve(sketch)}
+        {id, solve_sketch!(sketch)}
       end
 
     figure = get_current_figure()
@@ -252,7 +419,11 @@ defmodule Quartz.Figure do
 
   def solve(expression) do
     figure = get_current_figure()
-    Dantzig.Solution.evaluate(figure.solution, expression)
+    Polynomial.evaluate(figure.solution, expression)
+  end
+
+  def substitute(expression, substitutions) do
+    Polynomial.substitute(expression, substitutions)
   end
 
   def solve!(expression) do
@@ -260,6 +431,10 @@ defmodule Quartz.Figure do
     result = Dantzig.Solution.evaluate(figure.solution, expression)
     true = is_number(result)
     result
+  end
+
+  def solve_sketch!(sketch) do
+    Sketch.transform_lengths(sketch, &solve!/1)
   end
 
   def share_axes(axes) do
@@ -422,6 +597,66 @@ defmodule Quartz.Figure do
     end
   end
 
+  @doc false
+  def finish_axes(figure) do
+    lengths = get_all_lengths(figure)
+
+    data_lengths_by_axes =
+      Enum.group_by(
+        lengths,
+        &min_max_for_axis_group_fun/1,
+        &min_max_for_axis_value_fun/1
+      )
+
+    min_maxs =
+      for {{plot_id, axis_name}, values} <- data_lengths_by_axes, into: %{} do
+        min_max = Enum.min_max(values, fn -> {0.0, 1.0} end)
+        {{plot_id, axis_name}, min_max}
+      end
+
+    figure =
+      Enum.reduce(min_maxs, figure, fn {{plot_id, axis_name}, {min, max}}, current_figure ->
+        update_plot_axis(current_figure, plot_id, axis_name, fn axis ->
+          axis
+          |> Axis2D.maybe_set_limits(min, max)
+          |> Axis2D.fix_limits()
+        end)
+      end)
+
+    figure
+  end
+
+  defp update_plot(figure, plot_id, fun) do
+    new_plots = Map.update(figure.plots, plot_id, nil, fun)
+    %{figure | plots: new_plots}
+  end
+
+  defp update_plot_axis(figure, plot_id, axis_name, fun) do
+    update_plot(figure, plot_id, fn plot ->
+      Plot2D.update_axis(plot, axis_name, fun)
+    end)
+  end
+
+  defp min_max_for_axis_group_fun(length) do
+    case length do
+      %AxisData{} = axis_data ->
+        {axis_data.plot_id, axis_data.axis_name}
+
+      _other ->
+        nil
+    end
+  end
+
+  defp min_max_for_axis_value_fun(length) do
+    case length do
+      %AxisData{value: value} ->
+        value
+
+      other ->
+        other
+    end
+  end
+
   def center_on(object, container) do
     assert(Sketch.bbox_center(object), :==, Sketch.bbox_center(container))
   end
@@ -457,6 +692,20 @@ defmodule Quartz.Figure do
   end
 
   def assert_contains_horizontally(container, item) do
+    assert(Sketch.bbox_right(item), :<=, Sketch.bbox_right(container))
+    assert(Sketch.bbox_left(item), :>=, Sketch.bbox_left(container))
+
+    :ok
+  end
+
+  def assert_vertically_contained_in(item, container) do
+    assert(Sketch.bbox_top(item), :>=, Sketch.bbox_top(container))
+    assert(Sketch.bbox_bottom(item), :<=, Sketch.bbox_bottom(container))
+
+    :ok
+  end
+
+  def assert_horizontally_contained_in(item, container) do
     assert(Sketch.bbox_right(item), :<=, Sketch.bbox_right(container))
     assert(Sketch.bbox_left(item), :>=, Sketch.bbox_left(container))
 

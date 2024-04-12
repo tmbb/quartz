@@ -23,7 +23,12 @@ defmodule Quartz.MixProject do
     [
       {:dantzig, path: "../dantzig"},
       {:decimal, "> 0.0.0"},
-      {:ex_typst, "~> 0.1"}
+      {:ex_typst, "~> 0.1"},
+      {:conrex, "~> 1.0.0"},
+      {:benchee, "~> 1.3"},
+      {:explorer, "~> 0.8"},
+      {:rustler, "~> 0.31", override: true},
+      {:incendium, "~> 0.4", only: [:dev, :test]}
     ]
   end
 end

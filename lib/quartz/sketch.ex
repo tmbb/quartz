@@ -1,7 +1,8 @@
 defprotocol Quartz.Sketch do
   alias Quartz.Point2D
   alias Dantzig.Polynomial
-  alias Quartz.AxisData
+
+  @type length :: Polynomial.t() | number()
 
   @spec top_center(t()) :: Point2D.t()
   def top_center(obj)
@@ -27,32 +28,35 @@ defprotocol Quartz.Sketch do
   @spec top_left(t()) :: Point2D.t()
   def top_left(obj)
 
-  @spec bbox_center(t()) :: Polynomial.t() | number()
+  @spec bbox_center(t()) :: length()
   def bbox_center(obj)
 
-  @spec bbox_horizon(t()) :: Polynomial.t() | number()
+  @spec bbox_horizon(t()) :: length()
   def bbox_horizon(obj)
 
-  @spec bbox_top(t()) :: Polynomial.t() | number()
+  @spec bbox_top(t()) :: length()
   def bbox_top(obj)
 
-  @spec bbox_left(t()) :: Polynomial.t() | number()
+  @spec bbox_left(t()) :: length()
   def bbox_left(obj)
 
-  @spec bbox_left(t()) :: Polynomial.t() | number()
+  @spec bbox_left(t()) :: length()
   def bbox_right(obj)
 
-  @spec bbox_bottom(t()) :: Polynomial.t() | number()
+  @spec bbox_bottom(t()) :: length()
   def bbox_bottom(obj)
 
-  @spec bbox_height(t()) :: Polynomial.t() | number()
+  @spec bbox_height(t()) :: length()
   def bbox_height(obj)
 
-  @spec bbox_width(t()) :: Polynomial.t() | number()
+  @spec bbox_width(t()) :: length()
   def bbox_width(obj)
 
-  @spec solve(t()) :: t()
-  def solve(obj)
+  # @spec solve(t()) :: t()
+  # def solve(obj)
+
+  @spec transform_lengths(t(), (length() -> length())) :: t()
+  def transform_lengths(obj, fun)
 
   @spec lengths(t()) :: list(number())
   def lengths(obj)

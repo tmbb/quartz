@@ -602,7 +602,7 @@ defmodule Quartz.Color.FunctionBuilder do
               red: unquote(r),
               green: unquote(g),
               blue: unquote(b),
-              alpha: 255
+              alpha: 0
             }
           end
 

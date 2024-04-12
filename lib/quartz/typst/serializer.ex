@@ -26,7 +26,7 @@ defmodule Quartz.Typst.Serializer do
   end
 
   def serialize(%TypstAst{kind: :float, data: %{value: value}}, _indent) do
-    to_string(value)
+    value |> Float.round(2) |> to_string()
   end
 
   def serialize(%TypstAst{kind: :string, data: %{value: value}}, _indent) do

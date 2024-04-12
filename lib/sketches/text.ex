@@ -159,7 +159,7 @@ defmodule Quartz.Text do
 
     @impl true
     def bbox_horizon(text) do
-      (0.5 * (bbox_top(text) + bbox_bottom(text)))
+      0.5 * (bbox_top(text) + bbox_bottom(text))
     end
 
     @impl true
@@ -202,13 +202,19 @@ defmodule Quartz.Text do
     end
 
     @impl true
-    def solve(text) do
-      solved_x = Figure.solve!(text.x)
-      solved_y = Figure.solve!(text.y)
-      solved_width = Figure.solve!(text.width)
-      solved_height = Figure.solve!(text.height)
+    def transform_lengths(text, fun) do
+      transformed_x = fun.(text.x)
+      transformed_y = fun.(text.y)
+      transformed_width = fun.(text.width)
+      transformed_height = fun.(text.height)
 
-      %{text | x: solved_x, y: solved_y, width: solved_width, height: solved_height}
+      %{
+        text
+        | x: transformed_x,
+          y: transformed_y,
+          width: transformed_width,
+          height: transformed_height
+      }
     end
 
     alias Quartz.Typst.TypstValue
@@ -226,7 +232,11 @@ defmodule Quartz.Text do
           rotation ->
             TypstAst.function_call(
               TypstAst.variable("rotate"),
-              [TypstAst.raw("#{-rotation}deg"), unrotated_typst_text]
+              [TypstAst.raw("#{rotation}deg")] ++
+                TypstAst.named_arguments_from_proplist(
+                  origin:
+                    TypstAst.operator("+", TypstAst.variable("top"), TypstAst.variable("left"))
+                ) ++ [unrotated_typst_text]
             )
         end
 

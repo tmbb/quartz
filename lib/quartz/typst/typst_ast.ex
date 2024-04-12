@@ -9,8 +9,13 @@ defmodule Quartz.Typst.TypstAst do
     %TypstAst{kind: :raw, data: %{content: content}}
   end
 
-  def pt(value) do
+  def pt(value) when is_integer(value) do
     raw("#{value}pt")
+  end
+
+  def pt(value) when is_float(value) do
+    rounded_float = Float.round(value, 3)
+    raw("#{rounded_float}pt")
   end
 
   def sequence(items) when is_list(items) do

@@ -6,10 +6,25 @@ defmodule Quartz.Line do
             x1: nil,
             y1: nil,
             x2: nil,
-            y2: nil
+            y2: nil,
+            stroke_paint: nil,
+            stroke_cap: "square",
+            stroke_thickness: nil,
+            stroke_join: nil,
+            stroke_dash: nil
+
+  require Quartz.KeywordSpec, as: KeywordSpec
 
   def new(opts \\ []) do
-    prefix = Keyword.get(opts, :prefix, nil)
+    KeywordSpec.validate!(opts, [
+      prefix,
+      stroke_paint,
+      stroke_thickness,
+      stroke_join,
+      stroke_dash,
+      stroke_cap: "square"
+    ])
+
     # Assign variables (= Dantzig monomials) to the parameters of the line
     x1 = Variable.maybe_variable(opts, :x1, Variable.maybe_with_prefix(prefix, "line_x1"), [])
     y1 = Variable.maybe_variable(opts, :y1, Variable.maybe_with_prefix(prefix, "line_y1"), [])
@@ -18,10 +33,24 @@ defmodule Quartz.Line do
 
     # Get the next available ID from the figure
     id = Figure.get_id()
+
     # Create the actual line
-    line = %__MODULE__{id: id, x1: x1, y1: y1, x2: x2, y2: y2}
+    line = %__MODULE__{
+      id: id,
+      x1: x1,
+      y1: y1,
+      x2: x2,
+      y2: y2,
+      stroke_join: stroke_join,
+      stroke_paint: stroke_paint,
+      stroke_thickness: stroke_thickness,
+      stroke_dash: stroke_dash,
+      stroke_cap: stroke_cap
+    }
+
     # Add the line to the figure
     Figure.add_sketch(id, line)
+
     # Return the line, with no reference to the figure
     line
   end
@@ -148,32 +177,50 @@ defmodule Quartz.Line do
     end
 
     @impl true
-    def solve(line) do
-      solved_x = Figure.solve!(line.x1)
-      solved_y = Figure.solve!(line.y1)
-      solved_x2 = Figure.solve!(line.x2)
-      solved_y2 = Figure.solve!(line.y2)
+    def transform_lengths(line, fun) do
+      transform_x = fun.(line.x1)
+      transform_y = fun.(line.y1)
+      transform_x2 = fun.(line.x2)
+      transform_y2 = fun.(line.y2)
 
-      %{line | x1: solved_x, y1: solved_y, x2: solved_x2, y2: solved_y2}
+      %{line | x1: transform_x, y1: transform_y, x2: transform_x2, y2: transform_y2}
     end
 
     alias Quartz.Typst.TypstAst
 
     @impl true
     def to_typst(line) do
-      typst_line = TypstAst.function_call(
-        TypstAst.variable("line"),
-        TypstAst.named_arguments_from_proplist(
-          start: TypstAst.array([
+      stroke_cap_props = [
+        paint: line.stroke_paint,
+        cap: line.stroke_cap,
+        thickness: line.stroke_thickness,
+        join: line.stroke_join,
+        dash: line.stroke_dash
+      ]
+
+      stroke_cap_props = Enum.reject(stroke_cap_props, fn {_key, value} -> value == nil end)
+
+      stroke = TypstAst.named_arguments_from_proplist(stroke_cap_props)
+
+      line_props = [
+        start:
+          TypstAst.array([
             TypstAst.pt(line.x1),
             TypstAst.pt(line.y1)
           ]),
-          end: TypstAst.array([
+        end:
+          TypstAst.array([
             TypstAst.pt(line.x2),
             TypstAst.pt(line.y2)
-          ])
+          ]),
+        stroke: stroke
+      ]
+
+      typst_line =
+        TypstAst.function_call(
+          TypstAst.variable("line"),
+          TypstAst.named_arguments_from_proplist(line_props)
         )
-      )
 
       TypstAst.place(0, 0, typst_line)
     end

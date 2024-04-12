@@ -1,12 +1,22 @@
 defmodule Quartz.Canvas do
   alias Quartz.Figure
   alias Quartz.Variable
+  alias Quartz.Length
+  alias Quartz.Color.RGB
+
+  @debug_stroke %{
+    thickness: Length.pt(0.5),
+    paint: RGB.gray(),
+    dash: "dotted"
+  }
 
   defstruct id: nil,
             x: nil,
             y: nil,
             width: nil,
-            height: nil
+            height: nil,
+            stroke: nil,
+            contents: nil
 
   def new(opts \\ []) do
     prefix = Keyword.get(opts, :prefix, nil)
@@ -24,12 +34,34 @@ defmodule Quartz.Canvas do
         min: 0
       )
 
+    stroke =
+      case Keyword.fetch(opts, :stroke) do
+        {:ok, value} ->
+          value
+
+        :error ->
+          case Figure.debug?() do
+            true -> @debug_stroke
+            false -> nil
+          end
+      end
+
     # Get the next available ID from the figure
     id = Figure.get_id()
+
     # Create the actual canvas
-    canvas = %__MODULE__{id: id, x: x, y: y, height: height, width: width}
+    canvas = %__MODULE__{
+      id: id,
+      x: x,
+      y: y,
+      height: height,
+      width: width,
+      stroke: stroke
+    }
+
     # Add the canvas to the figure
     Figure.add_sketch(id, canvas)
+
     # Return the canvas, with no reference to the figure
     canvas
   end
@@ -37,28 +69,7 @@ defmodule Quartz.Canvas do
   defimpl Quartz.Sketch do
     use Dantzig.Polynomial.Operators
     alias Quartz.Point2D
-    alias Quartz.Color.RGB
-
-    def to_color_component(float_between_0_and_1) do
-      trunc(Kernel.+(64, Kernel.*(float_between_0_and_1, 191)))
-    end
-
-    def pseudorandom_color(id) do
-      n1 = rem(Kernel.*(id, 172), 897_577)
-      n2 = rem(Kernel.*(id, 7872), 543_566)
-      n3 = rem(Kernel.*(id, 971), 228_798)
-
-      s0 = :rand.seed_s(:exsss, {n1, n2, n3})
-      {r, s1} = :rand.uniform_s(s0)
-      {g, s2} = :rand.uniform_s(s1)
-      {b, _s3} = :rand.uniform_s(s2)
-
-      red = to_color_component(r)
-      green = to_color_component(g)
-      blue = to_color_component(b)
-
-      %RGB{red: red, green: green, blue: blue, alpha: 64}
-    end
+    alias Quartz.Typst.TypstAst
 
     defp horizontal_center(canvas) do
       (canvas.x + canvas.width) * 0.5
@@ -178,28 +189,48 @@ defmodule Quartz.Canvas do
     end
 
     @impl true
-    def solve(canvas) do
-      solved_x = Figure.solve!(canvas.x)
-      solved_y = Figure.solve!(canvas.y)
-      solved_width = Figure.solve!(canvas.width)
-      solved_height = Figure.solve!(canvas.height)
+    def transform_lengths(canvas, fun) do
+      transformed_x = fun.(canvas.x)
+      transformed_y = fun.(canvas.y)
+      transformed_width = fun.(canvas.width)
+      transformed_height = fun.(canvas.height)
 
-      %{canvas | x: solved_x, y: solved_y, width: solved_width, height: solved_height}
+      %{
+        canvas
+        | x: transformed_x,
+          y: transformed_y,
+          width: transformed_width,
+          height: transformed_height
+      }
     end
-
-    alias Quartz.Typst.TypstAst
 
     @impl true
     def to_typst(canvas) do
+      stroke =
+        if canvas.stroke do
+          # Get the parameters for the stroke
+          thickness = Access.get(canvas.stroke, :thickness, 0.75)
+          paint = Access.get(canvas.stroke, :paint, TypstAst.variable("gray"))
+          dash = Access.get(canvas.stroke, :dash, "dotted")
+
+          # NOTE: we can't just feed the stroke map into the TypstAst.dictionary/1
+          # function because there is no way to tell Typst that the thickness
+          # is a length. Lengths in Quartz are represented just like any
+          # other number (there is currently no good way around it)
+          TypstAst.dictionary(
+            thickness: TypstAst.pt(thickness),
+            paint: paint,
+            dash: dash
+          )
+        else
+          :none
+        end
+
       box =
         TypstAst.function_call(
           TypstAst.variable("rect"),
           TypstAst.named_arguments_from_proplist(
-            stroke: TypstAst.dictionary([
-              thickness: TypstAst.pt(0.75),
-              paint: TypstAst.variable("gray"),
-              dash: TypstAst.string("dotted")
-            ]),
+            stroke: stroke,
             width: TypstAst.pt(canvas.width),
             height: TypstAst.pt(canvas.height)
           )

@@ -1,18 +1,19 @@
 Running HiGHS 1.4.0 [date: 1970-01-01, git hash: bcf6c0b22]
 Copyright (c) 2022 ERGO-Code under MIT licence terms
-LP   1FQMLDO_model has 210 rows; 176 cols; 556 nonzeros
+WARNING: LP matrix packed vector contains 3 |values| in [3.06162e-17, 6.12323e-17] less than or equal to 1e-09: ignored
+LP   226K86U_model has 118 rows; 96 cols; 307 nonzeros
 Presolving model
-78 rows, 44 cols, 210 nonzeros
-26 rows, 30 cols, 72 nonzeros
-26 rows, 30 cols, 72 nonzeros
-Presolve : Reductions: rows 26(-184); columns 30(-146); elements 72(-484)
+41 rows, 26 cols, 107 nonzeros
+11 rows, 14 cols, 31 nonzeros
+11 rows, 13 cols, 30 nonzeros
+Presolve : Reductions: rows 11(-107); columns 13(-83); elements 30(-277)
 Solving the presolved LP
 Using EKK dual simplex solver - serial
   Iteration        Objective     Infeasibilities num(sum)
-          0    -3.9999937422e+00 Ph1: 14(12000); Du: 4(3.99999) 0s
-         26    -1.8446078740e+02 Pr: 0(0) 0s
+          0    -5.9999823579e+00 Ph1: 7(6000); Du: 2(5.99998) 0s
+         10    -7.9270535433e+02 Pr: 0(0) 0s
 Solving the original LP from the solution after postsolve
 Model   status      : Optimal
-Simplex   iterations: 26
-Objective value     :  1.8446078740e+02
+Simplex   iterations: 10
+Objective value     :  7.9270535433e+02
 HiGHS run time      :          0.00

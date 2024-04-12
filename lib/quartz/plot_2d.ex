@@ -2,30 +2,52 @@ defmodule Quartz.Plot2D do
   require Quartz.Figure, as: Figure
   alias Quartz.Canvas
   alias Quartz.Axis2D
+  alias Quartz.AxisData
+  alias Quartz.AxisReference
+  alias Quartz.Circle
+  alias Quartz.Line
+  alias Quartz.Plot2DElement
   alias Quartz.Length
   alias Quartz.Text
   alias Quartz.Sketch
   alias Quartz.Typst.TypstAst
   alias Quartz.Config
+  alias Quartz.Color.RGB
+
+  require Quartz.KeywordSpec, as: KeywordSpec
+
+  alias Dantzig.Polynomial
   use Dantzig.Polynomial.Operators
+
+  @decorations_area_content_padding Length.pt(7)
+  @boundaries_padding Length.pt(10)
+  @title_inner_padding Length.pt(12)
 
   defstruct id: nil,
             title: nil,
             title_alignment: :left,
             title_location: :left,
-            title_inner_padding: Length.pt(5),
-            padding_top: Length.pt(5),
-            padding_right: Length.pt(5),
-            padding_bottom: Length.pt(5),
-            padding_left: Length.pt(5),
+            title_inner_padding: @title_inner_padding,
+            padding_top: @boundaries_padding,
+            padding_right: @boundaries_padding,
+            padding_bottom: @boundaries_padding,
+            padding_left: @boundaries_padding,
             top: nil,
             bottom: nil,
             left: nil,
             right: nil,
+            current_top_bound: nil,
+            current_left_bound: nil,
+            current_right_bound: nil,
+            current_bottom_bound: nil,
             top_content: [],
             right_content: [],
             bottom_content: [],
             left_content: [],
+            top_content_padding: @decorations_area_content_padding,
+            bottom_content_padding: @decorations_area_content_padding,
+            left_content_padding: @decorations_area_content_padding,
+            right_content_padding: @decorations_area_content_padding,
             data: [],
             axes: %{},
             plot_area: nil,
@@ -40,88 +62,7 @@ defmodule Quartz.Plot2D do
             left_decorations_area: nil,
             top_left_decorations_area: nil
 
-  def add_bottom_axis(plot, name, axis) do
-    axis = %{axis | location: :bottom}
-    axis = Axis2D.put_plot_id(axis, plot.id)
-    new_axes = Map.put(plot.axes, name, axis)
-    new_bottom = [{:axis_ref, name} | plot.bottom_content]
-
-    %{plot | axes: new_axes, bottom_content: new_bottom}
-  end
-
-  def add_top_axis(plot, name, axis) do
-    axis = %{axis | location: :top}
-    axis = Axis2D.put_plot_id(axis, plot.id)
-    new_axes = Map.put(plot.axes, name, axis)
-    new_top = [{:axis_ref, name} | plot.top_content]
-
-    %{plot | axes: new_axes, top_content: new_top}
-  end
-
-  def add_left_axis(plot, name, axis) do
-    axis = %{axis | location: :left}
-    axis = Axis2D.put_plot_id(axis, plot.id)
-    new_axes = Map.put(plot.axes, name, axis)
-    new_left = [{:axis_ref, name} | plot.left_content]
-
-    %{plot | axes: new_axes, left_content: new_left}
-  end
-
-  def add_right_axis(plot, name, axis) do
-    axis = %{axis | location: :right}
-    axis = Axis2D.put_plot_id(axis, plot.id)
-    new_axes = Map.put(plot.axes, name, axis)
-    new_right = [{:axis_ref, name} | plot.right_content]
-
-    %{plot | axes: new_axes, right_content: new_right}
-  end
-
-  def get_axis(plot, name) do
-    Map.get(plot.axes, name)
-  end
-
-  def fetch_axis(plot, name) do
-    Map.fetch(plot.axes, name)
-  end
-
-  def fetch_axis!(plot, name) do
-    Map.fetch!(plot.axes, name)
-  end
-
-  def align_bbox(elements, fun) do
-    for {e1, e2} <- Enum.zip(elements, Enum.drop(elements, 1)) do
-      Figure.assert(fun.(e1) == fun.(e2))
-    end
-  end
-
-  def align_top(elements), do: align_bbox(elements, &Sketch.bbox_top/1)
-  def align_left(elements), do: align_bbox(elements, &Sketch.bbox_left/1)
-  def align_right(elements), do: align_bbox(elements, &Sketch.bbox_right/1)
-  def align_bottom(elements), do: align_bbox(elements, &Sketch.bbox_bottom/1)
-
-  def stack_horizontally_inside_container(elements = [_first_element | _], container) do
-    first = Enum.at(elements, 0)
-    last = Enum.at(elements, -1)
-
-    for {e1, e2} <- Enum.zip(elements, Enum.drop(elements, 1)) do
-      Figure.assert(Sketch.bbox_right(e1) == Sketch.bbox_left(e2))
-    end
-
-    Figure.assert(Sketch.bbox_left(first) >= Sketch.bbox_left(container))
-    Figure.assert(Sketch.bbox_right(last) <= Sketch.bbox_right(container))
-  end
-
-  def stack_vertically_inside_container(elements = [_first_element | _], container) do
-    first = Enum.at(elements, 0)
-    last = Enum.at(elements, -1)
-
-    for {e1, e2} <- Enum.zip(elements, Enum.drop(elements, 1)) do
-      Figure.assert(Sketch.bbox_bottom(e1) == Sketch.bbox_top(e2))
-    end
-
-    Figure.assert(Sketch.bbox_top(first) >= Sketch.bbox_top(container))
-    Figure.assert(Sketch.bbox_bottom(last) <= Sketch.bbox_bottom(container))
-  end
+  @type t :: %__MODULE__{}
 
   def new(opts \\ []) do
     plot_id =
@@ -130,10 +71,12 @@ defmodule Quartz.Plot2D do
         :error -> Figure.get_id()
       end
 
-    top = Keyword.get(opts, :top, 0.0)
-    bottom = Keyword.get(opts, :bottom, Figure.current_figure_height())
-    left = Keyword.get(opts, :left, 0.0)
-    right = Keyword.get(opts, :right, Figure.current_figure_height())
+    top = Figure.variable("plot_bounds_top", [])
+    bottom = Figure.variable("plot_bounds_bottom", [])
+    left = Figure.variable("plot_bounds_left", [])
+    right = Figure.variable("plot_bounds_right", [])
+
+    bounds = Keyword.get(opts, :bounds, [])
 
     plot_area = Canvas.new(prefix: "plot_area")
     title_area = Canvas.new(prefix: "title_area")
@@ -209,9 +152,6 @@ defmodule Quartz.Plot2D do
     align_left(right_areas)
     align_right(right_areas)
 
-    # Figure.assert(Sketch.bbox_right(top_left_decorations_area) <= Sketch.bbox_left(top_decorations_area))
-    # Figure.assert(top_left_decorations_area.x + top_left_decorations_area.width <= top_decorations_area.x)
-
     stack_horizontally_inside_container(top_areas, plot_area)
     stack_horizontally_inside_container(horizon_areas, plot_area)
     stack_horizontally_inside_container(bottom_areas, plot_area)
@@ -219,12 +159,6 @@ defmodule Quartz.Plot2D do
     stack_vertically_inside_container([title_area | left_areas], plot_area)
     stack_vertically_inside_container([title_area | center_areas], plot_area)
     stack_vertically_inside_container([title_area | right_areas], plot_area)
-
-    Figure.assert(title_area.height >= Length.pt(8))
-    Figure.assert(top_decorations_area.height >= Length.pt(8))
-    Figure.assert(left_decorations_area.width >= Length.pt(8))
-    Figure.assert(right_decorations_area.width >= Length.pt(8))
-    Figure.assert(bottom_decorations_area.height >= Length.pt(8))
 
     Figure.maximize(data_area.width)
     Figure.maximize(data_area.height)
@@ -235,11 +169,6 @@ defmodule Quartz.Plot2D do
     Figure.minimize(right_decorations_area.width)
     Figure.minimize(left_decorations_area.width)
 
-    axis_x = Axis2D.new("x", location: :bottom)
-    axis_y = Axis2D.new("y", location: :left)
-    axis_x2 = Axis2D.new("x2", location: :top)
-    axis_y2 = Axis2D.new("y2", location: :right)
-
     plot = %__MODULE__{
       id: plot_id,
       title: nil,
@@ -247,6 +176,10 @@ defmodule Quartz.Plot2D do
       bottom: bottom,
       left: left,
       right: right,
+      current_top_bound: nil,
+      current_bottom_bound: nil,
+      current_left_bound: nil,
+      current_right_bound: nil,
       plot_area: plot_area,
       title_area: title_area,
       data_area: data_area,
@@ -261,10 +194,109 @@ defmodule Quartz.Plot2D do
     }
 
     plot
-    |> add_bottom_axis("x", axis_x)
-    |> add_left_axis("y", axis_y)
-    |> add_top_axis("x2", axis_x2)
-    |> add_right_axis("y2", axis_y2)
+    |> set_bounds(bounds)
+    |> add_bottom_axis("x")
+    |> add_left_axis("y")
+    |> add_top_axis("x2")
+    |> add_right_axis("y2")
+  end
+
+  def set_bounds(plot, bounds) do
+    top_bound = Access.get(bounds, :top, 0.0)
+    bottom_bound = Access.get(bounds, :bottom, Figure.current_figure_height())
+    left_bound = Access.get(bounds, :left, 0.0)
+    right_bound = Access.get(bounds, :right, Figure.current_figure_width())
+
+    %{
+      plot
+      | current_top_bound: top_bound,
+        current_bottom_bound: bottom_bound,
+        current_left_bound: left_bound,
+        current_right_bound: right_bound
+    }
+  end
+
+  def add_bottom_axis(plot, name, opts \\ []) do
+    axis = Axis2D.new(name, Keyword.put(opts, :location, :bottom))
+    axis = Axis2D.put_plot_id(axis, plot.id)
+    new_axes = Map.put(plot.axes, name, axis)
+    new_bottom = [%AxisReference{name: name} | plot.bottom_content]
+
+    %{plot | axes: new_axes, bottom_content: new_bottom}
+  end
+
+  def add_top_axis(plot, name, opts \\ []) do
+    axis = Axis2D.new(name, Keyword.put(opts, :location, :top))
+    axis = Axis2D.put_plot_id(axis, plot.id)
+    new_axes = Map.put(plot.axes, name, axis)
+    new_top = [%AxisReference{name: name} | plot.top_content]
+
+    %{plot | axes: new_axes, top_content: new_top}
+  end
+
+  def add_left_axis(plot, name, opts \\ []) do
+    axis = Axis2D.new(name, Keyword.put(opts, :location, :left))
+    axis = Axis2D.put_plot_id(axis, plot.id)
+    new_axes = Map.put(plot.axes, name, axis)
+    new_left = [%AxisReference{name: name} | plot.left_content]
+
+    %{plot | axes: new_axes, left_content: new_left}
+  end
+
+  def add_right_axis(plot, name, opts \\ []) do
+    axis = Axis2D.new(name, Keyword.put(opts, :location, :right))
+    axis = Axis2D.put_plot_id(axis, plot.id)
+    new_axes = Map.put(plot.axes, name, axis)
+    new_right = [%AxisReference{name: name} | plot.right_content]
+
+    %{plot | axes: new_axes, right_content: new_right}
+  end
+
+  def get_axis(plot, name) do
+    Map.get(plot.axes, name)
+  end
+
+  def fetch_axis(plot, name) do
+    Map.fetch(plot.axes, name)
+  end
+
+  def fetch_axis!(plot, name) do
+    Map.fetch!(plot.axes, name)
+  end
+
+  def align_bbox(elements, fun) do
+    for {e1, e2} <- Enum.zip(elements, Enum.drop(elements, 1)) do
+      Figure.assert(fun.(e1) == fun.(e2))
+    end
+  end
+
+  def align_top(elements), do: align_bbox(elements, &Sketch.bbox_top/1)
+  def align_left(elements), do: align_bbox(elements, &Sketch.bbox_left/1)
+  def align_right(elements), do: align_bbox(elements, &Sketch.bbox_right/1)
+  def align_bottom(elements), do: align_bbox(elements, &Sketch.bbox_bottom/1)
+
+  def stack_horizontally_inside_container(elements = [_first_element | _], container) do
+    first = Enum.at(elements, 0)
+    last = Enum.at(elements, -1)
+
+    for {e1, e2} <- Enum.zip(elements, Enum.drop(elements, 1)) do
+      Figure.assert(Sketch.bbox_right(e1) == Sketch.bbox_left(e2))
+    end
+
+    Figure.assert(Sketch.bbox_left(first) >= Sketch.bbox_left(container))
+    Figure.assert(Sketch.bbox_right(last) <= Sketch.bbox_right(container))
+  end
+
+  def stack_vertically_inside_container(elements = [_first_element | _], container) do
+    first = Enum.at(elements, 0)
+    last = Enum.at(elements, -1)
+
+    for {e1, e2} <- Enum.zip(elements, Enum.drop(elements, 1)) do
+      Figure.assert(Sketch.bbox_bottom(e1) == Sketch.bbox_top(e2))
+    end
+
+    Figure.assert(Sketch.bbox_top(first) >= Sketch.bbox_top(container))
+    Figure.assert(Sketch.bbox_bottom(last) <= Sketch.bbox_bottom(container))
   end
 
   def put_axis_label(plot, axis_name, text, opts \\ []) do
@@ -273,11 +305,46 @@ defmodule Quartz.Plot2D do
     end)
   end
 
+  def put_axis_scale(plot, axis_name, scale) do
+    update_axis(plot, axis_name, fn axis ->
+      Axis2D.put_scale(axis, scale)
+    end)
+  end
+
   def update_axis(plot, axis_name, fun) do
     axis = Map.fetch!(plot.axes, axis_name)
     updated_axis = fun.(axis)
     new_axes = Map.put(plot.axes, axis_name, updated_axis)
     %{plot | axes: new_axes}
+  end
+
+  def put_minimum_axis_start_margin(plot, axis_name, value) do
+    update_axis(plot, axis_name, fn axis ->
+      Axis2D.put_minimum_start_margin(axis, value)
+    end)
+  end
+
+  def put_minimum_axis_end_margin(plot, axis_name, value) do
+    update_axis(plot, axis_name, fn axis ->
+      Axis2D.put_minimum_end_margin(axis, value)
+    end)
+  end
+
+  def put_minimum_axis_margins(plot, axis_name, value) do
+    update_axis(plot, axis_name, fn axis ->
+      Axis2D.put_minimum_margins(axis, value)
+    end)
+  end
+
+  def put_axes_margins(plot, value, opts \\ []) do
+    axis_names = Keyword.get(opts, :axes, get_axes_names(plot))
+    Enum.reduce(axis_names, plot, fn axis_name, plot ->
+      put_minimum_axis_margins(plot, axis_name, value)
+    end)
+  end
+
+  defp get_axes_names(plot) do
+    Map.keys(plot.axes)
   end
 
   def put_title(plot, title, opts \\ []) do
@@ -303,106 +370,81 @@ defmodule Quartz.Plot2D do
   end
 
   def finalize(plot) do
+    plot = fix_bounds(plot)
     :ok = Figure.put_plot_in_current_figure(plot)
     plot
   end
 
-  def draw_bottom_content(plot) do
+  def draw_bottom_content(plot, padding) do
     x0 = plot.bottom_decorations_area.x
     y0 = plot.bottom_decorations_area.y
 
-    Enum.reduce(plot.bottom_content, y0, fn element, y ->
-      drawn =
-        case element do
-          {:axis_ref, name} ->
-            axis = fetch_axis!(plot, name)
-            Axis2D.draw_bottom_axis(plot, x0, y, axis)
+    reordered_content = Enum.reverse(plot.bottom_content)
 
-          _ ->
-            raise "Ooops"
-        end
-
-      Figure.assert(Sketch.bbox_top(drawn) >= Sketch.bbox_top(plot.bottom_decorations_area))
-      Figure.assert(Sketch.bbox_bottom(drawn) <= Sketch.bbox_bottom(plot.bottom_decorations_area))
-
-      Sketch.bbox_bottom(drawn)
+    Enum.reduce(reordered_content, y0, fn element, y ->
+      drawn = Plot2DElement.draw(element, plot, x0, y)
+      Figure.assert_vertically_contained_in(drawn, plot.bottom_decorations_area)
+      Sketch.bbox_bottom(drawn) + padding
     end)
+
+    :ok
   end
 
-  def draw_top_content(plot) do
+  def draw_top_content(plot, padding) do
     x0 = plot.top_decorations_area.x
     y0 = Sketch.bbox_bottom(plot.top_decorations_area)
 
-    Enum.reduce(plot.top_content, y0, fn element, y ->
-      drawn =
-        case element do
-          {:axis_ref, name} ->
-            axis = fetch_axis!(plot, name)
-            Axis2D.draw_top_axis(plot, x0, y, axis)
+    reordered_content = Enum.reverse(plot.top_content)
 
-          _ ->
-            raise "Ooops"
-        end
-
-      Figure.assert(Sketch.bbox_top(drawn) >= Sketch.bbox_top(plot.top_decorations_area))
-      Figure.assert(Sketch.bbox_bottom(drawn) <= Sketch.bbox_bottom(plot.top_decorations_area))
-
-      y - Sketch.bbox_height(drawn)
+    Enum.reduce(reordered_content, y0, fn element, y ->
+      drawn = Plot2DElement.draw(element, plot, x0, y)
+      Figure.assert_vertically_contained_in(drawn, plot.top_decorations_area)
+      y - Sketch.bbox_height(drawn) - padding
     end)
+
+    :ok
   end
 
-  def draw_left_content(plot) do
+  def draw_left_content(plot, padding) do
     x0 = Sketch.bbox_right(plot.left_decorations_area)
     y0 = plot.left_decorations_area.y
 
-    Enum.reduce(plot.left_content, x0, fn element, x ->
-      drawn =
-        case element do
-          {:axis_ref, name} ->
-            axis = fetch_axis!(plot, name)
-            Axis2D.draw_left_axis(plot, x, y0, axis)
+    reordered_content = Enum.reverse(plot.left_content)
 
-          _ ->
-            raise "Ooops"
-        end
-
-      Figure.assert(Sketch.bbox_left(drawn) >= Sketch.bbox_left(plot.left_decorations_area))
-      Figure.assert(Sketch.bbox_right(drawn) <= Sketch.bbox_right(plot.left_decorations_area))
-
-      x - Sketch.bbox_width(drawn)
+    Enum.reduce(reordered_content, x0, fn element, x ->
+      drawn = Plot2DElement.draw(element, plot, x, y0)
+      Figure.assert_horizontally_contained_in(drawn, plot.left_decorations_area)
+      x - Sketch.bbox_width(drawn) - padding
     end)
+
+    :ok
   end
 
-  def draw_right_content(plot) do
+  def draw_right_content(plot, padding) do
     x0 = plot.right_decorations_area.x
     y0 = plot.right_decorations_area.y
 
-    Enum.reduce(plot.right_content, x0, fn element, x ->
-      drawn =
-        case element do
-          {:axis_ref, name} ->
-            axis = fetch_axis!(plot, name)
-            Axis2D.draw_right_axis(plot, x, y0, axis)
+    reordered_content = Enum.reverse(plot.right_content)
 
-          _ ->
-            raise "Ooops"
-        end
-
-      Figure.assert(Sketch.bbox_left(drawn) >= Sketch.bbox_left(plot.right_decorations_area))
-      Figure.assert(Sketch.bbox_right(drawn) <= Sketch.bbox_right(plot.right_decorations_area))
-
-      x + Sketch.bbox_width(drawn)
+    Enum.reduce(reordered_content, x0, fn element, x ->
+      drawn = Plot2DElement.draw(element, plot, x, y0)
+      Figure.assert_horizontally_contained_in(drawn, plot.right_decorations_area)
+      Sketch.bbox_right(drawn) + padding
     end)
+
+    :ok
   end
 
   def draw_title(plot) do
     if plot.title do
+      y_offset = -1 * plot.title_inner_padding
+
       Figure.position_with_location_and_alignment(
         plot.title,
         plot.title_area,
         x_location: :left,
         y_location: :bottom,
-        y_offset: -plot.title_inner_padding,
+        y_offset: y_offset,
         contains_vertically?: true
       )
     end
@@ -412,47 +454,130 @@ defmodule Quartz.Plot2D do
 
   def draw(plot) do
     draw_title(plot)
-    draw_left_content(plot)
-    draw_top_content(plot)
-    draw_right_content(plot)
-    draw_bottom_content(plot)
+    draw_left_content(plot, plot.left_content_padding)
+    draw_top_content(plot, plot.top_content_padding)
+    draw_right_content(plot, plot.right_content_padding)
+    draw_bottom_content(plot, plot.bottom_content_padding)
   end
 
   def boxplot(plot, _data) do
     plot
   end
 
-  def example() do
-    use Dantzig.Polynomial.Operators
-    alias Quartz.Figure
-    alias Quartz.Plot2D
-    alias Quartz.Length
+  def scatter_plot(plot, data_x, data_y, opts \\ []) do
+    KeywordSpec.validate!(opts, style: [], x_axis: "x", y_axis: "y")
+    KeywordSpec.validate!(style, [radii, color: RGB.teal(), radius: Length.pt(2)])
 
-    figure =
-      Figure.new([width: Length.cm(16), height: Length.cm(6)], fn fig ->
-        figure_width = fig.width
+    # Convert eveyrthing that might be a polynomial into a number
+    data_x = Enum.map(data_x, &Polynomial.to_number!/1)
+    data_y = Enum.map(data_y, &Polynomial.to_number!/1)
 
-        _plot_task_A =
-          Plot2D.new(id: "plot_task_A", left: 0.0, right: 0.55 * figure_width)
-          |> Plot2D.boxplot(nil)
-          # Use typst to explicitly style the title and labels ――――――――――――――――――――――――――――――――
-          |> Plot2D.put_title("A. Task A")
-          |> Plot2D.put_axis_label("y", "Y-label")
-          |> Plot2D.put_axis_label("x2", "X2-label")
-          |> Plot2D.put_axis_label("x", "X-label without $math$")
-          |> Plot2D.finalize()
+    if radii do
+      # There are multiple radii
+      for {x, y, r} <- Enum.zip([data_x, data_y, radii]) do
+        # Convert to data
+        center_x = AxisData.new(x, plot.id, x_axis) |> Polynomial.variable()
+        center_y = AxisData.new(y, plot.id, y_axis) |> Polynomial.variable()
 
-        _plot_task_B =
-          Plot2D.new(id: "plot_task_B", left: 0.55 * figure_width + Length.pt(8), right: figure_width)
-          |> Plot2D.boxplot(nil)
-          # Use typst to explicitly style the title and labels ――――――――――――――――――――――――――――――――
-          |> Plot2D.put_title("B. Task B")
-          |> Plot2D.put_axis_label("y", "Y-label")
-          |> Plot2D.put_axis_label("x2", "X2-label")
-          |> Plot2D.put_axis_label("x", "X-label (with  math: $x^2 + y^2$)", text: [escape: false])
-          |> Plot2D.finalize()
-      end)
+        Circle.new(
+          center_x: center_x,
+          center_y: center_y,
+          radius: r,
+          fill: color
+        )
+      end
+    else
+      # All circles have the same radius
+      for {x, y} <- Enum.zip(data_x, data_y) do
+        # Convert to data
+        center_x = AxisData.new(x, plot.id, x_axis) |> Polynomial.variable()
+        center_y = AxisData.new(y, plot.id, y_axis) |> Polynomial.variable()
 
-    Figure.render_to_pdf!(figure, "example.pdf")
+        Circle.new(
+          center_x: center_x,
+          center_y: center_y,
+          radius: radius,
+          fill: color
+        )
+      end
+    end
+
+    plot
+  end
+
+  def line_plot(plot, data_x, data_y, opts \\ []) do
+    KeywordSpec.validate!(opts, style: [], x_axis: "x", y_axis: "y")
+    KeywordSpec.validate!(style, stroke_cap: "round", color: RGB.teal())
+
+    # Convert eveyrthing that might be a polynomial into a number
+    xs = Enum.map(data_x, &Polynomial.to_number!/1)
+    ys = Enum.map(data_y, &Polynomial.to_number!/1)
+
+    # 1st point of the line segment
+    xy_1 = Enum.zip(xs, ys)
+    # 2nd point of the line segment
+    xy_2 = Enum.zip(xs, ys) |> Enum.drop(1)
+
+    for {{x1, y1}, {x2, y2}} <- Enum.zip(xy_1, xy_2) do
+      # Convert the numeric values into variables
+      line_x1 = AxisData.new(x1, plot.id, x_axis) |> Polynomial.variable()
+      line_y1 = AxisData.new(y1, plot.id, y_axis) |> Polynomial.variable()
+      line_x2 = AxisData.new(x2, plot.id, x_axis) |> Polynomial.variable()
+      line_y2 = AxisData.new(y2, plot.id, y_axis) |> Polynomial.variable()
+
+      Line.new(
+        x1: line_x1,
+        y1: line_y1,
+        x2: line_x2,
+        y2: line_y2,
+        stroke_cap: stroke_cap,
+        stroke_paint: color
+      )
+    end
+
+    plot
+  end
+
+  alias Quartz.Statistics.KDE
+  alias Explorer.Series
+
+  def kde_plot(plot, values, opts \\ []) do
+    value_series =
+      case values do
+        %Series{} ->
+          values
+
+        _other ->
+          float_values = Enum.map(values, &Polynomial.to_number!/1)
+          Series.from_list(float_values)
+      end
+
+    df = KDE.kde(value_series, 200)
+
+    xs = Series.to_list(df[:x])
+    ys = Series.to_list(df[:y])
+
+    line_plot(plot, xs, ys, opts)
+  end
+
+  defp fix_bounds(plot) do
+    top_bound = plot.current_top_bound || 0.0
+    bottom_bound = plot.current_bottom_bound || Figure.current_figure_height()
+    left_bound = plot.current_left_bound || 0.0
+    right_bound = plot.current_right_bound || Figure.current_figure_height()
+
+    bounds = [
+      top: top_bound,
+      bottom: bottom_bound,
+      left: left_bound,
+      right: right_bound
+    ]
+
+    Figure.assert(plot.top == top_bound)
+    Figure.assert(plot.bottom == bottom_bound)
+    Figure.assert(plot.left == left_bound)
+    Figure.assert(plot.right == right_bound)
+
+    set_bounds(plot, bounds)
   end
 end
