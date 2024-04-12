@@ -1,19 +1,19 @@
 Running HiGHS 1.4.0 [date: 1970-01-01, git hash: bcf6c0b22]
 Copyright (c) 2022 ERGO-Code under MIT licence terms
 WARNING: LP matrix packed vector contains 3 |values| in [3.06162e-17, 6.12323e-17] less than or equal to 1e-09: ignored
-LP   226K86U_model has 118 rows; 96 cols; 307 nonzeros
+LP   25TOTNS_model has 110 rows; 96 cols; 299 nonzeros
 Presolving model
 41 rows, 26 cols, 107 nonzeros
 11 rows, 14 cols, 31 nonzeros
 11 rows, 13 cols, 30 nonzeros
-Presolve : Reductions: rows 11(-107); columns 13(-83); elements 30(-277)
+Presolve : Reductions: rows 11(-99); columns 13(-83); elements 30(-269)
 Solving the presolved LP
 Using EKK dual simplex solver - serial
   Iteration        Objective     Infeasibilities num(sum)
           0    -5.9999823579e+00 Ph1: 7(6000); Du: 2(5.99998) 0s
-         10    -7.9270535433e+02 Pr: 0(0) 0s
+         10    -9.0609118110e+02 Pr: 0(0) 0s
 Solving the original LP from the solution after postsolve
 Model   status      : Optimal
 Simplex   iterations: 10
-Objective value     :  7.9270535433e+02
+Objective value     :  9.0609118110e+02
 HiGHS run time      :          0.00
