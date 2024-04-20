@@ -17,10 +17,10 @@ defmodule Quartz.Benchmarks.LinePlot do
     theta_3 = DataFrame.filter(samples, chain_id__ == 3)["theta"]
     theta_4 = DataFrame.filter(samples, chain_id__ == 4)["theta"]
 
-    color_1 = RGB.hot_pink(0.4)
-    color_2 = RGB.dark_violet(0.4)
-    color_3 = RGB.medium_blue(0.4)
-    color_4 = RGB.dark_red(0.4)
+    color_1 = RGB.hot_pink(1.0)
+    color_2 = RGB.dark_violet(1.0)
+    color_3 = RGB.medium_blue(1.0)
+    color_4 = RGB.dark_red(1.0)
 
     figure =
       Figure.new([width: Length.cm(8), height: Length.cm(6)], fn _fig ->
@@ -32,16 +32,15 @@ defmodule Quartz.Benchmarks.LinePlot do
           |> Plot2D.kde_plot(theta_4, style: [color: color_4])
           # Add some margins to the plot
           |> Plot2D.put_axes_margins(Length.cm(0.25))
-          # Use typst to explicitly style the title and labels
           |> Plot2D.put_title("A. Probability distribution")
-          |> Plot2D.put_axis_label("x", "$theta$", text: [escape: false])
-          |> Plot2D.put_axis_label("y", "$P(theta)$", text: [escape: false])
+          |> Plot2D.put_axis_label("x", "𝜃", text: [escape: false])
+          |> Plot2D.put_axis_label("y", "P(𝜃)", text: [escape: false])
           |> Plot2D.finalize()
       end)
 
 
-    path = Path.join([__DIR__, "dist_plot", "example.pdf"])
-    Figure.render_to_pdf_file!(figure, path)
+    path = Path.join([__DIR__, "dist_plot", "example.svg"])
+    Figure.render_to_svg_file!(figure, path)
   end
 
   def run_benchee() do

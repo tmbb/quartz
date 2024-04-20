@@ -1,13 +1,12 @@
 defmodule Quartz.Config do
   alias Quartz.Figure
-  alias Quartz.Typst.TypstAst
 
   defstruct text_font: "Ubuntu",
             text_style: nil,
             text_weight: "regular",
             text_stretch: nil,
             text_size: 9,
-            text_fill: TypstAst.variable("black"),
+            text_fill: "black",
             text_ligatures: true,
             text_discretionary_ligatures: true,
             text_historical_ligatures: false,

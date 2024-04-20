@@ -12,9 +12,9 @@ defmodule Quartz.Figure do
   alias Quartz.Axis2D
   alias Quartz.Plot2D
   alias Quartz.Length
-  alias Quartz.Typst.Serializer
-  alias Quartz.Typst.Measuring
-  alias Quartz.Typst.TypstAst
+
+  alias Quartz.SVG
+  alias Quartz.SVG.Measuring
 
   @derive {Inspect, only: [:width, :height, :debug, :finalized]}
 
@@ -30,6 +30,7 @@ defmodule Quartz.Figure do
             sketches: %{},
             config: nil,
             finalized: false,
+            resvg_options: [],
             store: %{}
 
   def new(args, fun) do
@@ -38,12 +39,25 @@ defmodule Quartz.Figure do
     config = Keyword.get(args, :config, Config.new())
     debug = Keyword.get(args, :debug, false)
 
+    default_font_dir = Path.join(
+      to_string(:code.priv_dir(:quartz)),
+      "fonts"
+    )
+
+    resvg_options = [
+      resources_dir: Keyword.get(args, :resources_dir, "."),
+      skip_system_fonts: Keyword.get(args, :skip_system_fonts, true),
+      font_dirs: Keyword.get(args, :font_dirs, [default_font_dir]),
+      dpi: Keyword.get(args, :dpi, 300)
+    ]
+
     try do
       figure = %__MODULE__{
         width: width,
         height: height,
         debug: debug,
         config: config,
+        resvg_options: resvg_options,
         store: %{}
       }
 
@@ -203,33 +217,15 @@ defmodule Quartz.Figure do
     get_current_figure().debug
   end
 
-  def render_to_pdf_binary!(figure) do
-    typst_binary = render_to_standalone_typst_binary!(figure)
-    # Render the typst code into PDF
-    ExTypst.render_to_pdf!(typst_binary, [])
+  def render_to_svg_file!(figure, path) do
+    svg_contents = to_svg_iodata(figure)
+    File.write!(path, svg_contents)
   end
 
-  def render_to_standalone_typst_binary!(figure) do
-    # Convert the figure into Typst AST (easier to manipulate than binaries)
-    typst_ast = to_typst(figure)
-
-    # Serialize the AST into a binary
-    IO.iodata_to_binary([
-      "#set page(width: auto, height: auto, margin: 0.5cm)\n#",
-      Serializer.serialize(typst_ast)
-    ])
-  end
-
-  def render_to_typst_file!(figure, path) do
-    typst_binary = render_to_standalone_typst_binary!(figure)
-    # Save the Typst binary to a file
-    File.write!(path, typst_binary)
-  end
-
-  def render_to_pdf_file!(figure, path) do
-    pdf_binary = render_to_pdf_binary!(figure)
-    # Save the PDF to a file
-    File.write!(path, pdf_binary)
+  def render_to_png_file!(figure, path) do
+    svg_contents = to_svg_iodata(figure)
+    svg_binary = IO.iodata_to_binary(svg_contents)
+    Resvg.svg_string_to_png(svg_binary, path, figure.resvg_options)
   end
 
   def position_with_location_and_alignment(sketch, container, opts \\ []) do
@@ -312,9 +308,10 @@ defmodule Quartz.Figure do
   end
 
   defp get_measurements(figure) do
-    measured = Measuring.measure(figure.unmeasured)
+    measured = Measuring.measure(figure.unmeasured, figure.resvg_options)
 
     for {element_id, measured_element} <- measured do
+      # Map.put(figure.sketch, element_id, measured_element)
       unmeasured_element = figure.sketches[element_id]
       # Add the new measurements to the constraints
       assert(unmeasured_element.width, :==, measured_element.width)
@@ -329,7 +326,7 @@ defmodule Quartz.Figure do
 
   defp draw_plots(figure) do
     for {_name, plot} <- figure.plots do
-      Quartz.Plot2D.draw(plot)
+      Plot2D.draw(plot)
     end
 
     get_current_figure()
@@ -347,26 +344,18 @@ defmodule Quartz.Figure do
     end)
   end
 
-  def to_typst(figure) do
+  def to_svg_iodata(figure) do
     sorted_sketches = sort_while_keeping_canvases_behind(figure.sketches)
-
-    typst_sketches =
+    svg_elements =
       for {_id, sketch} <- sorted_sketches do
-        Sketch.to_typst(sketch)
+        Sketch.to_svg(sketch)
       end
 
-    content = TypstAst.sequence(typst_sketches)
+    view_box = "0 0 #{figure.width} #{figure.height}"
 
-    box =
-      TypstAst.function_call(
-        TypstAst.variable("box"),
-        TypstAst.named_arguments_from_proplist(
-          width: TypstAst.pt(figure.width),
-          height: TypstAst.pt(figure.height)
-        ) ++ [content]
-      )
+    svg = SVG.svg([width: figure.width, height: figure.height, viewBox: view_box], svg_elements)
 
-    box
+    SVG.to_iodata(svg)
   end
 
   defp finalize(figure) do

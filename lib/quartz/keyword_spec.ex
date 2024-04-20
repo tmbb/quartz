@@ -1,4 +1,10 @@
 defmodule Quartz.KeywordSpec do
+  @moduledoc false
+
+  @doc """
+  Create variables and validate their presence from a keyword list
+  and a specification.
+  """
   defmacro validate!(keywords, spec) when is_list(spec) do
     dummy_var = Macro.var(:dummy_var, __MODULE__)
 

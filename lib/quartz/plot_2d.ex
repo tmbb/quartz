@@ -10,7 +10,6 @@ defmodule Quartz.Plot2D do
   alias Quartz.Length
   alias Quartz.Text
   alias Quartz.Sketch
-  alias Quartz.Typst.TypstAst
   alias Quartz.Config
   alias Quartz.Color.RGB
 
@@ -364,7 +363,6 @@ defmodule Quartz.Plot2D do
 
       # Find out how we should deal with this
       true ->
-        %TypstAst{} = title
         %{plot | title: title, title_location: location, title_alignment: alignment}
     end
   end
@@ -579,7 +577,7 @@ defmodule Quartz.Plot2D do
 
     contours = Conrex.conrec(values, x_coords, y_coords, countour_levels)
 
-    for {level, line_segments} <- contours do
+    for {_level, line_segments} <- contours do
       for line_segment <- line_segments do
         {{x1, y1}, {x2, y2}} = line_segment
 

@@ -6,32 +6,32 @@ defmodule Quartz.Rotations do
 
   @deg_to_rad_scale Kernel./(:math.pi(), 180.0)
 
-  # defp cos_degrees(0), do: 1
-  # defp cos_degrees(0.0), do: 1.0
-  # defp cos_degrees(90), do: 0
-  # defp cos_degrees(90.0), do: 0.0
-  # defp cos_degrees(180), do: 1
-  # defp cos_degrees(180.0), do: 1.0
-  # defp cos_degrees(-90), do: 0
-  # defp cos_degrees(-90.0), do: 0.0
-  # defp cos_degrees(-180), do: -1
-  # defp cos_degrees(-180.0), do: -1.0
+  defp cos_degrees(0), do: 1
+  defp cos_degrees(0.0), do: 1.0
+  defp cos_degrees(90), do: 0
+  defp cos_degrees(90.0), do: 0.0
+  defp cos_degrees(180), do: 1
+  defp cos_degrees(180.0), do: 1.0
+  defp cos_degrees(-90), do: 0
+  defp cos_degrees(-90.0), do: 0.0
+  defp cos_degrees(-180), do: -1
+  defp cos_degrees(-180.0), do: -1.0
 
   defp cos_degrees(angle_in_degrees) do
     angle_in_rads = Polynomial.to_number_if_possible(angle_in_degrees * @deg_to_rad_scale)
     :math.cos(angle_in_rads)
   end
 
-  # defp sin_degrees(0), do: 0
-  # defp sin_degrees(0.0), do: 0.0
-  # defp sin_degrees(90), do: 1
-  # defp sin_degrees(90.0), do: 1.0
-  # defp sin_degrees(180), do: 0.0
-  # defp sin_degrees(180.0), do: 0.0
-  # defp sin_degrees(-90), do: -1
-  # defp sin_degrees(-90.0), do: -1.0
-  # defp sin_degrees(-180), do: 0
-  # defp sin_degrees(-180.0), do: 0.0
+  defp sin_degrees(0), do: 0
+  defp sin_degrees(0.0), do: 0.0
+  defp sin_degrees(90), do: 1
+  defp sin_degrees(90.0), do: 1.0
+  defp sin_degrees(180), do: 0.0
+  defp sin_degrees(180.0), do: 0.0
+  defp sin_degrees(-90), do: -1
+  defp sin_degrees(-90.0), do: -1.0
+  defp sin_degrees(-180), do: 0
+  defp sin_degrees(-180.0), do: 0.0
 
   defp sin_degrees(angle_in_degrees) do
     angle_in_rads = Polynomial.to_number_if_possible(angle_in_degrees * @deg_to_rad_scale)
@@ -57,48 +57,27 @@ defmodule Quartz.Rotations do
     cos = cos_degrees(angle_in_degrees)
     sin = sin_degrees(angle_in_degrees)
 
-    reduced_angle_in_degrees =
+    theta =
       case :math.fmod(angle_in_degrees, 360.0) do
         value when value < 0 -> Kernel.+(360.0, value)
         value -> value
       end
 
-    a_x = x
-    a_y = y
-
-    b_x = x + width
-    b_y = y
-
-    c_x = x + width
-    c_y = y + height
-
-    d_x = x
-    d_y = y + height
-
-    ra_x = a_x
-    ra_y = a_y
-
-    rb_x = (b_x - a_x) * cos - (b_y - a_y) * sin + a_x
-    rb_y = (b_y - a_y) * cos + (b_x - a_x) * sin + a_y
-
-    rc_x = (c_x - a_x) * cos - (c_y - a_y) * sin + a_x
-    rc_y = (c_y - a_y) * cos + (c_x - a_x) * sin + a_y
-
-    rd_x = (d_x - a_x) * cos - (d_y - a_y) * sin + a_x
-    rd_y = (d_y - a_y) * cos + (d_x - a_x) * sin + a_y
+    h = height
+    w = width
 
     cond do
-      0 <= reduced_angle_in_degrees and reduced_angle_in_degrees < 90 ->
-        {{rd_x, rb_x}, {ra_y, rc_y}}
+      0 <= theta and theta < 90 ->
+        {{0 + x, w*cos + h*sin + x}, {0 + y, w*sin + h*cos + y}}
 
-      90 <= reduced_angle_in_degrees and reduced_angle_in_degrees < 180 ->
-        {{rc_x, ra_x}, {rd_y, rb_y}}
+      90 <= theta and theta < 180 ->
+        {{w*cos + x, h*sin + x}, {w*cos + y, w*sin + y}}
 
-      180 < reduced_angle_in_degrees and reduced_angle_in_degrees < 270 ->
-        {{rb_x, rd_x}, {rc_y, ra_y}}
+      180 < theta and theta < 270 ->
+        {{w*cos + h*sin + x, 0 + x}, {w*sin + h*cos + y, 0 + y}}
 
-      270 <= reduced_angle_in_degrees and reduced_angle_in_degrees <= 360 ->
-        {{ra_x, rc_x}, {rb_y, rd_y}}
+      270 <= theta and theta <= 360 ->
+        {{h*sin + x, w*cos + x}, {w*sin + y, h*cos + y}}
     end
   end
 end

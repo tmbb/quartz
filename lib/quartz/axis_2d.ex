@@ -1,7 +1,6 @@
 defmodule Quartz.Axis2D do
   alias Quartz.Text
   alias Quartz.Config
-  alias Quartz.Typst.TypstAst
   alias Quartz.Canvas
   alias Quartz.Line
   alias Quartz.Sketch
@@ -266,6 +265,13 @@ defmodule Quartz.Axis2D do
     # Merge the user-given text options with the default options for this figure
     text_opts = Config.get_axis_label_text_attributes(user_given_text_opts)
 
+    # Add the text rotation if given
+    text_opts =
+      case Keyword.fetch(user_given_text_opts, :rotation) do
+        {:ok, rotation} -> [{:rotation, rotation} | text_opts]
+        :error -> text_opts
+      end
+
     # Handle the non-text-related options
     alignment =
       case Keyword.get(opts, :alignment) do
@@ -298,7 +304,6 @@ defmodule Quartz.Axis2D do
 
       # Find out how we should deal with this
       true ->
-        %TypstAst{} = label
         %{axis | label: label, label_location: location, label_alignment: alignment}
     end
   end

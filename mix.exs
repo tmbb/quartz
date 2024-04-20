@@ -22,13 +22,14 @@ defmodule Quartz.MixProject do
   defp deps do
     [
       {:dantzig, path: "../dantzig"},
+      # {:resvg, "~> 0.3"},
+      {:resvg, path: "../resvg_nif"},
       {:decimal, "> 0.0.0"},
-      {:ex_typst, "~> 0.1"},
       {:conrex, "~> 1.0.0"},
       {:benchee, "~> 1.3"},
       {:explorer, "~> 0.8"},
       {:rustler, "~> 0.31", override: true},
-      {:incendium, "~> 0.4", only: [:dev, :test]}
+      {:rustler_precompiled, "~> 0.7", override: true}
     ]
   end
 end

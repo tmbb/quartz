@@ -16,7 +16,6 @@ defmodule Quartz.Benchmarks.ContourPlot do
         _plot =
           Plot2D.new(id: "plot_A")
           |> Plot2D.draw_function_contour_plot(&f/2, 0.0, :math.pi, 0.0, :math.pi, [0.2, 0.4, 0.6, 0.8])
-          # Use typst to explicitly style the title and labels ――――――――――――――――――――――――――――――――
           |> Plot2D.put_title("A. Contour plot for $f(theta, phi) = (cos(2 theta) + cos(2 phi))^2$", text: [escape: false])
           |> Plot2D.put_axis_label("y", "$phi$", text: [escape: false])
           |> Plot2D.put_axis_label("x", "$theta$", text: [escape: false])
@@ -24,8 +23,8 @@ defmodule Quartz.Benchmarks.ContourPlot do
       end)
 
 
-    path = Path.join([__DIR__, "contour_plot", "example.pdf"])
-    Figure.render_to_pdf_file!(figure, path)
+    # path = Path.join([__DIR__, "contour_plot", "example.pdf"])
+    # Figure.render_to_pdf_file!(figure, path)
   end
 
   def run_benchee() do
