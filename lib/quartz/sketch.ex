@@ -1,5 +1,4 @@
 defmodule Quartz.Sketch do
-  alias Quartz.Point2D
   require Dantzig.Polynomial, as: Polynomial
   # alias Quartz.Sketch.BBoxBounds
   alias Quartz.Sketch.Protocol
@@ -7,30 +6,6 @@ defmodule Quartz.Sketch do
 
   @type t() :: any()
   @type length :: Polynomial.t() | number()
-
-  # @spec top_center(t()) :: Point2D.t()
-  # def top_center(obj)
-
-  # @spec top_right(t()) :: Point2D.t()
-  # def top_right(obj)
-
-  # @spec horizon_right(t()) :: Point2D.t()
-  # def horizon_right(obj)
-
-  # @spec bottom_right(t()) :: Point2D.t()
-  # def bottom_right(obj)
-
-  # @spec bottom_center(t()) :: Point2D.t()
-  # def bottom_center(obj)
-
-  # @spec bottom_left(t()) :: Point2D.t()
-  # def bottom_left(obj)
-
-  # @spec horizon_left(t()) :: Point2D.t()
-  # def horizon_left(obj)
-
-  # @spec top_left(t()) :: Point2D.t()
-  # def top_left(obj)
 
   @spec bbox_center(t()) :: length()
   def bbox_center(obj) do
@@ -97,11 +72,6 @@ defmodule Quartz.Sketch do
   @spec to_svg(t()) :: SVG.t()
   def to_svg(obj) do
     Protocol.to_svg(obj)
-  end
-
-  @spec to_unpositioned_svg(t()) :: SVG.t()
-  def to_unpositioned_svg(obj) do
-    Protocol.to_unpositioned_svg(obj)
   end
 
   @spec transform_lengths(t(), (length() -> length())) :: t()

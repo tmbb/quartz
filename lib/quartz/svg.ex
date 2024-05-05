@@ -36,17 +36,22 @@ defmodule Quartz.SVG do
   def text(attrs, content) do
     attrs = handle_units_of_measurement(attrs, [:x, :y, :width, :height])
     contents = List.wrap(content)
-    escaped_contents = for fragment <- contents, do: xml_escape_to_iodata(fragment)
+    escaped_contents = for fragment <- contents do
+      case fragment do
+        binary when is_binary(fragment) ->
+          xml_escape_to_iodata(fragment)
+
+        other ->
+          other
+      end
+    end
+
     {"text", attrs, escaped_contents}
   end
 
-  @doc """
-  Build a path.
-  """
-  def path(attrs) do
-    {points, attrs} = Keyword.pop(attrs, :d, [])
-    new_attrs = [{"d", points_to_iodata(points)} | attrs]
-    {"path", new_attrs, []}
+  def title(attrs, content) do
+    wrapped_content = List.wrap(content)
+    {"title", attrs, wrapped_content}
   end
 
   @doc """
@@ -70,58 +75,93 @@ defmodule Quartz.SVG do
     {"svg", first_attrs ++ attrs, contents}
   end
 
+  @doc """
+  Build a path.
+  """
+  def path(attrs, content \\ []) do
+    wrapped_content = List.wrap(content)
+    {points, attrs} = Keyword.pop(attrs, :d, [])
+    new_attrs = [{"d", points_to_iodata(points)} | attrs]
+    {"path", new_attrs, wrapped_content}
+  end
+
   def points_to_iodata(points), do: Enum.map(points, &point_to_iodata/1)
 
   # Move to point without drawing a line
-  def point_to_iodata({:M, {x, y}}), do: ["M ", to_string(x), to_string(y), ""]
-  def point_to_iodata({:m, {dx, dy}}), do: ["m ", to_string(dx), to_string(dy), ""]
+  def point_to_iodata({:M, {x, y}}), do: ["M ", to_string(x), " ", to_string(y)]
+  def point_to_iodata({:m, {dx, dy}}), do: ["m ", to_string(dx), " ", to_string(dy)]
   # Draw a line from the last point to the current point
-  def point_to_iodata({:L, {x, y}}), do: ["L ", to_string(x), to_string(y), ""]
-  def point_to_iodata({:l, {dx, dy}}), do: ["l ", to_string(dx), to_string(dy), ""]
+  def point_to_iodata({:L, {x, y}}), do: ["L ", to_string(x), " ", to_string(y)]
+  def point_to_iodata({:l, {dx, dy}}), do: ["l ", to_string(dx), " ", to_string(dy)]
   # Horizontal line
-  def point_to_iodata({:H, x}), do: ["H ", to_string(x), ""]
-  def point_to_iodata({:h, dx}), do: ["h ", to_string(dx), ""]
+  def point_to_iodata({:H, x}), do: ["H ", to_string(x)]
+  def point_to_iodata({:h, dx}), do: ["h ", to_string(dx)]
   # Vertical line
-  def point_to_iodata({:V, y}), do: ["V ", to_string(y), ""]
-  def point_to_iodata({:v, dy}), do: ["v ", to_string(dy), ""]
+  def point_to_iodata({:V, y}), do: ["V ", to_string(y)]
+  def point_to_iodata({:v, dy}), do: ["v ", to_string(dy)]
   # Bezier curves
   def point_to_iodata({:C, {x1, y1, x2, y2, x, y}}), do: [
     "C ", to_string(x1), to_string(y1), ", ",
           to_string(x2), to_string(y2), ", ",
-          to_string(x), to_string(y), ", "
+          to_string(x), to_string(y)
     ]
 
   def point_to_iodata({:c, {dx1, dy1, dx2, dy2, dx, dy}}), do: [
     "c ", to_string(dx1), to_string(dy1), ", ",
           to_string(dx2), to_string(dy2), ", ",
-          to_string(dx), to_string(dy), ", "
+          to_string(dx), to_string(dy)
     ]
 
-  def rect(attrs) do
+  def point_to_iodata(z) when z in [:z, :Z] do
+    "z"
+  end
+
+  def rect(attrs, content \\ []) do
+    wrapped_content = List.wrap(content)
     attrs = handle_units_of_measurement(attrs, [:x, :y, :width, :height])
-    {"rect", attrs, []}
+    {"rect", attrs, wrapped_content}
   end
 
-  def circle(attrs) do
+  def circle(attrs, content \\ []) do
+    wrapped_content = List.wrap(content)
     attrs = handle_units_of_measurement(attrs, [:cx, :cy, :r])
-    {"circle", attrs, []}
+    {"circle", attrs, wrapped_content}
   end
 
-  def line(attrs) do
+  def line(attrs, content \\ []) do
+    wrapped_content = List.wrap(content)
     attrs = handle_units_of_measurement(attrs, [:x1, :y1, :x2, :y2])
-    {"line", attrs, []}
+    {"line", attrs, wrapped_content}
   end
+
+  def desc(attrs, content \\ []) do
+    wrapped_content = List.wrap(content)
+    {"desc", attrs, wrapped_content}
+  end
+
+  def escaped_iodata(iodata), do: {:escaped_iodata, iodata}
 
   def to_binary(element) do
     to_string(to_iodata(element))
   end
+
+  def to_iodata({:escaped_iodata, iodata}), do: iodata
 
   def to_iodata({tag, attrs, []}) do
     ["<", tag, attrs_to_iodata(attrs), "/>"]
   end
 
   def to_iodata({tag, attrs, contents}) when is_list(contents) do
-    ["<", tag, attrs_to_iodata(attrs), ">", Enum.map(contents, &to_iodata/1), "</", tag, ">"]
+    escaped_contents = Enum.map(contents, &to_iodata/1)
+
+    iodata_contents = for fragment <- escaped_contents do
+      case fragment do
+        {:escaped_iodata, iodata} -> iodata
+        other -> other
+      end
+    end
+
+    ["<", tag, attrs_to_iodata(attrs), ">", iodata_contents, "</", tag, ">"]
   end
 
   def to_iodata(list_of_stuff) when is_list(list_of_stuff) do
@@ -137,7 +177,8 @@ defmodule Quartz.SVG do
     for {key, value} <- attrs, value != nil do
       escaped_value =
         if key == :style or key == "style" do
-          xml_escape_iodata(style_to_iodata(value))
+          {:escaped_iodata, iodata} = xml_escape_iodata(style_to_iodata(value))
+          iodata
         else
           attr_value_to_iodata(value)
         end
@@ -155,15 +196,16 @@ defmodule Quartz.SVG do
   def attr_value_to_iodata(%RGB{} = color) do
     # Handle all cases for alpha
     alpha = case color.alpha do
-      i when is_integer(i) -> 1 - (i / 256)
-      f when is_float(f) -> 1 - f
+      i when is_integer(i) -> (i / 256)
+      f when is_float(f) -> f
     end
 
     "rgba(#{color.red}, #{color.green}, #{color.blue}, #{alpha})"
   end
 
   def attr_value_to_iodata(attr_value) do
-    xml_escape_iodata(to_string(attr_value))
+    {:escaped_iodata, iodata} = xml_escape_iodata(to_string(attr_value))
+    iodata
   end
 
   # --------------------------------------------------------------------
@@ -175,16 +217,16 @@ defmodule Quartz.SVG do
   # --------------------------------------------------------------------
   # TODO: see if there are any legal issues with the Apache License here
 
-  @spec xml_escape_iodata(iodata) :: iodata
+  @spec xml_escape_iodata(iodata) :: {:escaped_iodata, iodata}
   def xml_escape_iodata(data) when is_list(data) do
-    Enum.map(data, &xml_escape/1)
+    {:escaped_iodata, Enum.map(data, &xml_escape/1)}
   end
 
   def xml_escape_iodata(data) when is_binary(data) do
-    xml_escape_to_iodata(data)
+    {:escaped_iodata, xml_escape(data)}
   end
 
-  @spec xml_escape(String.t()) :: String.t()
+  @spec xml_escape(any) :: any
   def xml_escape(data) when is_binary(data) do
     IO.iodata_to_binary(to_iodata(data, 0, data, []))
   end
@@ -193,18 +235,18 @@ defmodule Quartz.SVG do
   Escapes the given HTML to iodata.
 
       iex> Quartz.SVG.xml_escape_to_iodata("foo")
-      "foo"
+      {:escaped_iodata, "foo"}
 
       iex> Quartz.SVG.xml_escape_to_iodata("<foo>")
-      [[[] | "&lt;"], "foo" | "&gt;"]
+      {:escaped_iodata, [[[] | "&lt;"], "foo" | "&gt;"]}
 
       iex> Quartz.SVG.xml_escape_to_iodata("quotes: \" & \'")
-      [[[[], "quotes: " | "&quot;"], " " | "&amp;"], " " | "&#39;"]
+      {:escaped_iodata, [[[[], "quotes: " | "&quot;"], " " | "&amp;"], " " | "&#39;"]}
 
   """
-  @spec xml_escape_to_iodata(String.t()) :: iodata
+  @spec xml_escape_to_iodata(String.t()) :: {:escaped_iodata, iodata}
   def xml_escape_to_iodata(data) when is_binary(data) do
-    to_iodata(data, 0, data, [])
+    {:escaped_iodata, to_iodata(data, 0, data, [])}
   end
 
   escapes = [

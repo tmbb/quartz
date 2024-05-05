@@ -1,8 +1,14 @@
 defmodule Quartz.Statistics.KDE do
   require Explorer.DataFrame, as: DataFrame
   alias Explorer.Series
+  alias Quartz.Statistics.KDE.DensityEstimator1D
 
-  def default_bandwidth(series) do
+
+  # A constant used by the gaussian distribution
+  @inv_sqrt_2pi 1 / :math.sqrt(2 * :math.pi())
+
+  @doc false
+  def gaussian_kernel_bandwidth_selector(series) do
     n = Series.size(series)
     sigma_hat = Series.standard_deviation(series)
     q1 = Series.quantile(series, 0.25)
@@ -12,120 +18,120 @@ defmodule Quartz.Statistics.KDE do
     0.9 * min(sigma_hat, iqr / 1.34) * n ** (-1 / 5)
   end
 
-  def linear_space_list(a, b, n) do
+  @doc false
+  def gaussian_kernel(series) do
+    Series.multiply(
+      @inv_sqrt_2pi,
+      Series.exp(
+        Series.multiply(
+          -0.5,
+          Series.pow(
+            series,
+            2
+          )
+        )
+      )
+    )
+  end
+
+  @doc """
+  A gaussian estimator for 1D probability distributions.
+  """
+  def gaussian_kernel_estimator() do
+    %DensityEstimator1D{
+      name: "Gaussian estimator",
+      kernel: {__MODULE__, :gaussian_kernel, []},
+      bandwidth_selector: {__MODULE__, :gaussian_kernel_bandwidth_selector, []}
+    }
+  end
+
+  defp series_from_range(range) do
+    range
+    |> Enum.into([])
+    |> Series.from_list()
+  end
+
+  defp apply_kernel_to_cols(estimator, bandwidth, x_col, obs_col) do
+    DensityEstimator1D.apply_kernel(
+      estimator,
+      Series.divide(
+        Series.subtract(
+          x_col,
+          obs_col
+        ),
+        bandwidth
+      )
+    )
+  end
+
+  defp aggregate_deltas(delta_col, n, bandwidth) do
+    Series.multiply(1/(n * bandwidth), Series.sum(delta_col))
+  end
+
+  def kde(observations, nr_of_points, opts \\ []) do
+    estimator =
+      Keyword.get(
+        opts,
+        :estimator,
+        gaussian_kernel_estimator()
+      )
+
+    bandwidth =
+      Keyword.get(
+        opts,
+        :bandwidth,
+        DensityEstimator1D.select_bandwidth(estimator, observations)
+      )
+
+    n_observations = Series.size(observations)
+    min = Series.min(observations)
+    max = Series.max(observations)
+
+    # Estimate the bandwidth
+
+    # Use some Explorar-based programming to keep the number-crunching
+    # out of the BEAM and offload the hard calculations to Rust.
+
+    x_df =
+      DataFrame.new(
+        id: series_from_range(1..nr_of_points),
+        x: linear_space(min, max, nr_of_points)
+      )
+      |> DataFrame.lazy()
+
+    obs_df =
+      DataFrame.new(
+        id: series_from_range(1..n_observations),
+        obs: observations
+      )
+      |> DataFrame.lazy()
+
+    # The expression that will compute the kernel function at each point.
+    # These values will be later aggregated by x-value and summed together
+
+    delta_fun = fn df ->
+      apply_kernel_to_cols(estimator, bandwidth, df[:x], df[:obs])
+    end
+
+    aggregate_deltas_fun = fn df ->
+      aggregate_deltas(df[:delta], nr_of_points, bandwidth)
+    end
+
+    DataFrame.join(x_df, obs_df, how: :cross, on: :id)
+    |> DataFrame.mutate_with(fn df -> [delta: delta_fun.(df)] end)
+    |> DataFrame.group_by(:x)
+    |> DataFrame.summarise_with(fn df -> [y: aggregate_deltas_fun.(df)] end)
+    |> DataFrame.collect()
+  end
+
+  # Evenly split an interval of real numbers into n parts
+
+  defp linear_space_list(a, b, n) do
     step = (b - a) / n
     [a | Enum.reverse(Enum.map(0..(n - 2), fn i -> b - i * step end))]
   end
 
-  def linear_space(a, b, n) do
+  defp linear_space(a, b, n) do
     Series.from_list(linear_space_list(a, b, n))
-  end
-
-  defguardp one_is_series(a, b) when is_struct(a, Series) or is_struct(b, Series)
-
-  @doc false
-  def maybe_series_add(a, b) when one_is_series(a, b), do: Series.add(a, b)
-  def maybe_series_add(a, b), do: a + b
-
-  @doc false
-  def maybe_series_subtract(a, b) when one_is_series(a, b), do: Series.subtract(a, b)
-  def maybe_series_subtract(a, b), do: a - b
-
-  @doc false
-  def maybe_series_multiply(a, b) when one_is_series(a, b), do: Series.multiply(a, b)
-  def maybe_series_multiply(a, b), do: a * b
-
-  @doc false
-  def maybe_series_divide(a, b) when one_is_series(a, b), do: Series.divide(a, b)
-  def maybe_series_divide(a, b), do: a / b
-
-  @doc false
-  def maybe_series_pow(a, b) when one_is_series(a, b), do: Series.pow(a, b)
-  def maybe_series_pow(a, b), do: a ** b
-
-  @doc false
-  def maybe_series_minus(s) when is_struct(s, Series), do: Series.subtract(0, s)
-  def maybe_series_minus(a), do: -a
-
-  @doc false
-  def maybe_series_exp(s) when is_struct(s, Series), do: Series.exp(s)
-  def maybe_series_exp(a), do: :math.exp(a)
-
-  defmacro series!(do: body) do
-    new_ast =
-      Macro.prewalk(body, fn ast_node ->
-        case ast_node do
-          {:+, _meta, [left, right]} ->
-            quote do
-              unquote(__MODULE__).maybe_series_add(unquote(left), unquote(right))
-            end
-
-          {:-, _meta, [left, right]} ->
-            quote do
-              unquote(__MODULE__).maybe_series_subtract(unquote(left), unquote(right))
-            end
-
-          {:*, _meta, [left, right]} ->
-            quote do
-              unquote(__MODULE__).maybe_series_multiply(unquote(left), unquote(right))
-            end
-
-          {:/, _meta, [left, right]} ->
-            quote do
-              unquote(__MODULE__).maybe_series_divide(unquote(left), unquote(right))
-            end
-
-          {:**, _meta, [left, right]} ->
-            quote do
-              unquote(__MODULE__).maybe_series_pow(unquote(left), unquote(right))
-            end
-
-          {:-, _meta, [value]} ->
-            quote do
-              unquote(__MODULE__).maybe_series_minus(unquote(value))
-            end
-
-          {:exp, _meta, [value]} ->
-            quote do
-              unquote(__MODULE__).maybe_series_exp(unquote(value))
-            end
-
-          {:sum, _meta, [series]} ->
-            quote do
-              Explorer.Series.sum(unquote(series))
-            end
-
-          other ->
-            other
-        end
-      end)
-
-    new_ast
-  end
-
-  @inv_sqrt_2pi 1 / :math.sqrt(2 * :math.pi())
-
-  def gaussian_kernel(x, observations, bandwidth) do
-    series! do
-      @inv_sqrt_2pi * exp(-0.5 * ((x - observations) / bandwidth) ** 2)
-    end
-  end
-
-  def kde(observations, n, opts \\ []) do
-    kernel = Keyword.get(opts, :kernel, &gaussian_kernel/3)
-    n_observations = Series.size(observations)
-    min = Series.min(observations)
-    max = Series.max(observations)
-    # Estimate the bandwidth
-    bandwidth = default_bandwidth(observations)
-    # Get the x points at which we want to draw
-    xs = linear_space_list(min, max, n)
-
-    ys =
-      for x_i <- xs do
-        Series.sum(kernel.(x_i, observations, bandwidth)) / (n_observations * bandwidth)
-      end
-
-    DataFrame.new(x: xs, y: ys)
   end
 end

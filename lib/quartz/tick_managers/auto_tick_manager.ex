@@ -14,7 +14,7 @@ defmodule Quartz.TickManagers.AutoTickManager do
          add_above_max?,
          opts
        ) do
-    desired_nr_of_ticks = Keyword.get(opts, :desired_nr_of_ticks, 7)
+    desired_nr_of_ticks = Keyword.get(opts, :desired_nr_of_ticks, 5)
 
     desired_nr_of_inner_ticks =
       case {add_below_min?, add_above_max?} do
@@ -73,6 +73,7 @@ defmodule Quartz.TickManagers.AutoTickManager do
         add_above_max?,
         opts \\ []
       ) do
+
     {_step, locations} =
       step_and_major_tick_locations(
         min_value,
@@ -98,8 +99,8 @@ defmodule Quartz.TickManagers.AutoTickManager do
     supplied_nr_of_decimal_places = Keyword.get(opts, :nr_of_decimal_places)
 
     # Only add the limits when the axis limits haven't been explicitly set
-    add_below_min? = axis.min_value_set_by_user == false
-    add_above_max? = axis.max_value_set_by_user == false
+    add_below_min? = axis.min_value_fixed == false
+    add_above_max? = axis.max_value_fixed == false
 
     {step, tick_locations} =
       step_and_major_tick_locations(

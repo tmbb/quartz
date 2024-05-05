@@ -10,7 +10,7 @@ defmodule Quartz.Utilities do
     try do
       fun.(tmp_file)
     after
-      File.rm!(tmp_file)
+      File.rm(tmp_file)
     end
   end
 end

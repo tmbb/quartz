@@ -16,6 +16,11 @@ defmodule Quartz.Figure do
   alias Quartz.SVG
   alias Quartz.SVG.Measuring
 
+  require Quartz.KeywordSpec, as: KeywordSpec
+  require Dantzig.Polynomial, as: Polynomial
+
+  @default_min_max_level 10
+
   @derive {Inspect, only: [:width, :height, :debug, :finalized]}
 
   defstruct width: nil,
@@ -32,67 +37,6 @@ defmodule Quartz.Figure do
             finalized: false,
             resvg_options: [],
             store: %{}
-
-  def new(args, fun) do
-    width = Keyword.get(args, :width, 300)
-    height = Keyword.get(args, :height, 200)
-    config = Keyword.get(args, :config, Config.new())
-    debug = Keyword.get(args, :debug, false)
-
-    default_font_dir = Path.join(
-      to_string(:code.priv_dir(:quartz)),
-      "fonts"
-    )
-
-    resvg_options = [
-      resources_dir: Keyword.get(args, :resources_dir, "."),
-      skip_system_fonts: Keyword.get(args, :skip_system_fonts, true),
-      font_dirs: Keyword.get(args, :font_dirs, [default_font_dir]),
-      dpi: Keyword.get(args, :dpi, 300)
-    ]
-
-    try do
-      figure = %__MODULE__{
-        width: width,
-        height: height,
-        debug: debug,
-        config: config,
-        resvg_options: resvg_options,
-        store: %{}
-      }
-
-      Process.put(:"$quartz_figure", figure)
-
-      cond do
-        is_function(fun, 0) ->
-          fun.()
-
-        is_function(fun, 1) ->
-          fun.(figure)
-
-        is_function(fun, 2) ->
-          fun.(width, height)
-
-        true ->
-          raise "Function must be of arity 0, 1 or 2"
-      end
-
-      # Get the figure that might have been modified by the code above
-      figure = get_current_figure()
-
-      figure
-      |> get_measurements()
-      |> finish_axes()
-      |> apply_scales_to_data()
-      |> align_decorations_areas()
-      |> draw_plots()
-      |> solve_problem()
-      |> solve_sketches()
-      |> finalize()
-    after
-      Process.delete(:"$quartz_figure")
-    end
-  end
 
   def bounds_for_plots_in_grid(opts \\ []) do
     nr_of_rows = Keyword.fetch!(opts, :nr_of_rows)
@@ -111,38 +55,38 @@ defmodule Quartz.Figure do
     total_height = Keyword.get(opts, :total_height, current_figure_height())
 
     left_bounds =
-      for i <- 0..Kernel.-(nr_of_columns, 1) do
+      for i <- 0..(nr_of_columns - 1) do
         if i == 0 do
           x
         else
-          x + total_width * (i / nr_of_columns) + half_horizontal_padding
+          Polynomial.algebra(x + total_width * (i / nr_of_columns) + half_horizontal_padding)
         end
       end
 
     right_bounds =
-      for i <- 0..Kernel.-(nr_of_columns, 1) do
-        if i == Kernel.-(nr_of_columns, 1) do
-          x + total_width
+      for i <- 0..(nr_of_columns - 1) do
+        if i == nr_of_columns - 1 do
+          Polynomial.algebra(x + total_width)
         else
-          x + total_width * (Kernel.+(i, 1) / nr_of_columns) - half_horizontal_padding
+          Polynomial.algebra(x + total_width * ((i + 1) / nr_of_columns) - half_horizontal_padding)
         end
       end
 
     top_bounds =
-      for i <- 0..Kernel.-(nr_of_rows, 1) do
+      for i <- 0..(nr_of_rows - 1) do
         if i == 0 do
           y
         else
-          y + total_height * (i / nr_of_rows) + half_vertical_padding
+          Polynomial.algebra(y + total_height * (i / nr_of_rows) + half_vertical_padding)
         end
       end
 
     bottom_bounds =
-      for i <- 0..Kernel.-(nr_of_rows, 1) do
-        if i == Kernel.-(nr_of_rows, 1) do
-          y + total_height
+      for i <- 0..(nr_of_rows - 1) do
+        if i == nr_of_rows - 1 do
+          Polynomial.algebra(y + total_height)
         else
-          y + total_height * (Kernel.+(i, 1) / nr_of_rows) - half_vertical_padding
+          Polynomial.algebra(y + total_height * ((i + 1) / nr_of_rows) - half_vertical_padding)
         end
       end
 
@@ -362,20 +306,56 @@ defmodule Quartz.Figure do
     %{figure | finalized: true}
   end
 
+  def get_lengths_from_constraints(figure) do
+    constraints = figure.problem.constraints
+
+    nested =
+      for {_constraint_id, constraint} <- constraints do
+        [constraint.left_hand_side, constraint.right_hand_side]
+      end
+
+    List.flatten(nested)
+  end
+
+  def get_all_lengths(figure) do
+    lengths_from_sketches = get_lengths_from_sketches(figure)
+    lengths_from_constraints = get_lengths_from_constraints(figure)
+
+    lengths_from_sketches ++ lengths_from_constraints
+  end
+
   @doc false
   def apply_scales_to_data(figure) do
     sketches = figure.sketches
+    constraints = figure.problem.constraints
+
     lengths = get_all_lengths(figure)
+
     axes = get_all_axes(figure)
 
-    new_sketches = Scale.apply_scales_to_sketches(sketches, lengths, axes)
-    new_figure = %{figure | sketches: new_sketches}
+    # Apply the scales to all places where references to axes may appear.
+    # This includes the constraints and not only the sketches.
+    {new_sketches, new_constraints} =
+      Scale.apply_scales_to_sketches_and_constraints(
+        sketches,
+        constraints,
+        lengths,
+        axes
+      )
+
+    # Update the constraints so that they don't refer to axes anymore
+    new_problem = %{figure.problem | constraints: new_constraints}
+
+    # Update the figure with the new problem and the new sketches
+    new_figure = %{figure | problem: new_problem, sketches: new_sketches}
+
     put_current_figure(new_figure)
+
     new_figure
   end
 
   @doc false
-  def get_all_lengths(figure) do
+  def get_lengths_from_sketches(figure) do
     Enum.flat_map(figure.sketches, fn {_id, sketch} ->
       Sketch.lengths(sketch)
     end)
@@ -386,6 +366,19 @@ defmodule Quartz.Figure do
     Enum.flat_map(figure.plots, fn {_plot_id, plot} ->
       Map.values(plot.axes)
     end)
+  end
+
+  defp solve_figure_dimensions(figure) do
+    put_current_figure(figure)
+
+    solved_width = solve!(figure.width)
+    solved_height = solve!(figure.height)
+
+    new_figure = %{figure | width: solved_width, height: solved_height}
+
+    put_current_figure(new_figure)
+
+    new_figure
   end
 
   defp solve_sketches(figure) do
@@ -411,14 +404,18 @@ defmodule Quartz.Figure do
     Polynomial.evaluate(figure.solution, expression)
   end
 
-  def substitute(expression, substitutions) do
-    Polynomial.substitute(expression, substitutions)
-  end
+  # def substitute(expression, substitutions) do
+  #   Polynomial.substitute(expression, substitutions)
+  # end
 
   def solve!(expression) do
     figure = get_current_figure()
     result = Dantzig.Solution.evaluate(figure.solution, expression)
-    true = is_number(result)
+
+    if not is_number(result) do
+      raise RuntimeError, "#{inspect(result)} is not a number"
+    end
+
     result
   end
 
@@ -488,7 +485,8 @@ defmodule Quartz.Figure do
     end)
   end
 
-  defp update_current_figure_problem(fun) do
+  @doc false
+  def update_current_figure_problem(fun) do
     figure = get_current_figure()
     problem = figure.problem
     {updated_problem, result} = fun.(problem)
@@ -506,7 +504,32 @@ defmodule Quartz.Figure do
         |> Problem.add_constraint(constraint_x)
         |> Problem.add_constraint(constraint_y)
 
-      {updated_problem, :ok}
+      {updated_problem, {:ok, [constraint_x, constraint_y]}}
+    end)
+  end
+
+  alias Quartz.Sketch
+
+  def assert(contained, :in, container) do
+    update_current_figure_problem(fn problem ->
+      c_left = Constraint.new(Sketch.bbox_left(contained), :>=, Sketch.bbox_left(container))
+      c_top = Constraint.new(Sketch.bbox_top(contained), :>=, Sketch.bbox_top(container))
+      c_right = Constraint.new(Sketch.bbox_right(contained), :<=, Sketch.bbox_right(container))
+      c_bottom = Constraint.new(Sketch.bbox_bottom(contained), :<=, Sketch.bbox_bottom(container))
+
+      constraints = [
+        c_left,
+        c_top,
+        c_right,
+        c_bottom
+      ]
+
+      updated_problem_1 = Problem.add_constraint(problem, c_left)
+      updated_problem_2 = Problem.add_constraint(updated_problem_1, c_top)
+      updated_problem_3 = Problem.add_constraint(updated_problem_2, c_right)
+      updated_problem_4 = Problem.add_constraint(updated_problem_3, c_bottom)
+
+      {updated_problem_4, {:ok, constraints}}
     end)
   end
 
@@ -514,8 +537,40 @@ defmodule Quartz.Figure do
     update_current_figure_problem(fn problem ->
       constraint = Constraint.new(left, operator, right)
       updated_problem = Problem.add_constraint(problem, constraint)
-      {updated_problem, :ok}
+      {updated_problem, {:ok, [constraint]}}
     end)
+  end
+
+  defmacro assert({:==, _meta, [expr, {:max, _, [args]}]}) do
+    expr = Polynomial.replace_operators(expr)
+    args = Polynomial.replace_operators(args)
+
+    quote do
+      (
+        require Quartz.Figure
+        fixed_expr = unquote(expr)
+        Quartz.Figure.minimize(fixed_expr, level: 5)
+        for arg <- unquote(args) do
+          Quartz.Figure.assert(fixed_expr >= arg)
+        end
+      )
+    end
+  end
+
+  defmacro assert({:==, _meta, [expr, {:min, _, [args]}]}) do
+    expr = Polynomial.replace_operators(expr)
+    args = Polynomial.replace_operators(args)
+
+    quote do
+      (
+        require Quartz.Figure
+        fixed_expr = unquote(expr)
+        Quartz.Figure.maximize(fixed_expr, level: 15)
+        for arg <- unquote(args) do
+          Quartz.Figure.assert(fixed_expr <= arg)
+        end
+      )
+    end
   end
 
   defmacro assert(comparison) do
@@ -526,18 +581,107 @@ defmodule Quartz.Figure do
     end
   end
 
-  def maximize(expression) do
-    update_current_figure_problem(fn problem ->
-      updated_problem = Problem.increment_objective(problem, expression)
-      {updated_problem, :ok}
-    end)
+  defmacro maximize(expression, opts \\ []) do
+    transformed_expression = min_max_transform_expression_with_opts(expression, opts)
+
+    quote do
+      unquote(__MODULE__).update_current_figure_problem(fn problem ->
+        require Dantzig.Polynomial
+
+        updated_problem =
+          Dantzig.Problem.increment_objective(
+            problem,
+            unquote(transformed_expression)
+          )
+
+        {updated_problem, :ok}
+      end)
+    end
   end
 
-  def minimize(expression) do
-    update_current_figure_problem(fn problem ->
-      updated_problem = Problem.decrement_objective(problem, expression)
-      {updated_problem, :ok}
-    end)
+  defmacro minimize(expression, opts \\ []) do
+    transformed_expression = min_max_transform_expression_with_opts(expression, opts)
+
+    quote do
+      unquote(__MODULE__).update_current_figure_problem(fn problem ->
+        require Dantzig.Polynomial
+
+        updated_problem =
+          Dantzig.Problem.decrement_objective(
+            problem,
+            unquote(transformed_expression)
+          )
+
+        {updated_problem, :ok}
+      end)
+    end
+  end
+
+  defp min_max_transform_expression_with_opts(expression, opts) do
+    level = Keyword.get(opts, :level, @default_min_max_level)
+    quote do
+      Dantzig.Polynomial.algebra(unquote(level) * unquote(expression))
+    end
+  end
+
+  @doc """
+  Place a sketch in a canvas with the given parameters.s
+  """
+  def place_in_canvas(sketch, canvas, opts) do
+    KeywordSpec.validate!(opts,
+      x: :left,
+      y: :top,
+      horizontal_alignment: :center,
+      vertical_alignment: :horizon,
+      contained_horizontally_in_canvas: true,
+      contained_vertically_in_canvas: true
+    )
+
+    x_location =
+      case x do
+        nil -> nil
+        :left -> Sketch.bbox_left(canvas)
+        :center -> Sketch.bbox_center(canvas)
+        :right -> Sketch.bbox_right(canvas)
+        other -> Polynomial.algebra(Sketch.bbox_left(canvas) + other)
+      end
+
+    y_location =
+      case y do
+        nil -> nil
+        :top -> Sketch.bbox_top(canvas)
+        :horizon -> Sketch.bbox_horizon(canvas)
+        :bottom -> Sketch.bbox_bottom(canvas)
+        other -> Polynomial.algebra(Sketch.bbox_top(canvas) + other)
+      end
+
+    x_handle =
+      case horizontal_alignment do
+        :left -> Sketch.bbox_left(sketch)
+        :center -> Sketch.bbox_center(sketch)
+        :right -> Sketch.bbox_right(sketch)
+      end
+
+    y_handle =
+      case vertical_alignment do
+        :top -> Sketch.bbox_top(sketch)
+        :horizon -> Sketch.bbox_horizon(sketch)
+        :baseline -> Sketch.bbox_bottom(sketch)
+        :bottom -> Sketch.bbox_bottom(sketch)
+      end
+
+    if x_location, do: assert(x_handle == x_location)
+    if y_location, do: assert(y_handle == y_location)
+
+    if contained_vertically_in_canvas do
+      assert(Sketch.bbox_top(sketch) >= Sketch.bbox_top(canvas))
+      assert(Sketch.bbox_bottom(sketch) <= Sketch.bbox_bottom(canvas))
+    end
+
+    if contained_horizontally_in_canvas do
+      assert(Sketch.bbox_left(sketch) >= Sketch.bbox_left(canvas))
+      assert(Sketch.bbox_right(sketch) <= Sketch.bbox_right(canvas))
+    end
   end
 
   def variable(name, opts \\ []) do
@@ -631,6 +775,19 @@ defmodule Quartz.Figure do
       %AxisData{} = axis_data ->
         {axis_data.plot_id, axis_data.axis_name}
 
+      %Polynomial{} = polynomial ->
+        variables = Polynomial.get_variables_by(polynomial, fn x ->
+          is_struct(x, AxisData)
+        end)
+
+        case variables  do
+          [] ->
+            nil
+
+          [variable | _] ->
+            {variable.plot_id, variable.axis_name}
+        end
+
       _other ->
         nil
     end
@@ -641,8 +798,21 @@ defmodule Quartz.Figure do
       %AxisData{value: value} ->
         value
 
-      other ->
-        other
+      %Polynomial{} = polynomial ->
+        variables = Polynomial.get_variables_by(polynomial, fn x ->
+          is_struct(x, AxisData)
+        end)
+
+        case variables  do
+          [] ->
+            nil
+
+          [variable | _] ->
+            variable.value
+        end
+
+      _other ->
+        nil
     end
   end
 
@@ -699,5 +869,87 @@ defmodule Quartz.Figure do
     assert(Sketch.bbox_left(item), :>=, Sketch.bbox_left(container))
 
     :ok
+  end
+
+  def new(args, fun) do
+    min_width = Keyword.get(args, :width, Length.cm(12))
+    min_height = Keyword.get(args, :height, Length.cm(8))
+    config = Keyword.get(args, :config, Config.new())
+    debug = Keyword.get(args, :debug, false)
+
+    default_font_dir = Path.join(
+      to_string(:code.priv_dir(:quartz)),
+      "fonts"
+    )
+
+    resvg_options = [
+      resources_dir: Keyword.get(args, :resources_dir, "."),
+      skip_system_fonts: Keyword.get(args, :skip_system_fonts, true),
+      font_dirs: Keyword.get(args, :font_dirs, [default_font_dir]),
+      dpi: Keyword.get(args, :dpi, 300)
+    ]
+
+    try do
+      # Figure without width or height
+      figure = %__MODULE__{
+        width: nil,
+        height: nil,
+        debug: debug,
+        config: config,
+        resvg_options: resvg_options,
+        store: %{}
+      }
+
+      # Put the figure so that we can generate variables for the width and height
+      Process.put(:"$quartz_figure", figure)
+
+      # Now that we have a figure, we can generate variables for the width and height.
+      # Quartz will try to design the smallest figure that fits the elements,
+      # with minimum values for width and height as given by the user.
+      width = variable("figure_width", min: min_width)
+      height = variable("figure_height", min: min_height)
+
+      minimize(width)
+      minimize(height)
+
+      # Update the figure with the height and width variables
+      update_current_figure(fn fig ->
+        {%{fig | width: width, height: height}, :ok}
+      end)
+
+      # Get the updated figure from the current process so that it can be used below
+      # as an argument to the anonymous function
+      figure = get_current_figure()
+
+      cond do
+        is_function(fun, 0) ->
+          fun.()
+
+        is_function(fun, 1) ->
+          fun.(figure)
+
+        is_function(fun, 2) ->
+          fun.(width, height)
+
+        true ->
+          raise "Function must be of arity 0, 1 or 2"
+      end
+
+      # Get the figure that might have been modified by the code above
+      figure = get_current_figure()
+
+      figure
+      |> finish_axes()
+      |> align_decorations_areas()
+      |> draw_plots()
+      |> get_measurements()
+      |> apply_scales_to_data()
+      |> solve_problem()
+      |> solve_figure_dimensions()
+      |> solve_sketches()
+      |> finalize()
+    after
+      Process.delete(:"$quartz_figure")
+    end
   end
 end

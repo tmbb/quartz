@@ -2,6 +2,7 @@ defmodule Quartz.SVG.Measuring do
   alias Quartz.SVG
   alias Quartz.Sketch
   alias Quartz.Utilities
+  alias Quartz.Text
 
   require Logger
 
@@ -41,7 +42,7 @@ defmodule Quartz.SVG.Measuring do
           # and this is why we need to create the quartz_sketches map withn string ids.
           sketch = Map.fetch!(quartz_sketches, resvg_node.id)
           # Add height and width to the current sketch
-          new_sketch = %{sketch | width: resvg_node.width, height: resvg_node.height}
+          new_sketch = measure_sketch(sketch, resvg_node)
           {sketch.id, new_sketch}
         end
 
@@ -50,27 +51,14 @@ defmodule Quartz.SVG.Measuring do
     end)
   end
 
-  def test() do
-    alias Quartz.Figure
-    alias Quartz.Text
+  def measure_sketch(%Text{} = text, resvg_node) do
+    height = -resvg_node.y
+    depth = resvg_node.height + resvg_node.y
 
-    resvg_options = [
-      resources_dir: ".",
-      skip_system_fonts: true,
-      font_dirs: ["priv/fonts"],
-      dpi: 600
-    ]
+    %{text | width: resvg_node.width, depth: depth, height: height}
+  end
 
-    Figure.new([width: 100, height: 100], fn _ ->
-      elements = [
-        Text.new("this is some text",
-          id: 1, size: 12,
-          x: 0, y: 50,
-          font: "Linux Libertine"
-        )
-      ]
-
-      measure(elements, resvg_options)
-    end)
+  def measure_sketch(sketch, resvg_node) do
+    %{sketch | width: resvg_node.width, height: resvg_node.height}
   end
 end

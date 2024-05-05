@@ -70,8 +70,9 @@ defmodule Quartz.Circle do
   end
 
   defimpl Quartz.Sketch.Protocol do
+    alias Quartz.Sketch.BBoxBounds
+    require Dantzig.Polynomial, as: Polynomial
     use Dantzig.Polynomial.Operators
-    alias Quartz.Point2D
 
     @impl true
     def lengths(circle) do
@@ -89,6 +90,16 @@ defmodule Quartz.Circle do
         | center_x: transformed_center_x,
           center_y: transformed_center_y,
           radius: transformed_radius
+      }
+    end
+
+    @impl true
+    def bbox_bounds(circle) do
+      %BBoxBounds{
+        x_min: Polynomial.algebra(circle.x - circle.radius),
+        x_max: Polynomial.algebra(circle.x + circle.radius),
+        y_min: Polynomial.algebra(circle.y - circle.radius),
+        y_max: Polynomial.algebra(circle.y + circle.radius),
       }
     end
 

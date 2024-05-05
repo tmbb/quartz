@@ -6,21 +6,24 @@ defmodule Quartz.Plot2D do
   alias Quartz.AxisReference
   alias Quartz.Circle
   alias Quartz.Line
+  alias Quartz.LinearPath
   alias Quartz.Plot2DElement
   alias Quartz.Length
   alias Quartz.Text
   alias Quartz.Sketch
   alias Quartz.Config
   alias Quartz.Color.RGB
+  alias Quartz.ColorMap
 
   require Quartz.KeywordSpec, as: KeywordSpec
-
-  alias Dantzig.Polynomial
-  use Dantzig.Polynomial.Operators
+  require Dantzig.Polynomial, as: Polynomial
+  # use Dantzig.Polynomial.Operators
 
   @decorations_area_content_padding Length.pt(7)
   @boundaries_padding Length.pt(10)
-  @title_inner_padding Length.pt(12)
+  @title_inner_padding Length.pt(6)
+
+  @default_color_map ColorMap.tab10()
 
   defstruct id: nil,
             title: nil,
@@ -47,6 +50,10 @@ defmodule Quartz.Plot2D do
             bottom_content_padding: @decorations_area_content_padding,
             left_content_padding: @decorations_area_content_padding,
             right_content_padding: @decorations_area_content_padding,
+            top_margin: nil,
+            right_margin: nil,
+            bottom_margin: nil,
+            left_margin: nil,
             data: [],
             axes: %{},
             plot_area: nil,
@@ -59,16 +66,27 @@ defmodule Quartz.Plot2D do
             bottom_decorations_area: nil,
             bottom_left_decorations_area: nil,
             left_decorations_area: nil,
-            top_left_decorations_area: nil
+            top_left_decorations_area: nil,
+            categorical_color_map: @default_color_map,
+            categorical_color_index: 0,
+            width_to_aspect_ratio: nil
 
   @type t :: %__MODULE__{}
 
   def new(opts \\ []) do
-    plot_id =
-      case Keyword.fetch(opts, :id) do
-        {:ok, id} -> id
-        :error -> Figure.get_id()
-      end
+    KeywordSpec.validate!(opts, [
+      id: nil,
+      categorical_color_map: @default_color_map
+    ])
+
+    id = case id do
+      nil ->
+        default_id_suffix = Figure.get_id()
+        "plot_#{default_id_suffix}"
+
+      other ->
+        other
+    end
 
     top = Figure.variable("plot_bounds_top", [])
     bottom = Figure.variable("plot_bounds_bottom", [])
@@ -159,17 +177,24 @@ defmodule Quartz.Plot2D do
     stack_vertically_inside_container([title_area | center_areas], plot_area)
     stack_vertically_inside_container([title_area | right_areas], plot_area)
 
-    Figure.maximize(data_area.width)
-    Figure.maximize(data_area.height)
-
     Figure.minimize(title_area.height)
     Figure.minimize(top_decorations_area.height)
     Figure.minimize(bottom_decorations_area.height)
     Figure.minimize(right_decorations_area.width)
     Figure.minimize(left_decorations_area.width)
 
+    Figure.assert(
+      title_area.height + top_decorations_area.height +
+      data_area.height + bottom_decorations_area.height == plot_area.height
+    )
+
+    Figure.assert(
+      left_decorations_area.width + data_area.width +
+      right_decorations_area.width == plot_area.width
+    )
+
     plot = %__MODULE__{
-      id: plot_id,
+      id: id,
       title: nil,
       top: top,
       bottom: bottom,
@@ -189,7 +214,8 @@ defmodule Quartz.Plot2D do
       bottom_decorations_area: bottom_decorations_area,
       bottom_left_decorations_area: bottom_left_decorations_area,
       left_decorations_area: left_decorations_area,
-      top_left_decorations_area: top_left_decorations_area
+      top_left_decorations_area: top_left_decorations_area,
+      categorical_color_map: categorical_color_map
     }
 
     plot
@@ -206,13 +232,38 @@ defmodule Quartz.Plot2D do
     left_bound = Access.get(bounds, :left, 0.0)
     right_bound = Access.get(bounds, :right, Figure.current_figure_width())
 
+    # The margin is based on the label size of the figure
+    label_opts = Config.get_axis_label_text_attributes([])
+    font_size = Keyword.fetch!(label_opts, :size)
+    default_margin_size = Kernel.*(0.25, font_size)
+
+    top_margin = plot.top_margin || default_margin_size
+    right_margin = plot.right_margin || default_margin_size
+    bottom_margin = plot.bottom_margin || default_margin_size
+    left_margin = plot.left_margin || default_margin_size
+
+    # Correct the bounds according to the margins we've specified
+    top_bound_with_margin = Polynomial.algebra(top_bound + top_margin)
+    right_bound_with_margin = Polynomial.algebra(right_bound - right_margin)
+    bottom_bound_with_margin = Polynomial.algebra(bottom_bound - bottom_margin)
+    left_bound_with_margin = Polynomial.algebra(left_bound + left_margin)
+
     %{
       plot
-      | current_top_bound: top_bound,
-        current_bottom_bound: bottom_bound,
-        current_left_bound: left_bound,
-        current_right_bound: right_bound
+      | current_top_bound: top_bound_with_margin,
+        current_right_bound: right_bound_with_margin,
+        current_bottom_bound: bottom_bound_with_margin,
+        current_left_bound: left_bound_with_margin
     }
+  end
+
+  defguardp is_axes(axes) when is_list(axes) or is_binary(axes)
+
+  def put_major_tick_labels_style(plot, axes_name, style) when is_axes(axes_name) do
+    axes_name = List.wrap(axes_name)
+    update_axes(plot, axes_name, fn axis ->
+      Axis2D.put_major_tick_labels_style(axis, style)
+    end)
   end
 
   def add_bottom_axis(plot, name, opts \\ []) do
@@ -304,6 +355,30 @@ defmodule Quartz.Plot2D do
     end)
   end
 
+  def put_width_to_height_ratio(plot, ratio) when is_number(ratio) do
+    %{plot | width_to_aspect_ratio: ratio}
+  end
+
+  def remove_axis_ticks(plot, axis_name) do
+    update_axis(plot, axis_name, fn axis ->
+      axis
+      |> Axis2D.put_major_tick_locations([])
+      |> Axis2D.put_major_tick_labels([])
+    end)
+  end
+
+  def put_axis_major_tick_locations(plot, axis_name, locations) do
+    update_axis(plot, axis_name, fn axis ->
+      Axis2D.put_major_tick_locations(axis, locations)
+    end)
+  end
+
+  def put_axis_major_tick_labels(plot, axis_name, labels) do
+    update_axis(plot, axis_name, fn axis ->
+      Axis2D.put_major_tick_labels(axis, labels)
+    end)
+  end
+
   def put_axis_scale(plot, axis_name, scale) do
     update_axis(plot, axis_name, fn axis ->
       Axis2D.put_scale(axis, scale)
@@ -315,6 +390,12 @@ defmodule Quartz.Plot2D do
     updated_axis = fun.(axis)
     new_axes = Map.put(plot.axes, axis_name, updated_axis)
     %{plot | axes: new_axes}
+  end
+
+  def update_axes(plot, axis_names, fun) do
+    Enum.reduce(axis_names, plot, fn axis_name, current_plot ->
+      update_axis(current_plot, axis_name, fun)
+    end)
   end
 
   def put_minimum_axis_start_margin(plot, axis_name, value) do
@@ -347,10 +428,13 @@ defmodule Quartz.Plot2D do
   end
 
   def put_title(plot, title, opts \\ []) do
+    prefix = "plot_title"
     # Separate the text-related options from the other options
     {user_given_text_opts, opts} = Keyword.pop(opts, :text, [])
     # Merge the user-given text options with the default options for this figure
     text_opts = Config.get_plot_title_text_attributes(user_given_text_opts)
+    # Add the prefix for better debugging
+    text_opts = [{:prefix, prefix} | text_opts]
 
     # Handle the non-text-related options
     alignment = Keyword.get(opts, :alignment, :left)
@@ -369,7 +453,19 @@ defmodule Quartz.Plot2D do
 
   def finalize(plot) do
     plot = fix_bounds(plot)
+
+    # Set the aspect ratio if given
+    if plot.width_to_aspect_ratio do
+      Figure.assert(
+        plot.data_area.width ==
+          plot.width_to_aspect_ratio * plot.data_area.height
+      )
+    end
+
+    # Add the plot to the figure so that the figure machinery
+    # can handle the converting of scales and things like that.
     :ok = Figure.put_plot_in_current_figure(plot)
+
     plot
   end
 
@@ -382,7 +478,7 @@ defmodule Quartz.Plot2D do
     Enum.reduce(reordered_content, y0, fn element, y ->
       drawn = Plot2DElement.draw(element, plot, x0, y)
       Figure.assert_vertically_contained_in(drawn, plot.bottom_decorations_area)
-      Sketch.bbox_bottom(drawn) + padding
+      Polynomial.algebra(Sketch.bbox_bottom(drawn) + padding)
     end)
 
     :ok
@@ -397,7 +493,7 @@ defmodule Quartz.Plot2D do
     Enum.reduce(reordered_content, y0, fn element, y ->
       drawn = Plot2DElement.draw(element, plot, x0, y)
       Figure.assert_vertically_contained_in(drawn, plot.top_decorations_area)
-      y - Sketch.bbox_height(drawn) - padding
+      Polynomial.algebra(y - Sketch.bbox_height(drawn) - padding)
     end)
 
     :ok
@@ -412,7 +508,7 @@ defmodule Quartz.Plot2D do
     Enum.reduce(reordered_content, x0, fn element, x ->
       drawn = Plot2DElement.draw(element, plot, x, y0)
       Figure.assert_horizontally_contained_in(drawn, plot.left_decorations_area)
-      x - Sketch.bbox_width(drawn) - padding
+      Polynomial.algebra(x - Sketch.bbox_width(drawn) - padding)
     end)
 
     :ok
@@ -427,7 +523,7 @@ defmodule Quartz.Plot2D do
     Enum.reduce(reordered_content, x0, fn element, x ->
       drawn = Plot2DElement.draw(element, plot, x, y0)
       Figure.assert_horizontally_contained_in(drawn, plot.right_decorations_area)
-      Sketch.bbox_right(drawn) + padding
+      Polynomial.algebra(Sketch.bbox_right(drawn) + padding)
     end)
 
     :ok
@@ -435,7 +531,7 @@ defmodule Quartz.Plot2D do
 
   def draw_title(plot) do
     if plot.title do
-      y_offset = -1 * plot.title_inner_padding
+      y_offset = Polynomial.algebra(-1 * plot.title_inner_padding)
 
       Figure.position_with_location_and_alignment(
         plot.title,
@@ -458,13 +554,42 @@ defmodule Quartz.Plot2D do
     draw_bottom_content(plot, plot.bottom_content_padding)
   end
 
+  def maybe_next_color_from_colormap(plot, opts) do
+    # Validate the color and alpha from the style
+    KeywordSpec.validate!(opts, style: [])
+    KeywordSpec.validate!(style, color: nil, alpha: nil)
+
+    if color do
+      # If the color was given, return the given color and the plot unchanged
+      {color, plot}
+    else
+      # If no color is given, get it from the colormap
+      index = plot.categorical_color_index
+      next_color = ColorMap.get_color(plot.categorical_color_map, index)
+
+      # Update the color's alpha if given
+      next_color =
+        if alpha do
+          %{next_color | alpha: alpha}
+        else
+          next_color
+        end
+
+      new_plot = %{plot | categorical_color_index: Kernel.+(index, 1)}
+
+      {next_color, new_plot}
+    end
+  end
+
   def boxplot(plot, _data) do
     plot
   end
 
   def scatter_plot(plot, data_x, data_y, opts \\ []) do
+    {default_color, plot} = maybe_next_color_from_colormap(plot, opts)
+
     KeywordSpec.validate!(opts, style: [], x_axis: "x", y_axis: "y")
-    KeywordSpec.validate!(style, [radii, color: RGB.teal(), radius: Length.pt(2)])
+    KeywordSpec.validate!(style, [radii, color: default_color, radius: Length.pt(2)])
 
     # Convert eveyrthing that might be a polynomial into a number
     data_x = Enum.map(data_x, &Polynomial.to_number!/1)
@@ -504,34 +629,40 @@ defmodule Quartz.Plot2D do
   end
 
   def line_plot(plot, data_x, data_y, opts \\ []) do
+    {default_color, plot} = maybe_next_color_from_colormap(plot, opts)
+
     KeywordSpec.validate!(opts, style: [], x_axis: "x", y_axis: "y")
-    KeywordSpec.validate!(style, stroke_cap: "round", color: RGB.teal())
+
+    KeywordSpec.validate!(style,
+      stroke_cap: "round",
+      stroke_join: nil,
+      stroke_dash: nil,
+      stroke_thickness: nil,
+      color: default_color
+    )
 
     # Convert eveyrthing that might be a polynomial into a number
     xs = Enum.map(data_x, &Polynomial.to_number!/1)
     ys = Enum.map(data_y, &Polynomial.to_number!/1)
 
-    # 1st point of the line segment
-    xy_1 = Enum.zip(xs, ys)
-    # 2nd point of the line segment
-    xy_2 = Enum.zip(xs, ys) |> Enum.drop(1)
+    path_points =
+      for {x, y} <- Enum.zip(xs, ys) do
+        # Convert the numeric values into variables
+        path_x = AxisData.new(x, plot.id, x_axis) |> Polynomial.variable()
+        path_y = AxisData.new(y, plot.id, y_axis) |> Polynomial.variable()
 
-    for {{x1, y1}, {x2, y2}} <- Enum.zip(xy_1, xy_2) do
-      # Convert the numeric values into variables
-      line_x1 = AxisData.new(x1, plot.id, x_axis) |> Polynomial.variable()
-      line_y1 = AxisData.new(y1, plot.id, y_axis) |> Polynomial.variable()
-      line_x2 = AxisData.new(x2, plot.id, x_axis) |> Polynomial.variable()
-      line_y2 = AxisData.new(y2, plot.id, y_axis) |> Polynomial.variable()
+        {path_x, path_y}
+      end
 
-      Line.new(
-        x1: line_x1,
-        y1: line_y1,
-        x2: line_x2,
-        y2: line_y2,
-        stroke_cap: stroke_cap,
-        stroke_paint: color
-      )
-    end
+    LinearPath.new(
+      points: path_points,
+      closed: false,
+      stroke_paint: color,
+      stroke_cap: stroke_cap,
+      stroke_join: stroke_join,
+      stroke_dash: stroke_dash,
+      stroke_thickness: stroke_thickness
+    )
 
     plot
   end
@@ -559,7 +690,7 @@ defmodule Quartz.Plot2D do
   end
 
   def draw_function_contour_plot(plot, fun, x_min, x_max, y_min, y_max, countour_levels, opts \\ []) do
-    KeywordSpec.validate!(opts, style: [], x_axis: "x", y_axis: "y", n: 15)
+    KeywordSpec.validate!(opts, style: [], x_axis: "x", y_axis: "y", n: 100)
     KeywordSpec.validate!(style, stroke_cap: "round", color: RGB.teal())
 
     delta_x = Kernel.-(x_max, x_min)

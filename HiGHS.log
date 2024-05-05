@@ -1,18 +1,17 @@
 Running HiGHS 1.4.0 [date: 1970-01-01, git hash: bcf6c0b22]
 Copyright (c) 2022 ERGO-Code under MIT licence terms
-LP   1PNCPCT_model has 118 rows; 96 cols; 307 nonzeros
+LP   G0F928_model has 184 rows; 142 cols; 490 nonzeros
 Presolving model
-44 rows, 28 cols, 115 nonzeros
-11 rows, 14 cols, 31 nonzeros
-11 rows, 13 cols, 30 nonzeros
-Presolve : Reductions: rows 11(-107); columns 13(-83); elements 30(-277)
-Solving the presolved LP
-Using EKK dual simplex solver - serial
+Solving the original LP with primal simplex to determine infeasible or unbounded
+Using EKK primal simplex solver
   Iteration        Objective     Infeasibilities num(sum)
-          0    -5.9999823579e+00 Ph1: 7(6000); Du: 2(5.99998) 0s
-         10    -7.3935935219e+02 Pr: 0(0) 0s
-Solving the original LP from the solution after postsolve
-Model   status      : Optimal
-Simplex   iterations: 10
-Objective value     :  7.3935935219e+02
+          0    -3.4015736841e+03 Ph1: 87(740.499); Du: 75(107.342) 0s
+        139    -5.7791216644e+03 Pr: 0(0); Du: 2(20) 0s
+Using EKK primal simplex solver
+  Iteration        Objective     Infeasibilities num(sum)
+        139    -5.7791209463e+03 Pr: 0(0); Du: 2(20) 0s
+        140    -5.3131456826e+03 Pr: 0(0); Du: 1(10) 0s
+Model   status      : Unbounded
+Simplex   iterations: 140
+Objective value     : -5.3131456826e+03
 HiGHS run time      :          0.00

@@ -1,7 +1,0 @@
-<svg width="1000" height="100" xmlns="http://www.w3.org/2000/svg">
-  <text id="0" x="0" y="50" font-size="12"
-        font-weight="bold" font-family="Ubuntu">this is some text</text>
-  <text id="1" x="0" y="75" font-family="DejaVu Sans Mono"
-        font-size="12">this is some text</text>
-  <rect id="2" x="0" y="52" height="8" width="50"/>
-</svg>

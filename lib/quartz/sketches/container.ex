@@ -72,118 +72,16 @@ defmodule Quartz.Container do
 
   defimpl Quartz.Sketch.Protocol do
     use Dantzig.Polynomial.Operators
-    alias Quartz.Point2D
-
-    defp horizontal_center(container) do
-      (container.x + container.width) * 0.5
-    end
-
-    defp vertical_center(container) do
-      (container.y + container.height) * 0.5
-    end
+    alias Quartz.Sketch.BBoxBounds
 
     @impl true
-    def top_center(container) do
-      %Point2D{
-        x: horizontal_center(container),
-        y: container.y
+    def bbox_bounds(container) do
+      %BBoxBounds{
+        x_min: container.x,
+        x_max: container.x + container.width,
+        y_min: container.y,
+        y_max: container.y + container.height
       }
-    end
-
-    @impl true
-    def top_right(container) do
-      %Point2D{
-        x: container.x + container.width,
-        y: container.y
-      }
-    end
-
-    @impl true
-    def horizon_right(container) do
-      %Point2D{
-        x: container.x + container.width,
-        y: vertical_center(container)
-      }
-    end
-
-    @impl true
-    def bottom_right(container) do
-      %Point2D{
-        x: container.x + container.width,
-        y: container.y + container.height
-      }
-    end
-
-    @impl true
-    def bottom_center(container) do
-      %Point2D{
-        x: horizontal_center(container),
-        y: container.y + container.height
-      }
-    end
-
-    @impl true
-    def bottom_left(container) do
-      %Point2D{
-        x: container.x,
-        y: container.y + container.height
-      }
-    end
-
-    @impl true
-    def horizon_left(container) do
-      %Point2D{
-        x: container.x,
-        y: vertical_center(container)
-      }
-    end
-
-    @impl true
-    def top_left(container) do
-      %Point2D{
-        x: container.x,
-        y: container.y + container.height
-      }
-    end
-
-    @impl true
-    def bbox_center(container) do
-      0.5 * (bbox_left(container) + bbox_right(container))
-    end
-
-    @impl true
-    def bbox_horizon(container) do
-      0.5 * (bbox_top(container) + bbox_bottom(container))
-    end
-
-    @impl true
-    def bbox_top(container) do
-      container.y
-    end
-
-    @impl true
-    def bbox_left(container) do
-      container.x
-    end
-
-    @impl true
-    def bbox_right(container) do
-      container.x + container.width
-    end
-
-    @impl true
-    def bbox_bottom(container) do
-      container.y + container.height
-    end
-
-    @impl true
-    def bbox_height(container) do
-      bbox_bottom(container) - bbox_top(container)
-    end
-
-    @impl true
-    def bbox_width(container) do
-      bbox_right(container) - bbox_left(container)
     end
 
     @impl true

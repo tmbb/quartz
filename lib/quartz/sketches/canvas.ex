@@ -1,30 +1,25 @@
 defmodule Quartz.Canvas do
   alias Quartz.Figure
   alias Quartz.Variable
-  alias Quartz.Length
-  alias Quartz.Color.RGB
   alias Quartz.SVG
-  alias Quartz.Point2D
-
-  @debug_stroke %{
-    thickness: Length.pt(0.5),
-    paint: RGB.gray(),
-    dash: "dotted"
-  }
+  alias Quartz.Canvas.CanvasDebugProperties
+  alias Quartz.Config
 
   defstruct id: nil,
             x: nil,
             y: nil,
+            prefix: nil,
             width: nil,
             height: nil,
-            stroke: nil,
+            debug: false,
+            debug_properties: nil,
             contents: nil
 
   def new(opts \\ []) do
     prefix = Keyword.get(opts, :prefix, nil)
     # Assign variables (= Dantzig monomials) to the parameters of the canvas
-    x = Variable.maybe_variable(opts, :x, Variable.maybe_with_prefix(prefix, "canvas_x"), [])
-    y = Variable.maybe_variable(opts, :y, Variable.maybe_with_prefix(prefix, "canvas_y"), [])
+    x = Variable.maybe_variable(opts, :x, Variable.maybe_with_prefix(prefix, "canvas_x"), min: 0)
+    y = Variable.maybe_variable(opts, :y, Variable.maybe_with_prefix(prefix, "canvas_y"), min: 0)
 
     height =
       Variable.maybe_variable(opts, :height, Variable.maybe_with_prefix(prefix, "canvas_height"),
@@ -36,29 +31,22 @@ defmodule Quartz.Canvas do
         min: 0
       )
 
-    stroke =
-      case Keyword.fetch(opts, :stroke) do
-        {:ok, value} ->
-          value
-
-        :error ->
-          case Figure.debug?() do
-            true -> @debug_stroke
-            false -> nil
-          end
-      end
-
     # Get the next available ID from the figure
     id = Figure.get_id()
+
+    debug = Figure.debug?()
+    debug_properties = if debug, do: Config.get_canvas_debug_properties(), else: nil
 
     # Create the actual canvas
     canvas = %__MODULE__{
       id: id,
       x: x,
       y: y,
+      prefix: prefix,
       height: height,
       width: width,
-      stroke: stroke
+      debug: debug,
+      debug_properties: debug_properties
     }
 
     # Add the canvas to the figure
@@ -69,16 +57,17 @@ defmodule Quartz.Canvas do
   end
 
   defimpl Quartz.Sketch.Protocol do
-    use Dantzig.Polynomial.Operators
+    require Dantzig.Polynomial, as: Polynomial
+    alias Quartz.Formatter
     alias Quartz.Sketch.BBoxBounds
 
     @impl true
     def bbox_bounds(canvas) do
       %BBoxBounds{
         x_min: canvas.x,
-        x_max: canvas.x + canvas.width,
+        x_max: Polynomial.algebra(canvas.x + canvas.width),
         y_min: canvas.y,
-        y_max: canvas.y + canvas.height
+        y_max: Polynomial.algebra(canvas.y + canvas.height)
       }
     end
 
@@ -110,18 +99,31 @@ defmodule Quartz.Canvas do
 
     @impl true
     def to_svg(canvas) do
-      if canvas.stroke do
-        thickness = Access.get(canvas.stroke, :thickness, 0.75)
-        paint = Access.get(canvas.stroke, :paint, "gray")
+      if canvas.debug do
+        # Get some extra attributes for our rectangle
+        debug_attrs = CanvasDebugProperties.to_svg_attributes(canvas.debug_properties)
 
-        SVG.rect(
+        rect_attrs = [
           id: canvas.id,
           x: canvas.x,
           y: canvas.y,
           width: canvas.width,
           height: canvas.height,
-          stroke: paint
-        )
+        ]
+
+        all_attrs = rect_attrs ++ debug_attrs
+
+        tooltip_text = [
+          "Canvas [#{canvas.id}] #{canvas.prefix} &#13;",
+          "&#160;↳&#160;x = #{Formatter.rounded_float(canvas.x, 2)}pt&#13;",
+          "&#160;↳&#160;y = #{Formatter.rounded_float(canvas.y, 2)}pt&#13;",
+          "&#160;↳&#160;width = #{Formatter.rounded_float(canvas.width, 2)}pt&#13;",
+          "&#160;↳&#160;height = #{Formatter.rounded_float(canvas.height, 2)}pt"
+        ]
+
+        SVG.rect(all_attrs, [
+          SVG.title([], SVG.escaped_iodata(tooltip_text)),
+        ])
       else
         SVG.g([id: canvas.id], [])
       end

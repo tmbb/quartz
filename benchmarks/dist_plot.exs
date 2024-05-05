@@ -23,7 +23,7 @@ defmodule Quartz.Benchmarks.LinePlot do
     color_4 = RGB.dark_red(1.0)
 
     figure =
-      Figure.new([width: Length.cm(8), height: Length.cm(6)], fn _fig ->
+      Figure.new([width: Length.cm(8), height: Length.cm(4), debug: true], fn _fig ->
         _plot =
           Plot2D.new(id: "plot_A")
           |> Plot2D.kde_plot(theta_1, style: [color: color_1])
@@ -35,31 +35,34 @@ defmodule Quartz.Benchmarks.LinePlot do
           |> Plot2D.put_title("A. Probability distribution")
           |> Plot2D.put_axis_label("x", "𝜃", text: [escape: false])
           |> Plot2D.put_axis_label("y", "P(𝜃)", text: [escape: false])
+          |> Plot2D.remove_axis_ticks("y")
           |> Plot2D.finalize()
       end)
 
-
     path = Path.join([__DIR__, "dist_plot", "example.svg"])
     Figure.render_to_svg_file!(figure, path)
+
+    path = Path.join([__DIR__, "dist_plot", "example.png"])
+    Figure.render_to_png_file!(figure, path)
   end
 
   def run_benchee() do
     Benchee.run(%{
-      "line_plot" => fn -> build_plot() end
+      "kde_plot" => fn -> build_plot() end
       },
       time: 5,
       memory_time: 3,
-      title: "Line plot"
+      title: "KDE plot"
     )
   end
 
   def run_incendium() do
     Incendium.run(%{
-      "line_plot" => fn -> build_plot() end
+      "kde_plot" => fn -> build_plot() end
       },
       time: 5,
       memory_time: 3,
-      title: "Line plot"
+      title: "KDE plot"
     )
   end
 end

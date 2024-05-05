@@ -22,6 +22,8 @@ defmodule Quartz.MixProject do
   defp deps do
     [
       {:dantzig, path: "../dantzig"},
+      {:incendium, path: "../incendium"},
+      {:statistics, "~> 0.6", only: :dev},
       # {:resvg, "~> 0.3"},
       {:resvg, path: "../resvg_nif"},
       {:decimal, "> 0.0.0"},
@@ -29,7 +31,8 @@ defmodule Quartz.MixProject do
       {:benchee, "~> 1.3"},
       {:explorer, "~> 0.8"},
       {:rustler, "~> 0.31", override: true},
-      {:rustler_precompiled, "~> 0.7", override: true}
+      {:rustler_precompiled, "~> 0.7", override: true},
+      {:ex_doc, "~> 0.31", only: :dev}
     ]
   end
 end

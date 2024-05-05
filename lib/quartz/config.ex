@@ -1,5 +1,8 @@
 defmodule Quartz.Config do
   alias Quartz.Figure
+  alias Quartz.Length
+  alias Quartz.Color.RGB
+  alias Quartz.Canvas.CanvasDebugProperties
 
   defstruct text_font: "Ubuntu",
             text_style: nil,
@@ -63,7 +66,60 @@ defmodule Quartz.Config do
             major_tick_label_slashed_zero: nil,
             major_tick_label_fractions: nil,
             major_tick_label_features: nil,
-            major_tick_label_escape: true
+            major_tick_label_escape: true,
+            # Axis styles
+            axis_stroke: nil,
+            axis_stroke_dash_array: nil,
+            axis_stroke_dash_offset: nil,
+            axis_stroke_line_cap: nil,
+            axis_stroke_line_join: nil,
+            axis_stroke_mitter_limit: nil,
+            axis_stroke_opacity: nil,
+            axis_stroke_widh: nil,
+            # Ticks
+            tick_stroke: nil,
+            tick_stroke_dash_array: nil,
+            tick_stroke_dash_offset: nil,
+            tick_stroke_line_cap: nil,
+            tick_stroke_line_join: nil,
+            tick_stroke_mitter_limit: nil,
+            tick_stroke_opacity: nil,
+            tick_stroke_width: nil,
+            # Major ticks
+            major_tick_size: Length.pt(4),
+            major_tick_stroke: nil,
+            major_tick_stroke_dash_array: nil,
+            major_tick_stroke_dash_offset: nil,
+            major_tick_stroke_line_cap: nil,
+            major_tick_stroke_line_join: nil,
+            major_tick_stroke_mitter_limit: nil,
+            major_tick_stroke_opacity: nil,
+            major_tick_stroke_width: nil,
+            # Minor ticks
+            minor_tick_size: Length.pt(2),
+            minor_tick_stroke: nil,
+            minor_tick_stroke_dash_array: nil,
+            minor_tick_stroke_dash_offset: nil,
+            minor_tick_stroke_line_cap: nil,
+            minor_tick_stroke_line_join: nil,
+            minor_tick_stroke_mitter_limit: nil,
+            minor_tick_stroke_opacity: nil,
+            minor_tick_stroke_width: nil,
+            # Axis for Plot2D elements
+            plot2d_axis_stroke: nil,
+            plot2d_axis_stroke_dash_array: nil,
+            plot2d_axis_stroke_dash_offset: nil,
+            plot2d_axis_stroke_line_cap: nil,
+            plot2d_axis_stroke_line_join: nil,
+            plot2d_axis_stroke_mitter_limit: nil,
+            plot2d_axis_stroke_opacity: nil,
+            plot2d_axis_stroke_width: nil,
+            # Debug values
+            debug_canvas_stroke: RGB.gray(),
+            debug_canvas_stroke_width: Length.pt(0.5),
+            debug_canvas_stroke_dash_array: "2 4",
+            debug_canvas_fill: RGB.white(0)
+
 
   def new(opts \\ []) do
     struct(__MODULE__, opts)
@@ -72,6 +128,17 @@ defmodule Quartz.Config do
   def get_config() do
     figure = Figure.get_current_figure()
     figure.config
+  end
+
+  def get_canvas_debug_properties() do
+    config = get_config()
+
+    %CanvasDebugProperties{
+      fill: config.debug_canvas_fill,
+      stroke: config.debug_canvas_stroke,
+      stroke_width: config.debug_canvas_stroke_width,
+      stroke_dash_array: config.debug_canvas_stroke_dash_array,
+    }
   end
 
   def get_plot_title_text_attributes(opts \\ []) do
@@ -84,6 +151,53 @@ defmodule Quartz.Config do
 
   def get_major_tick_label_text_attributes(opts \\ []) do
     major_tick_label_text_attributes(get_config(), opts)
+  end
+
+  def get_major_tick_attributes(opts \\ []) do
+    major_tick_attributes(get_config(), opts)
+  end
+
+  def get_minor_tick_attributes(opts \\ []) do
+    minor_tick_attributes(get_config(), opts)
+  end
+
+  def get_major_tick_size(axis) do
+    axis.major_tick_size || major_tick_size(get_config(), [])
+  end
+
+  def major_tick_size(%__MODULE__{} = config, opts) do
+    [major_tick_size: major_tick_size] =
+      get_many_with_fallbacks(opts, config,
+        major_tick_size: {:major_tick_size, []}
+      )
+
+    major_tick_size
+  end
+
+  def major_tick_attributes(%__MODULE__{} = config, opts) do
+    get_many_with_fallbacks(opts, config,
+      stroke: {:major_tick_stroke, []},
+      "stroke-dasharray": {:major_tick_stroke_dash_array, []},
+      "stroke-dashoffset": {:major_tick_stroke_dash_offset, []},
+      "stroke-linecap": {:major_tick_stroke_line_cap, []},
+      "stroke-linejoin": {:major_tick_stroke_line_join, []},
+      "stroke-mitterlimit": {:major_tick_stroke_mitter_limit, []},
+      "stroke-opacity": {:major_tick_stroke_opacity, []},
+      "stroke-width": {:major_tick_stroke_width, []}
+    )
+  end
+
+  def minor_tick_attributes(%__MODULE__{} = config, opts) do
+    get_many_with_fallbacks(opts, config,
+      stroke: {:minor_tick_stroke, []},
+      "stroke-dasharray": {:minor_tick_stroke_dash_array, []},
+      "stroke-dashoffset": {:minor_tick_stroke_dash_offset, []},
+      "stroke-linecap": {:minor_tick_stroke_line_cap, []},
+      "stroke-linejoin": {:minor_tick_stroke_line_join, []},
+      "stroke-mitterlimit": {:minor_tick_stroke_mitter_limit, []},
+      "stroke-opacity": {:minor_tick_stroke_opacity, []},
+      "stroke-width": {:minor_tick_stroke_width, []}
+    )
   end
 
   def plot_title_text_attributes(%__MODULE__{} = config, opts) do

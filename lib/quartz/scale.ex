@@ -1,5 +1,5 @@
 defmodule Quartz.Scale do
-  alias Dantzig.Polynomial
+  require Dantzig.Polynomial, as: Polynomial
   alias Quartz.AxisData
   alias Quartz.Sketch
 
@@ -93,8 +93,7 @@ defmodule Quartz.Scale do
             axis_scale
           )
 
-        position = start_coord + axis_size * scaled_value
-        # Polynomial.add(start_coord, Polynomial.multiply(axis_size, scaled_value))
+        position = Polynomial.algebra(start_coord + axis_size * scaled_value)
 
         {variable, position}
       end
@@ -112,9 +111,17 @@ defmodule Quartz.Scale do
   end
 
   @doc false
-  def apply_scales_to_sketches(sketches, lengths, axes) do
+  def apply_scales_to_sketches_and_constraints(sketches, constraints, lengths, axes) do
     substitutions = get_substitutions_for_axes(lengths, axes)
 
+    sketches = apply_scales_to_sketches(sketches, substitutions, axes)
+    constraints = apply_scales_to_constraints(constraints, substitutions, axes)
+
+    {sketches, constraints}
+  end
+
+  @doc false
+  def apply_scales_to_sketches(sketches, substitutions, axes) do
     for {sketch_id, sketch} <- sketches, into: %{} do
       transformed_sketch =
         Sketch.transform_lengths(sketch, fn length ->
@@ -122,6 +129,37 @@ defmodule Quartz.Scale do
         end)
 
       {sketch_id, transformed_sketch}
+    end
+  end
+
+  @doc false
+  def apply_scales_to_constraints(constraints, substitutions, axes) do
+    for {constraint_id, constraint} <- constraints, into: %{} do
+      new_lhs =
+        if is_number(constraint.left_hand_side) do
+          constraint.left_hand_side
+        else
+          Polynomial.substitute(constraint.left_hand_side, substitutions)
+        end
+
+      # TODO: make sure this is needed.
+      # probably not because I think constraints normalize themselves
+      # so that the right hand side is a number
+      new_rhs =
+        if is_number(constraint.right_hand_side) do
+          constraint.right_hand_side
+        else
+          Polynomial.substitute(constraint.right_hand_side, substitutions)
+        end
+
+
+      transformed_constraint = %{
+        constraint |
+        left_hand_side: new_lhs,
+        right_hand_side: new_rhs
+      }
+
+      {constraint_id, transformed_constraint}
     end
   end
 end
