@@ -1,4 +1,6 @@
 defmodule Quartz.TickManagers.PowerMajorTickManager do
+  @moduledoc false
+
   alias Quartz.Formatter
 
   def nr_of_multiples_of_n_between(n, a, b) do

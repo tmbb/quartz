@@ -120,7 +120,6 @@ defmodule Quartz.Config do
             debug_canvas_stroke_dash_array: "2 4",
             debug_canvas_fill: RGB.white(0)
 
-
   def new(opts \\ []) do
     struct(__MODULE__, opts)
   end
@@ -137,7 +136,7 @@ defmodule Quartz.Config do
       fill: config.debug_canvas_fill,
       stroke: config.debug_canvas_stroke,
       stroke_width: config.debug_canvas_stroke_width,
-      stroke_dash_array: config.debug_canvas_stroke_dash_array,
+      stroke_dash_array: config.debug_canvas_stroke_dash_array
     }
   end
 
@@ -167,9 +166,7 @@ defmodule Quartz.Config do
 
   def major_tick_size(%__MODULE__{} = config, opts) do
     [major_tick_size: major_tick_size] =
-      get_many_with_fallbacks(opts, config,
-        major_tick_size: {:major_tick_size, []}
-      )
+      get_many_with_fallbacks(opts, config, major_tick_size: {:major_tick_size, []})
 
     major_tick_size
   end
@@ -304,6 +301,10 @@ defmodule Quartz.Config do
 end
 
 defmodule Quartz.Config2 do
+  # TODO: delete this?
+
+  @moduledoc false
+
   defstruct axes_autolimit_mode: "data",
             axes_axisbelow: "line",
             axes_edgecolor: "black",

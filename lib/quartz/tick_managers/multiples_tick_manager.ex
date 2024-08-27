@@ -1,4 +1,6 @@
 defmodule Quartz.TickManagers.MultiplesTickManager do
+  @moduledoc false
+
   alias Quartz.Formatter
 
   def init(opts \\ []) do

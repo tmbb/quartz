@@ -1,4 +1,6 @@
 defmodule Quartz.TickManagers.SymbolicMultiplesTickManager do
+  @moduledoc false
+
   def init(opts \\ []) do
     as_symbolic = Keyword.fetch!(opts, :as_symbolic)
     step = Keyword.fetch!(opts, :step)

@@ -121,7 +121,6 @@ defmodule Quartz.Line do
           "&#160;↳&#160;y2 = #{pprint(line.y2)}pt&#13;&#13;"
         ]
 
-
         SVG.line(common_attributes, [
           SVG.title([], SVG.escaped_iodata(tooltip_text))
         ])

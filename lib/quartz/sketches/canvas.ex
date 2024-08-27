@@ -108,7 +108,7 @@ defmodule Quartz.Canvas do
           x: canvas.x,
           y: canvas.y,
           width: canvas.width,
-          height: canvas.height,
+          height: canvas.height
         ]
 
         all_attrs = rect_attrs ++ debug_attrs
@@ -122,7 +122,7 @@ defmodule Quartz.Canvas do
         ]
 
         SVG.rect(all_attrs, [
-          SVG.title([], SVG.escaped_iodata(tooltip_text)),
+          SVG.title([], SVG.escaped_iodata(tooltip_text))
         ])
       else
         SVG.g([id: canvas.id], [])

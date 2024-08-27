@@ -1,5 +1,5 @@
 defmodule Quartz.AxisData do
-  alias Dantzig.Polynomial
+  alias Quartz.Figure
 
   @type t() :: %__MODULE__{}
 
@@ -9,6 +9,10 @@ defmodule Quartz.AxisData do
 
   def new(value, plot_id, axis_name) do
     %__MODULE__{value: value, plot_id: plot_id, axis_name: axis_name}
+  end
+
+  def new_variable(value, plot_id, axis_name) do
+    Figure.variable(new(value, plot_id, axis_name))
   end
 
   defimpl String.Chars do

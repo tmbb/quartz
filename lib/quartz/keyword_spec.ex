@@ -1,6 +1,8 @@
 defmodule Quartz.KeywordSpec do
   @moduledoc false
 
+  # A helper to deal with long optional arguments lists.
+
   @doc """
   Create variables and validate their presence from a keyword list
   and a specification.

@@ -99,7 +99,7 @@ defmodule Quartz.Circle do
         x_min: Polynomial.algebra(circle.x - circle.radius),
         x_max: Polynomial.algebra(circle.x + circle.radius),
         y_min: Polynomial.algebra(circle.y - circle.radius),
-        y_max: Polynomial.algebra(circle.y + circle.radius),
+        y_max: Polynomial.algebra(circle.y + circle.radius)
       }
     end
 

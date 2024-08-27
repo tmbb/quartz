@@ -2,6 +2,8 @@ defmodule Quartz.Sketch.BBoxBounds do
   require Quartz.KeywordSpec, as: KeywordSpec
   import ExUnit.Assertions, only: [assert: 1]
 
+  @type t() :: %__MODULE__{}
+
   defstruct x_min: nil,
             x_max: nil,
             y_min: nil,

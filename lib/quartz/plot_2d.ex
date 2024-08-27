@@ -2,28 +2,31 @@ defmodule Quartz.Plot2D do
   require Quartz.Figure, as: Figure
   alias Quartz.Canvas
   alias Quartz.Axis2D
-  alias Quartz.AxisData
   alias Quartz.AxisReference
-  alias Quartz.Circle
-  alias Quartz.Line
-  alias Quartz.LinearPath
   alias Quartz.Plot2DElement
   alias Quartz.Length
   alias Quartz.Text
   alias Quartz.Sketch
   alias Quartz.Config
-  alias Quartz.Color.RGB
   alias Quartz.ColorMap
 
+  alias Quartz.Plot2D.PairwiseDataPlot
+  alias Quartz.Plot2D.DistributionPlot
+  alias Quartz.Plot2D.GriddedDataPlot
+
   require Quartz.KeywordSpec, as: KeywordSpec
+
+  alias Explorer.DataFrame
+
   require Dantzig.Polynomial, as: Polynomial
-  # use Dantzig.Polynomial.Operators
 
   @decorations_area_content_padding Length.pt(7)
   @boundaries_padding Length.pt(10)
   @title_inner_padding Length.pt(6)
 
   @default_color_map ColorMap.tab10()
+
+  @derive {Inspect, only: [:id, :title]}
 
   defstruct id: nil,
             title: nil,
@@ -54,7 +57,6 @@ defmodule Quartz.Plot2D do
             right_margin: nil,
             bottom_margin: nil,
             left_margin: nil,
-            data: [],
             axes: %{},
             plot_area: nil,
             title_area: nil,
@@ -74,19 +76,20 @@ defmodule Quartz.Plot2D do
   @type t :: %__MODULE__{}
 
   def new(opts \\ []) do
-    KeywordSpec.validate!(opts, [
+    KeywordSpec.validate!(opts,
       id: nil,
       categorical_color_map: @default_color_map
-    ])
+    )
 
-    id = case id do
-      nil ->
-        default_id_suffix = Figure.get_id()
-        "plot_#{default_id_suffix}"
+    id =
+      case id do
+        nil ->
+          default_id_suffix = Figure.get_id()
+          "plot_#{default_id_suffix}"
 
-      other ->
-        other
-    end
+        other ->
+          other
+      end
 
     top = Figure.variable("plot_bounds_top", [])
     bottom = Figure.variable("plot_bounds_bottom", [])
@@ -185,12 +188,12 @@ defmodule Quartz.Plot2D do
 
     Figure.assert(
       title_area.height + top_decorations_area.height +
-      data_area.height + bottom_decorations_area.height == plot_area.height
+        data_area.height + bottom_decorations_area.height == plot_area.height
     )
 
     Figure.assert(
       left_decorations_area.width + data_area.width +
-      right_decorations_area.width == plot_area.width
+        right_decorations_area.width == plot_area.width
     )
 
     plot = %__MODULE__{
@@ -261,10 +264,13 @@ defmodule Quartz.Plot2D do
 
   def put_major_tick_labels_style(plot, axes_name, style) when is_axes(axes_name) do
     axes_name = List.wrap(axes_name)
+
     update_axes(plot, axes_name, fn axis ->
       Axis2D.put_major_tick_labels_style(axis, style)
     end)
   end
+
+
 
   def add_bottom_axis(plot, name, opts \\ []) do
     axis = Axis2D.new(name, Keyword.put(opts, :location, :bottom))
@@ -349,6 +355,24 @@ defmodule Quartz.Plot2D do
     Figure.assert(Sketch.bbox_bottom(last) <= Sketch.bbox_bottom(container))
   end
 
+  def put_axis_max_value(plot, axis_name, value) do
+    update_axis(plot, axis_name, fn axis ->
+      Axis2D.put_max_value(axis, value)
+    end)
+  end
+
+  def put_axis_min_value(plot, axis_name, value) do
+    update_axis(plot, axis_name, fn axis ->
+      Axis2D.put_max_value(axis, value)
+    end)
+  end
+
+  def put_axis_limits(plot, axis_name, min_value, max_value) do
+    update_axis(plot, axis_name, fn axis ->
+      Axis2D.put_limits(axis, min_value, max_value)
+    end)
+  end
+
   def put_axis_label(plot, axis_name, text, opts \\ []) do
     update_axis(plot, axis_name, fn axis ->
       Axis2D.put_label(axis, text, opts)
@@ -418,6 +442,7 @@ defmodule Quartz.Plot2D do
 
   def put_axes_margins(plot, value, opts \\ []) do
     axis_names = Keyword.get(opts, :axes, get_axes_names(plot))
+
     Enum.reduce(axis_names, plot, fn axis_name, plot ->
       put_minimum_axis_margins(plot, axis_name, value)
     end)
@@ -467,6 +492,10 @@ defmodule Quartz.Plot2D do
     :ok = Figure.put_plot_in_current_figure(plot)
 
     plot
+  end
+
+  def finalize_all(plots) do
+    Enum.map(plots, &finalize/1)
   end
 
   def draw_bottom_content(plot, padding) do
@@ -581,154 +610,94 @@ defmodule Quartz.Plot2D do
     end
   end
 
-  def boxplot(plot, _data) do
-    plot
+  def box_plot(plot, groups, opts \\ []) do
+    # Choose the color here to avoid recursive cross-module calls
+    {new_plot, new_opts} = maybe_add_color_to_opts_from_colormap(plot, opts)
+    # Plot the line with the color already picked
+    DistributionPlot.box_plot(new_plot, groups, new_opts)
   end
 
-  def scatter_plot(plot, data_x, data_y, opts \\ []) do
+  def maybe_add_color_to_opts_from_colormap(plot, opts) do
     {default_color, plot} = maybe_next_color_from_colormap(plot, opts)
+    style = Keyword.get(opts, :style, [])
+    style_with_color = Keyword.put_new(style, :color, default_color)
+    opts_with_color = Keyword.put(opts, :style, style_with_color)
 
-    KeywordSpec.validate!(opts, style: [], x_axis: "x", y_axis: "y")
-    KeywordSpec.validate!(style, [radii, color: default_color, radius: Length.pt(2)])
-
-    # Convert eveyrthing that might be a polynomial into a number
-    data_x = Enum.map(data_x, &Polynomial.to_number!/1)
-    data_y = Enum.map(data_y, &Polynomial.to_number!/1)
-
-    if radii do
-      # There are multiple radii
-      for {x, y, r} <- Enum.zip([data_x, data_y, radii]) do
-        # Convert to data
-        center_x = AxisData.new(x, plot.id, x_axis) |> Polynomial.variable()
-        center_y = AxisData.new(y, plot.id, y_axis) |> Polynomial.variable()
-
-        Circle.new(
-          center_x: center_x,
-          center_y: center_y,
-          radius: r,
-          fill: color
-        )
-      end
-    else
-      # All circles have the same radius
-      for {x, y} <- Enum.zip(data_x, data_y) do
-        # Convert to data
-        center_x = AxisData.new(x, plot.id, x_axis) |> Polynomial.variable()
-        center_y = AxisData.new(y, plot.id, y_axis) |> Polynomial.variable()
-
-        Circle.new(
-          center_x: center_x,
-          center_y: center_y,
-          radius: radius,
-          fill: color
-        )
-      end
-    end
-
-    plot
+    # Return the options with a color defined in the style
+    {plot, opts_with_color}
   end
 
-  def line_plot(plot, data_x, data_y, opts \\ []) do
-    {default_color, plot} = maybe_next_color_from_colormap(plot, opts)
-
-    KeywordSpec.validate!(opts, style: [], x_axis: "x", y_axis: "y")
-
-    KeywordSpec.validate!(style,
-      stroke_cap: "round",
-      stroke_join: nil,
-      stroke_dash: nil,
-      stroke_thickness: nil,
-      color: default_color
-    )
-
-    # Convert eveyrthing that might be a polynomial into a number
-    xs = Enum.map(data_x, &Polynomial.to_number!/1)
-    ys = Enum.map(data_y, &Polynomial.to_number!/1)
-
-    path_points =
-      for {x, y} <- Enum.zip(xs, ys) do
-        # Convert the numeric values into variables
-        path_x = AxisData.new(x, plot.id, x_axis) |> Polynomial.variable()
-        path_y = AxisData.new(y, plot.id, y_axis) |> Polynomial.variable()
-
-        {path_x, path_y}
-      end
-
-    LinearPath.new(
-      points: path_points,
-      closed: false,
-      stroke_paint: color,
-      stroke_cap: stroke_cap,
-      stroke_join: stroke_join,
-      stroke_dash: stroke_dash,
-      stroke_thickness: stroke_thickness
-    )
-
-    plot
+  @doc """
+  Draw a scatter plot for the given points.
+  """
+  def draw_scatter_plot(%__MODULE__{} = plot, data_x, data_y, opts \\ []) do
+    # Choose the color here to avoid recursive cross-module calls
+    {plot, opts} = maybe_add_color_to_opts_from_colormap(plot, opts)
+    # Plot the line with the color already picked
+    PairwiseDataPlot.draw_scatter_plot(plot, data_x, data_y, opts)
   end
 
-  alias Quartz.Statistics.KDE
-  alias Explorer.Series
+  @doc """
+  Draw a series of line segments between the given points.
+  """
+  def draw_line_plot(%__MODULE__{} = plot, data_x, data_y, opts \\ []) do
+    # Choose the color here to avoid recursive cross-module calls
+    {new_plot, new_opts} = maybe_add_color_to_opts_from_colormap(plot, opts)
+    # Plot the line with the color already picked
+    PairwiseDataPlot.draw_line_plot(new_plot, data_x, data_y, new_opts)
+  end
 
+  @doc """
+  Draw a series of line segments between the given points.
+  """
+  def draw_function_contour_plot(
+        %__MODULE__{} = plot,
+        fun,
+        x_min,
+        x_max,
+        y_min,
+        y_max,
+        countour_levels,
+        opts \\ []
+      ) do
+    # Choose the color here to avoid recursive cross-module calls
+    {new_plot, new_opts} = maybe_add_color_to_opts_from_colormap(plot, opts)
+
+    # Plot the line with the color already picked
+    GriddedDataPlot.draw_function_contour_plot(
+      new_plot,
+      fun,
+      x_min,
+      x_max,
+      y_min,
+      y_max,
+      countour_levels,
+      new_opts
+    )
+  end
+
+  @doc """
+  Draw a distribution using a kernel density estimate.
+  """
   def kde_plot(plot, values, opts \\ []) do
-    value_series =
-      case values do
-        %Series{} ->
-          values
-
-        _other ->
-          float_values = Enum.map(values, &Polynomial.to_number!/1)
-          Series.from_list(float_values)
-      end
-
-    df = KDE.kde(value_series, 200)
-
-    xs = Series.to_list(df[:x])
-    ys = Series.to_list(df[:y])
-
-    line_plot(plot, xs, ys, opts)
+    # Choose the color here to avoid recursive cross-module calls
+    {new_plot, new_opts} = maybe_add_color_to_opts_from_colormap(plot, opts)
+    # Plot the line with the color already picked
+    DistributionPlot.kde_plot(new_plot, values, new_opts)
   end
 
-  def draw_function_contour_plot(plot, fun, x_min, x_max, y_min, y_max, countour_levels, opts \\ []) do
-    KeywordSpec.validate!(opts, style: [], x_axis: "x", y_axis: "y", n: 100)
-    KeywordSpec.validate!(style, stroke_cap: "round", color: RGB.teal())
-
-    delta_x = Kernel.-(x_max, x_min)
-    delta_y = Kernel.-(y_max, y_min)
-
-    x_coords = for i <- 0..Kernel.-(n, 1), do: Kernel.+(x_min, Kernel.*(delta_x, Kernel./(i, n)))
-    y_coords = for j <- 0..Kernel.-(n, 1), do: Kernel.+(y_min, Kernel.*(delta_y, Kernel./(j, n)))
-
-    values =
-      for x <- x_coords do
-        for y <- y_coords do
-          fun.(x, y)
-        end
-      end
-
-    contours = Conrex.conrec(values, x_coords, y_coords, countour_levels)
-
-    for {_level, line_segments} <- contours do
-      for line_segment <- line_segments do
-        {{x1, y1}, {x2, y2}} = line_segment
-
-        line_x1 = AxisData.new(x1, plot.id, x_axis) |> Polynomial.variable()
-        line_y1 = AxisData.new(y1, plot.id, y_axis) |> Polynomial.variable()
-        line_x2 = AxisData.new(x2, plot.id, x_axis) |> Polynomial.variable()
-        line_y2 = AxisData.new(y2, plot.id, y_axis) |> Polynomial.variable()
-
-        Line.new(
-          x1: line_x1,
-          y1: line_y1,
-          x2: line_x2,
-          y2: line_y2,
-          stroke_cap: stroke_cap,
-          stroke_paint: color
-        )
-      end
-    end
-
-    plot
+  @doc """
+  Draw a distribution using a kernel density estimate.
+  """
+  def kde_plot_groups_from_dataframe(plot, %DataFrame{} = dataframe, group_column, values_column, opts \\ []) do
+    DistributionPlot.kde_plot_groups_from_dataframe(
+      plot,
+      dataframe,
+      group_column,
+      values_column,
+      &maybe_add_color_to_opts_from_colormap/2,
+      opts
+    )
   end
 
   defp fix_bounds(plot) do
@@ -750,5 +719,12 @@ defmodule Quartz.Plot2D do
     Figure.assert(plot.right == right_bound)
 
     set_bounds(plot, bounds)
+  end
+
+  def draw_histogram(plot, data, opts \\ []) do
+    # Choose the color here to avoid recursive cross-module calls
+    {new_plot, new_opts} = maybe_add_color_to_opts_from_colormap(plot, opts)
+    # Plot the line with the color already picked
+    DistributionPlot.histogram(new_plot, data, new_opts)
   end
 end

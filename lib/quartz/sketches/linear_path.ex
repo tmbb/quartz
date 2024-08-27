@@ -39,7 +39,7 @@ defmodule Quartz.LinearPath do
     # Get the next available ID from the figure
     id = Figure.get_id()
 
-    # Create the actual line
+    # Create the actual path
     path = %__MODULE__{
       id: id,
       prefix: prefix,
@@ -101,9 +101,10 @@ defmodule Quartz.LinearPath do
             {x0, y0} = point
 
             # Use the Line-to instruction for absolute locations
-            next_points = for {x, y} <- points do
-              {:L, {x, y}}
-            end
+            next_points =
+              for {x, y} <- points do
+                {:L, {x, y}}
+              end
 
             # Use the Move-to instruction for the first point
             path_points = [{:M, {x0, y0}} | next_points]
@@ -130,11 +131,11 @@ defmodule Quartz.LinearPath do
         tooltip_text = [
           "LinearPath [#{path.id}] #{path.prefix} &#13;",
           "&#160;&#160;stroke: #{pprint_color(path.stroke_paint)}&#13;",
-          "&#160;&#160;fill: #{pprint_color(path.fill)}&#13;",
+          "&#160;&#160;fill: #{pprint_color(path.fill)}&#13;"
         ]
 
         SVG.path(common_attributes, [
-          SVG.title([], SVG.escaped_iodata(tooltip_text)),
+          SVG.title([], SVG.escaped_iodata(tooltip_text))
         ])
       else
         SVG.path(common_attributes)
@@ -145,10 +146,11 @@ defmodule Quartz.LinearPath do
 
     defp pprint_color(%RGB{} = color) do
       # Handle all cases for alpha
-      alpha = case color.alpha do
-        i when is_integer(i) -> (i / 256)
-        f when is_float(f) -> f
-      end
+      alpha =
+        case color.alpha do
+          i when is_integer(i) -> i / 256
+          f when is_float(f) -> f
+        end
 
       "rgba(#{color.red}, #{color.green}, #{color.blue}, #{alpha})"
     end

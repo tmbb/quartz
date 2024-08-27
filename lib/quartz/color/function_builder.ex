@@ -609,10 +609,10 @@ defmodule Quartz.Color.FunctionBuilder do
           @doc """
           Semi-transparent RGB color for #{unquote(color_name)}
           as defined by the CSS3 standard.
-
+          
           The value of `alpha` may be either an *integer* between
           0 and 255 or a *float* between 0.0 and 1.0.
-
+          
           Color according to the value of `alpha`:
           #{unquote(color_block_alphas)}
           """

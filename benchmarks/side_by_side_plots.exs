@@ -21,7 +21,7 @@ defmodule Quartz.Benchmarks.SideBySidePlots do
         _plot_task_A =
           Plot2D.new(id: "plot_task_A")
           |> Plot2D.set_bounds(bounds_A)
-          |> Plot2D.scatter_plot(x, y)
+          |> Plot2D.draw_scatter_plot(x, y)
           |> Plot2D.put_title("A. Task A")
           |> Plot2D.put_axis_label("y", "Y-label (log scale)")
           |> Plot2D.put_axis_scale("y", Scale.log())
@@ -31,7 +31,7 @@ defmodule Quartz.Benchmarks.SideBySidePlots do
         _plot_task_B =
           Plot2D.new(id: "plot_task_B")
           |> Plot2D.set_bounds(bounds_B)
-          |> Plot2D.scatter_plot(x, y)
+          |> Plot2D.draw_scatter_plot(x, y)
           |> Plot2D.put_title("B. Task B")
           |> Plot2D.put_axis_label("y", "Y-label")
           |> Plot2D.put_axis_label("x", "X-label (with  math: $x^2 + y^2$)", text: [escape: false])

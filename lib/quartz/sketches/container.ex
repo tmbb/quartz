@@ -1,4 +1,6 @@
 defmodule Quartz.Container do
+  @moduledoc false
+
   alias Quartz.Figure
   alias Quartz.Variable
   alias Quartz.Length

@@ -3,7 +3,6 @@ defmodule Quartz.Statistics.KDE do
   alias Explorer.Series
   alias Quartz.Statistics.KDE.DensityEstimator1D
 
-
   # A constant used by the gaussian distribution
   @inv_sqrt_2pi 1 / :math.sqrt(2 * :math.pi())
 
@@ -65,7 +64,7 @@ defmodule Quartz.Statistics.KDE do
   end
 
   defp aggregate_deltas(delta_col, n, bandwidth) do
-    Series.multiply(1/(n * bandwidth), Series.sum(delta_col))
+    Series.multiply(1 / (n * bandwidth), Series.sum(delta_col))
   end
 
   def kde(observations, nr_of_points, opts \\ []) do

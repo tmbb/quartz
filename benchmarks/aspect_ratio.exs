@@ -1,4 +1,4 @@
-defmodule Quartz.Benchmarks.ScatterPlot do
+defmodule Quartz.Benchmarks.AspectRatioScatterPlot do
   require Quartz.Figure, as: Figure
   alias Quartz.Plot2D
   alias Quartz.Length
@@ -30,7 +30,7 @@ defmodule Quartz.Benchmarks.ScatterPlot do
         prototype_plot = fn id ->
           Plot2D.new(id: id)
           # Plot the four datasets
-          |> Plot2D.scatter_plot(x1, y1)
+          |> Plot2D.draw_scatter_plot(x1, y1)
           # The axis labels must be explicitly given by the user.
           # One can overwrite default properties such as text rotation.
           # TODO: support non-text based labels
@@ -63,11 +63,6 @@ defmodule Quartz.Benchmarks.ScatterPlot do
           |> Plot2D.finalize()
       end)
 
-
-    Dantzig.dump_problem_to_file(figure.problem, "problem.lp")
-    File.write!("solution.exs", inspect(figure.solution, limit: :infinity, pretty: true))
-
-
     svg_path = Path.join([__DIR__, "aspect_ratio", "example.svg"])
     Figure.render_to_svg_file!(figure, svg_path)
 
@@ -76,4 +71,4 @@ defmodule Quartz.Benchmarks.ScatterPlot do
   end
 end
 
-Quartz.Benchmarks.ScatterPlot.build_plot()
+Quartz.Benchmarks.AspectRatioScatterPlot.build_plot()

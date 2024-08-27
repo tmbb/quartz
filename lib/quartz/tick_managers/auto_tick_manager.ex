@@ -1,4 +1,6 @@
 defmodule Quartz.TickManagers.AutoTickManager do
+  @doc false
+
   alias Quartz.Formatter
 
   @steps [1, 2, 2.5, 5, 10]
@@ -73,7 +75,6 @@ defmodule Quartz.TickManagers.AutoTickManager do
         add_above_max?,
         opts \\ []
       ) do
-
     {_step, locations} =
       step_and_major_tick_locations(
         min_value,

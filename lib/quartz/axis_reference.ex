@@ -1,4 +1,5 @@
 defmodule Quartz.AxisReference do
+  @doc false
   defstruct name: nil
 
   def new(name) do

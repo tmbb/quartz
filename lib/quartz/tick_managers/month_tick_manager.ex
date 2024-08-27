@@ -1,4 +1,6 @@
 defmodule Quartz.TickManagers.MonthsTickManager do
+  @doc false
+
   alias Quartz.Formatter
 
   def init(opts \\ []) do

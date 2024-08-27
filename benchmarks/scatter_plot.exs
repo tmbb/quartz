@@ -33,8 +33,8 @@ defmodule Quartz.Benchmarks.ScatterPlot do
             Plot2D.new()
             # Plot the four datasets
             |> Plot2D.set_bounds(bounds)
-            |> Plot2D.scatter_plot(x1, y1)
-            |> Plot2D.scatter_plot(x2, y2, x_axis: "x2", y_axis: "y2")
+            |> Plot2D.draw_scatter_plot(x1, y1)
+            |> Plot2D.draw_scatter_plot(x2, y2, x_axis: "x2", y_axis: "y2")
             # Use typst to explicitly style the title and labels ――――――――――――――――――――――――――――――――
             |> Plot2D.put_title("A. Scatter plot (1 color per dataset) - linear scale")
             |> Plot2D.put_major_tick_labels_style(["x", "y"], fill: ColorMap.tab10(0))
@@ -61,10 +61,10 @@ defmodule Quartz.Benchmarks.ScatterPlot do
     Dantzig.dump_problem_to_file(figure.problem, "problem.lp")
     File.write!("solution.exs", inspect(figure.solution, limit: :infinity, pretty: true))
 
-    svg_path = Path.join([__DIR__, "scatter_plot", "example.svg"])
+    svg_path = Path.join([__DIR__, "draw_scatter_plot", "example.svg"])
     Figure.render_to_svg_file!(figure, svg_path)
 
-    png_path = Path.join([__DIR__, "scatter_plot", "example.png"])
+    png_path = Path.join([__DIR__, "draw_scatter_plot", "example.png"])
     Figure.render_to_png_file!(figure, png_path)
   end
 end

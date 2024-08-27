@@ -1,0 +1,10 @@
+[
+  {
+    "approved": true,
+    "file": "/home/tmbb/Projects/sideprojects/elixir/quartz/test/quartz/plot_2d/kde_plot_test.exs",
+    "line": 91,
+    "module": "Quartz.Plot2D.KDEPlotTest",
+    "reference": "test/quartz/plot_2d/kde_plot_test/reference.png",
+    "snapshot": "test/quartz/plot_2d/kde_plot_test/grouped-snapshot.png"
+  }
+]

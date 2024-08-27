@@ -1,4 +1,6 @@
 defmodule Quartz.TextSpan do
+  @moduledoc false
+
   defstruct id: nil,
             font: nil,
             x: nil,
@@ -9,11 +11,17 @@ defmodule Quartz.TextSpan do
 end
 
 defmodule Quartz.Text do
+  @moduledoc """
+  Text element.
+  """
+
   alias Quartz.Variable
   alias Quartz.Figure
   alias Quartz.SVG
   alias Quartz.Sketch.BBoxBounds
   alias Quartz.Formatter
+
+  @type t() :: %__MODULE__{}
 
   defstruct id: nil,
             x: nil,
@@ -56,6 +64,9 @@ defmodule Quartz.Text do
             debug: false,
             debug_properties: nil
 
+  @doc """
+  Create a text element.
+  """
   def new(binary, opts \\ []) do
     prefix = Keyword.get(opts, :prefix, nil)
     # Assign variables (= Dantzig monomials) to the parameters of the canvas
@@ -147,18 +158,19 @@ defmodule Quartz.Text do
       transform_attrs = []
 
       # Attributes that are common to "normal mode" and "debug mode"
-      common_attributes = [
-        id: text.id,
-        x: text.x,
-        y: text.y,
-        fill: text.fill,
-        "font-family": text.font,
-        "font-weight": text.weight,
-        "font-style": text.style,
-        "font-size": text.size,
-        "text-anchor": "start",
-        "alignment-baseline": "baseline",
-      ] ++ transform_attrs
+      common_attributes =
+        [
+          id: text.id,
+          x: text.x,
+          y: text.y,
+          fill: text.fill,
+          "font-family": text.font,
+          "font-weight": text.weight,
+          "font-style": text.style,
+          "font-size": text.size,
+          "text-anchor": "start",
+          "alignment-baseline": "baseline"
+        ] ++ transform_attrs
 
       if text.debug do
         tooltip_text = [

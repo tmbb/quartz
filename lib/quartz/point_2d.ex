@@ -1,4 +1,6 @@
 defmodule Quartz.Point2D do
+  @moduledoc false
+
   alias __MODULE__
   alias Dantzig.Polynomial, as: Poly
 

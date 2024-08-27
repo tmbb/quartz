@@ -1,4 +1,8 @@
 defmodule Quartz.Figure do
+  @moduledoc """
+  Figure
+  """
+
   alias Dantzig.Problem
   alias Dantzig.Constraint
   alias Dantzig.Polynomial
@@ -23,6 +27,8 @@ defmodule Quartz.Figure do
 
   @derive {Inspect, only: [:width, :height, :debug, :finalized]}
 
+  @type t() :: %__MODULE__{}
+
   defstruct width: nil,
             height: nil,
             problem: %Problem{direction: :maximize},
@@ -38,6 +44,25 @@ defmodule Quartz.Figure do
             resvg_options: [],
             store: %{}
 
+  @type bounds() :: Keyword.t()
+
+  @doc """
+  Get bounds for plots in a grid.
+  Currently only regular grids are supported.
+
+  Supports the following options:
+
+    - `:nr_of_rows` - *required* (integer)
+    - `:nr_of_columns` - *required* (integer)
+    - `:padding` - *optional* (default: `Length.pt(8)`): the padding between plots
+    - `:horizontal_padding` - *optional* (default: the value of `:padding`):
+      the horizontal padding between plots
+    - `:vertical_padding` - *optional* (default: the value of `:padding`):
+      the vertical padding between plots
+
+  Returns a neste list of bounds.
+  """
+  @spec bounds_for_plots_in_grid(Keyword.t()) :: list(list(bounds()))
   def bounds_for_plots_in_grid(opts \\ []) do
     nr_of_rows = Keyword.fetch!(opts, :nr_of_rows)
     nr_of_columns = Keyword.fetch!(opts, :nr_of_columns)
@@ -68,7 +93,9 @@ defmodule Quartz.Figure do
         if i == nr_of_columns - 1 do
           Polynomial.algebra(x + total_width)
         else
-          Polynomial.algebra(x + total_width * ((i + 1) / nr_of_columns) - half_horizontal_padding)
+          Polynomial.algebra(
+            x + total_width * ((i + 1) / nr_of_columns) - half_horizontal_padding
+          )
         end
       end
 
@@ -157,21 +184,98 @@ defmodule Quartz.Figure do
     Enum.zip(sequence, Enum.drop(sequence, 1))
   end
 
+  @doc """
+  Returns true if the current figure is being created with `:debug` mode active.
+  """
   def debug?() do
     get_current_figure().debug
   end
 
+  @doc """
+  Renders a figure into SVG and saves it in the given path.
+  """
+  @spec render_to_svg_file(Figure.t(), Path.t()) :: :ok | {:error, File.posix()}
+  def render_to_svg_file(figure, path) do
+    svg_contents = render_to_svg_iodata(figure)
+    File.write(path, svg_contents)
+  end
+
+  @doc """
+  Renders a figure into SVG and saves it in the given path.
+  Raises an error if it can't write to the file.
+  """
+  @spec render_to_svg_file!(Figure.t(), Path.t()) :: :ok
   def render_to_svg_file!(figure, path) do
-    svg_contents = to_svg_iodata(figure)
+    svg_contents = render_to_svg_iodata(figure)
     File.write!(path, svg_contents)
   end
 
+  @doc """
+  Renders a figure into an SVG string (not iodata).
+  """
+  @spec render_to_svg_binary(Figure.t()) :: String.t()
+  def render_to_svg_binary(figure) do
+    figure
+    |> render_to_svg_iodata()
+    |> IO.iodata_to_binary()
+  end
+
+  @doc """
+  Renders a figure into a PNG file and saves it in the given path.
+  Raises an error if it can't write to the file.
+  """
+  @spec render_to_png_file!(Figure.t(), Path.t()) :: :ok | {:error, binary()}
   def render_to_png_file!(figure, path) do
-    svg_contents = to_svg_iodata(figure)
+    :ok = render_to_png_file(figure, path)
+  end
+
+  @doc """
+  Renders a figure into a PNG file and saves it in the given path.
+  """
+  @spec render_to_png_file(Figure.t(), Path.t()) :: :ok | {:error, binary()}
+  def render_to_png_file(figure, path) do
+    svg_contents = render_to_svg_iodata(figure)
     svg_binary = IO.iodata_to_binary(svg_contents)
     Resvg.svg_string_to_png(svg_binary, path, figure.resvg_options)
   end
 
+  @doc """
+  Renders a figure into a PNG binary.
+  """
+  @spec render_to_png_binary(Figure.t()) :: String.t()
+  def render_to_png_binary(figure) do
+    svg_binary =
+      figure
+      |> render_to_svg_iodata()
+      |> IO.iodata_to_binary()
+
+    # We'll assume this will never fail
+    {:ok, png_charlist} = Resvg.svg_string_to_png_buffer(svg_binary, figure.resvg_options)
+
+    IO.iodata_to_binary(png_charlist)
+  end
+
+  @doc """
+  Renders a figure into SVG iodata (not a string).
+  """
+  def render_to_svg_iodata(figure) do
+    sorted_sketches = sort_while_keeping_canvases_behind(figure.sketches)
+
+    svg_elements =
+      for {_id, sketch} <- sorted_sketches do
+        Sketch.to_svg(sketch)
+      end
+
+    view_box = "0 0 #{figure.width} #{figure.height}"
+
+    svg = SVG.svg([width: figure.width, height: figure.height, viewBox: view_box], svg_elements)
+
+    SVG.to_iodata(svg)
+  end
+
+  @doc """
+  TODO: document this
+  """
   def position_with_location_and_alignment(sketch, container, opts \\ []) do
     x_location = Keyword.get(opts, :x_location, :center)
     y_location = Keyword.get(opts, :y_location, :horizon)
@@ -245,6 +349,14 @@ defmodule Quartz.Figure do
     end
   end
 
+  @doc """
+  Add an unmeasure item to the figure.
+
+  Unmeasured items are items in which the item dimensions
+  can't be determined without rendering them first.
+  Before rendering the final output, Quartz will render
+  the unmeasured items and query the renderer for their dimensions.
+  """
   def add_unmeasured_item(object) do
     figure = get_current_figure()
     updated_figure = %{figure | unmeasured: [object | figure.unmeasured]}
@@ -276,7 +388,7 @@ defmodule Quartz.Figure do
     get_current_figure()
   end
 
-  def sort_while_keeping_canvases_behind(sketches) do
+  defp sort_while_keeping_canvases_behind(sketches) do
     Enum.sort_by(sketches, fn {id, sketch} ->
       case sketch do
         %Canvas{} ->
@@ -288,25 +400,11 @@ defmodule Quartz.Figure do
     end)
   end
 
-  def to_svg_iodata(figure) do
-    sorted_sketches = sort_while_keeping_canvases_behind(figure.sketches)
-    svg_elements =
-      for {_id, sketch} <- sorted_sketches do
-        Sketch.to_svg(sketch)
-      end
-
-    view_box = "0 0 #{figure.width} #{figure.height}"
-
-    svg = SVG.svg([width: figure.width, height: figure.height, viewBox: view_box], svg_elements)
-
-    SVG.to_iodata(svg)
-  end
-
   defp finalize(figure) do
     %{figure | finalized: true}
   end
 
-  def get_lengths_from_constraints(figure) do
+  defp get_lengths_from_constraints(figure) do
     constraints = figure.problem.constraints
 
     nested =
@@ -317,7 +415,7 @@ defmodule Quartz.Figure do
     List.flatten(nested)
   end
 
-  def get_all_lengths(figure) do
+  defp get_all_lengths(figure) do
     lengths_from_sketches = get_lengths_from_sketches(figure)
     lengths_from_constraints = get_lengths_from_constraints(figure)
 
@@ -335,7 +433,7 @@ defmodule Quartz.Figure do
 
     # Apply the scales to all places where references to axes may appear.
     # This includes the constraints and not only the sketches.
-    {new_sketches, new_constraints} =
+    {new_sketches, new_constraints, substitutions} =
       Scale.apply_scales_to_sketches_and_constraints(
         sketches,
         constraints,
@@ -343,13 +441,24 @@ defmodule Quartz.Figure do
         axes
       )
 
+    unsubstituted_variables = Map.drop(figure.problem.variables, Map.keys(substitutions))
+
+    # TODO: why are theres still leftover variables that haven't been substituted?
+    # Should we replace them also in the `problem.variables`?
+    variables_without_axis_data =
+      for {v, problem_v} <- unsubstituted_variables, not is_struct(v, Quartz.AxisData), into: %{} do
+        {v, problem_v}
+      end
+
     # Update the constraints so that they don't refer to axes anymore
-    new_problem = %{figure.problem | constraints: new_constraints}
+    new_problem = %{
+      figure.problem
+      | constraints: new_constraints,
+        variables: variables_without_axis_data
+    }
 
     # Update the figure with the new problem and the new sketches
     new_figure = %{figure | problem: new_problem, sketches: new_sketches}
-
-    put_current_figure(new_figure)
 
     new_figure
   end
@@ -399,14 +508,11 @@ defmodule Quartz.Figure do
     %{figure | solution: solution}
   end
 
+  @doc false
   def solve(expression) do
     figure = get_current_figure()
     Polynomial.evaluate(figure.solution, expression)
   end
-
-  # def substitute(expression, substitutions) do
-  #   Polynomial.substitute(expression, substitutions)
-  # end
 
   def solve!(expression) do
     figure = get_current_figure()
@@ -546,14 +652,13 @@ defmodule Quartz.Figure do
     args = Polynomial.replace_operators(args)
 
     quote do
-      (
-        require Quartz.Figure
-        fixed_expr = unquote(expr)
-        Quartz.Figure.minimize(fixed_expr, level: 5)
-        for arg <- unquote(args) do
-          Quartz.Figure.assert(fixed_expr >= arg)
-        end
-      )
+      require Quartz.Figure
+      fixed_expr = unquote(expr)
+      Quartz.Figure.minimize(fixed_expr, level: 5)
+
+      for arg <- unquote(args) do
+        Quartz.Figure.assert(fixed_expr >= arg)
+      end
     end
   end
 
@@ -562,14 +667,13 @@ defmodule Quartz.Figure do
     args = Polynomial.replace_operators(args)
 
     quote do
-      (
-        require Quartz.Figure
-        fixed_expr = unquote(expr)
-        Quartz.Figure.maximize(fixed_expr, level: 15)
-        for arg <- unquote(args) do
-          Quartz.Figure.assert(fixed_expr <= arg)
-        end
-      )
+      require Quartz.Figure
+      fixed_expr = unquote(expr)
+      Quartz.Figure.maximize(fixed_expr, level: 15)
+
+      for arg <- unquote(args) do
+        Quartz.Figure.assert(fixed_expr <= arg)
+      end
     end
   end
 
@@ -619,6 +723,7 @@ defmodule Quartz.Figure do
 
   defp min_max_transform_expression_with_opts(expression, opts) do
     level = Keyword.get(opts, :level, @default_min_max_level)
+
     quote do
       Dantzig.Polynomial.algebra(unquote(level) * unquote(expression))
     end
@@ -730,16 +835,27 @@ defmodule Quartz.Figure do
     end
   end
 
-  @doc false
-  def finish_axes(figure) do
-    lengths = get_all_lengths(figure)
-
+  defp group_by_axis(lengths) do
     data_lengths_by_axes =
       Enum.group_by(
         lengths,
         &min_max_for_axis_group_fun/1,
         &min_max_for_axis_value_fun/1
       )
+
+    data_lengths_by_axis_flattened =
+      for {axis, values} <- data_lengths_by_axes, into: %{} do
+        {axis, List.flatten(values)}
+      end
+
+    data_lengths_by_axis_flattened
+  end
+
+  @doc false
+  def finish_axes(figure) do
+    lengths = get_all_lengths(figure)
+
+    data_lengths_by_axes = group_by_axis(lengths)
 
     min_maxs =
       for {{plot_id, axis_name}, values} <- data_lengths_by_axes, into: %{} do
@@ -776,11 +892,12 @@ defmodule Quartz.Figure do
         {axis_data.plot_id, axis_data.axis_name}
 
       %Polynomial{} = polynomial ->
-        variables = Polynomial.get_variables_by(polynomial, fn x ->
-          is_struct(x, AxisData)
-        end)
+        variables =
+          Polynomial.get_variables_by(polynomial, fn x ->
+            is_struct(x, AxisData)
+          end)
 
-        case variables  do
+        case variables do
           [] ->
             nil
 
@@ -796,23 +913,24 @@ defmodule Quartz.Figure do
   defp min_max_for_axis_value_fun(length) do
     case length do
       %AxisData{value: value} ->
-        value
+        [value]
 
       %Polynomial{} = polynomial ->
-        variables = Polynomial.get_variables_by(polynomial, fn x ->
-          is_struct(x, AxisData)
-        end)
+        variables =
+          Polynomial.get_variables_by(polynomial, fn x ->
+            is_struct(x, AxisData)
+          end)
 
-        case variables  do
+        case variables do
           [] ->
             nil
 
-          [variable | _] ->
-            variable.value
+          other when is_list(other) ->
+            for v <- other, do: v.value
         end
 
       _other ->
-        nil
+        []
     end
   end
 
@@ -871,16 +989,20 @@ defmodule Quartz.Figure do
     :ok
   end
 
+  @doc """
+  Create a new figure.
+  """
   def new(args, fun) do
     min_width = Keyword.get(args, :width, Length.cm(12))
     min_height = Keyword.get(args, :height, Length.cm(8))
     config = Keyword.get(args, :config, Config.new())
     debug = Keyword.get(args, :debug, false)
 
-    default_font_dir = Path.join(
-      to_string(:code.priv_dir(:quartz)),
-      "fonts"
-    )
+    default_font_dir =
+      Path.join(
+        to_string(:code.priv_dir(:quartz)),
+        "fonts"
+      )
 
     resvg_options = [
       resources_dir: Keyword.get(args, :resources_dir, "."),
@@ -928,11 +1050,8 @@ defmodule Quartz.Figure do
         is_function(fun, 1) ->
           fun.(figure)
 
-        is_function(fun, 2) ->
-          fun.(width, height)
-
         true ->
-          raise "Function must be of arity 0, 1 or 2"
+          raise "Function must be of arity 0 or 1"
       end
 
       # Get the figure that might have been modified by the code above

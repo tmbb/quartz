@@ -16,7 +16,7 @@ defmodule Quartz.Benchmarks.LinePlot do
 
         _plot =
           Plot2D.new(id: "plot_A")
-          |> Plot2D.scatter_plot(x, y, style: [color: RGB.teal(0.5)])
+          |> Plot2D.draw_scatter_plot(x, y, style: [color: RGB.teal(0.5)])
           # Use typst to explicitly style the title and labels ――――――――――――――――――――――――――――――――
           |> Plot2D.put_title("A. Line plot")
           |> Plot2D.put_axis_label("y", "f(x)", text: [escape: false, rotation: 0])
@@ -25,16 +25,16 @@ defmodule Quartz.Benchmarks.LinePlot do
           |> Plot2D.finalize()
       end)
 
-    svg_path = Path.join([__DIR__, "line_plot", "example.svg"])
+    svg_path = Path.join([__DIR__, "draw_line_plot", "example.svg"])
     Figure.render_to_svg_file!(figure, svg_path)
 
-    png_path = Path.join([__DIR__, "line_plot", "example.png"])
+    png_path = Path.join([__DIR__, "draw_line_plot", "example.png"])
     Figure.render_to_png_file!(figure, png_path)
   end
 
   def run_benchee() do
     Benchee.run(%{
-      "line_plot" => fn -> build_plot() end
+      "draw_line_plot" => fn -> build_plot() end
       },
       time: 5,
       memory_time: 3,
@@ -44,7 +44,7 @@ defmodule Quartz.Benchmarks.LinePlot do
 
   # def run_incendium() do
   #   Incendium.run(%{
-  #     "line_plot" => fn -> build_plot() end
+  #     "draw_line_plot" => fn -> build_plot() end
   #     },
   #     time: 5,
   #     memory_time: 3,

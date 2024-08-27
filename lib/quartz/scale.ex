@@ -1,10 +1,30 @@
 defmodule Quartz.Scale do
+  @moduledoc """
+  Scales for axes.
+  """
+
   require Dantzig.Polynomial, as: Polynomial
   alias Quartz.AxisData
   alias Quartz.Sketch
 
+  @type scale() :: {module(), atom(), Keyword.t()}
+
+  @doc """
+  Linear scale.
+  """
+  @spec linear() :: scale()
   def linear(), do: {__MODULE__, :linear_scale, []}
+
+  @doc """
+  Logarithmic scale.
+  """
+  @spec log() :: scale()
   def log(), do: {__MODULE__, :log_scale, []}
+
+  @doc """
+  Power scale with the given exponent.
+  """
+  @spec power(number()) :: scale()
   def power(exponent), do: {__MODULE__, :power_scale, [exponent]}
 
   @doc false
@@ -22,12 +42,14 @@ defmodule Quartz.Scale do
     0.5
   end
 
+  @doc false
   def apply_normalized_scale(value, scaled_value_min, scaled_value_max, scale) do
     {scale_mod, scale_fun, scale_args} = scale
     scaled_value = apply(scale_mod, scale_fun, [value | scale_args])
     (scaled_value - scaled_value_min) / (scaled_value_max - scaled_value_min)
   end
 
+  @doc false
   def scaled_min_max(values, scale) do
     {scale_mod, scale_fun, scale_args} = scale
     scaled_values = Enum.map(values, fn v -> apply(scale_mod, scale_fun, [v | scale_args]) end)
@@ -81,6 +103,20 @@ defmodule Quartz.Scale do
 
     variable_values = Enum.map(axis_data_variables, fn var -> var.value end)
 
+    variable_values =
+      if axis.min_value do
+        [axis.min_value | variable_values]
+      else
+        variable_values
+      end
+
+    variable_values =
+      if axis.max_value do
+        [axis.max_value | variable_values]
+      else
+        variable_values
+      end
+
     {scaled_value_min, scaled_value_max} = scaled_min_max(variable_values, axis.scale)
 
     substitutions =
@@ -114,14 +150,14 @@ defmodule Quartz.Scale do
   def apply_scales_to_sketches_and_constraints(sketches, constraints, lengths, axes) do
     substitutions = get_substitutions_for_axes(lengths, axes)
 
-    sketches = apply_scales_to_sketches(sketches, substitutions, axes)
-    constraints = apply_scales_to_constraints(constraints, substitutions, axes)
+    sketches = apply_scales_to_sketches(sketches, substitutions)
+    constraints = apply_scales_to_constraints(constraints, substitutions)
 
-    {sketches, constraints}
+    {sketches, constraints, substitutions}
   end
 
   @doc false
-  def apply_scales_to_sketches(sketches, substitutions, axes) do
+  def apply_scales_to_sketches(sketches, substitutions) do
     for {sketch_id, sketch} <- sketches, into: %{} do
       transformed_sketch =
         Sketch.transform_lengths(sketch, fn length ->
@@ -133,7 +169,7 @@ defmodule Quartz.Scale do
   end
 
   @doc false
-  def apply_scales_to_constraints(constraints, substitutions, axes) do
+  def apply_scales_to_constraints(constraints, substitutions) do
     for {constraint_id, constraint} <- constraints, into: %{} do
       new_lhs =
         if is_number(constraint.left_hand_side) do
@@ -152,11 +188,10 @@ defmodule Quartz.Scale do
           Polynomial.substitute(constraint.right_hand_side, substitutions)
         end
 
-
       transformed_constraint = %{
-        constraint |
-        left_hand_side: new_lhs,
-        right_hand_side: new_rhs
+        constraint
+        | left_hand_side: new_lhs,
+          right_hand_side: new_rhs
       }
 
       {constraint_id, transformed_constraint}

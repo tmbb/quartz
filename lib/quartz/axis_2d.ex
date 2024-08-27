@@ -180,7 +180,7 @@ defmodule Quartz.Axis2D do
 
     canvas = Canvas.new(prefix: "bottom_axis_canvas")
 
-    Figure.minimize(canvas.height)
+    Figure.minimize(canvas.height, level: 30)
 
     Figure.assert(canvas.x == x)
     Figure.assert(canvas.y == y)
@@ -209,7 +209,8 @@ defmodule Quartz.Axis2D do
 
     # But the top of the labels shouldn't be so high (== low y position) that it gets too close...
     # This is how close the top of the labels is allowed to be to the axis
-    minimum_tick_label_top = Polynomial.algebra(y + major_tick_size + axis.major_tick_label_inner_padding)
+    minimum_tick_label_top =
+      Polynomial.algebra(y + major_tick_size + axis.major_tick_label_inner_padding)
 
     tick_label_baseline = Figure.variable("tick_label_baseline")
     # The baseline should be as close to the axis as allowed by the remaining constraints
@@ -285,7 +286,7 @@ defmodule Quartz.Axis2D do
   def draw_top_axis(plot, x, y, axis = %Axis2D{location: :top}) do
     canvas = Canvas.new(prefix: "top_axis_canvas")
 
-    Figure.minimize(canvas.height)
+    Figure.minimize(canvas.height, level: 30)
 
     Figure.assert(canvas.width == plot.top_decorations_area.width)
     Figure.assert(canvas.x == x)
@@ -313,11 +314,12 @@ defmodule Quartz.Axis2D do
 
     # But the top of the labels shouldn't be so high (== low y position) that it gets too close...
     # This is how close the top of the labels is allowed to be to the axis
-    maximum_tick_label_bottom = Polynomial.algebra(y - major_tick_size - axis.major_tick_label_inner_padding)
+    maximum_tick_label_bottom =
+      Polynomial.algebra(y - major_tick_size - axis.major_tick_label_inner_padding)
 
     tick_label_baseline = Figure.variable("tick_label_baseline")
     # The baseline should be as close to the axis as allowed by the remaining constraints
-    Figure.minimize(tick_label_baseline)
+    Figure.maximize(tick_label_baseline)
     Figure.assert(tick_label_baseline <= maximum_tick_label_bottom)
 
     tick_label_top = Figure.variable("tick_label_bottom")
@@ -352,12 +354,12 @@ defmodule Quartz.Axis2D do
           Figure.assert(Sketch.bbox_bottom(label) <= maximum_tick_label_bottom)
           Figure.assert(tick_label_top <= Sketch.bbox_top(label))
 
-        # other ->
-        #   # Position everything else so that the bottom rests on the baseline.
-        #   # This includes rotated text
-        #   Figure.assert(Sketch.bbox_bottom(other) == tick_label_baseline)
-        #   Figure.assert(Sketch.bbox_top(other) >= minimum_tick_label_top)
-        #   Figure.assert(tick_label_top >= Sketch.bbox_top(other))
+          # other ->
+          #   # Position everything else so that the bottom rests on the baseline.
+          #   # This includes rotated text
+          #   Figure.assert(Sketch.bbox_bottom(other) == tick_label_baseline)
+          #   Figure.assert(Sketch.bbox_top(other) >= minimum_tick_label_top)
+          #   Figure.assert(tick_label_top >= Sketch.bbox_top(other))
       end
     end
 
@@ -391,7 +393,7 @@ defmodule Quartz.Axis2D do
 
     canvas = Canvas.new(prefix: "left_axis_canvas")
 
-    Figure.minimize(canvas.width)
+    Figure.minimize(canvas.width, level: 30)
 
     Figure.assert(Sketch.bbox_right(canvas) == x)
     Figure.assert(canvas.y == y)
@@ -426,13 +428,14 @@ defmodule Quartz.Axis2D do
       for tick_location <- axis.major_tick_locations do
         tick_y = Polynomial.variable(AxisData.new(tick_location, plot.id, axis.name))
 
-        tick_line = Line.new(
-          x1: Polynomial.algebra(x - major_tick_size),
-          x2: x,
-          y1: tick_y,
-          y2: tick_y,
-          prefix: "left_axis_tick"
-        )
+        tick_line =
+          Line.new(
+            x1: Polynomial.algebra(x - major_tick_size),
+            x2: x,
+            y1: tick_y,
+            y2: tick_y,
+            prefix: "left_axis_tick"
+          )
 
         Figure.assert(tick_line.x1 >= Sketch.bbox_left(canvas))
 
@@ -448,7 +451,11 @@ defmodule Quartz.Axis2D do
       label = make_major_tick_label(axis, tick_label)
 
       Figure.assert(Sketch.bbox_horizon(label) == tick_y)
-      Figure.assert(Sketch.bbox_right(label) == Polynomial.algebra(x - major_tick_size - Length.pt(4)))
+
+      Figure.assert(
+        Sketch.bbox_right(label) == Polynomial.algebra(x - major_tick_size - Length.pt(4))
+      )
+
       Figure.assert(Sketch.bbox_left(label) >= Sketch.bbox_left(canvas))
 
       Figure.assert(labels_left_bound <= Sketch.bbox_left(label))
@@ -458,7 +465,9 @@ defmodule Quartz.Axis2D do
 
     if axis.label do
       relative_x_location =
-        Polynomial.algebra(labels_left_bound - axis.label_inner_padding - Sketch.bbox_left(canvas))
+        Polynomial.algebra(
+          labels_left_bound - axis.label_inner_padding - Sketch.bbox_left(canvas)
+        )
 
       Figure.place_in_canvas(
         axis.label,
@@ -478,7 +487,7 @@ defmodule Quartz.Axis2D do
   def draw_right_axis(plot, x, y, axis = %Axis2D{location: :right}) do
     canvas = Canvas.new(prefix: "right_axis_canvas")
 
-    Figure.minimize(canvas.width)
+    Figure.minimize(canvas.width, level: 30)
 
     Figure.assert(canvas.height == plot.right_decorations_area.height)
     Figure.assert(canvas.x == x)
@@ -512,13 +521,14 @@ defmodule Quartz.Axis2D do
       for tick_location <- axis.major_tick_locations do
         tick_y = Polynomial.variable(AxisData.new(tick_location, plot.id, axis.name))
 
-        tick_line = Line.new(
-          x1: x,
-          x2: Polynomial.algebra(x + major_tick_size),
-          y1: tick_y,
-          y2: tick_y,
-          prefix: "right_axis_tick"
-        )
+        tick_line =
+          Line.new(
+            x1: x,
+            x2: Polynomial.algebra(x + major_tick_size),
+            y1: tick_y,
+            y2: tick_y,
+            prefix: "right_axis_tick"
+          )
 
         Figure.assert(tick_line.x2 <= Sketch.bbox_right(canvas))
 
@@ -528,25 +538,29 @@ defmodule Quartz.Axis2D do
         tick_line
       end
 
+    for {tick_line, tick_label} <- Enum.zip(major_tick_lines, axis.major_tick_labels) do
+      tick_y = tick_line.y1
 
-  for {tick_line, tick_label} <- Enum.zip(major_tick_lines, axis.major_tick_labels) do
-    tick_y = tick_line.y1
+      label = make_major_tick_label(axis, tick_label)
 
-    label = make_major_tick_label(axis, tick_label)
+      Figure.assert(Sketch.bbox_horizon(label) == tick_y)
 
-    Figure.assert(Sketch.bbox_horizon(label) == tick_y)
-    Figure.assert(Sketch.bbox_left(label) == Polynomial.algebra(x + major_tick_size + Length.pt(4)))
-    Figure.assert(Sketch.bbox_right(label) <= Sketch.bbox_right(canvas))
+      Figure.assert(
+        Sketch.bbox_left(label) == Polynomial.algebra(x + major_tick_size + Length.pt(4))
+      )
 
-    Figure.assert(labels_right_bound >= Sketch.bbox_right(label))
+      Figure.assert(Sketch.bbox_right(label) <= Sketch.bbox_right(canvas))
 
-    label
-  end
+      Figure.assert(labels_right_bound >= Sketch.bbox_right(label))
+
+      label
+    end
 
     if axis.label do
       relative_x_location =
-        Polynomial.algebra(labels_right_bound + axis.label_inner_padding - Sketch.bbox_left(canvas))
-
+        Polynomial.algebra(
+          labels_right_bound + axis.label_inner_padding - Sketch.bbox_left(canvas)
+        )
 
       Figure.place_in_canvas(
         axis.label,
@@ -637,11 +651,24 @@ defmodule Quartz.Axis2D do
     end
   end
 
-  def set_min_value(%__MODULE__{} = axis, new_min_value) do
+  def put_min_value(%__MODULE__{} = axis, new_min_value) do
     if axis.max_value_fixed do
       raise RuntimeError, "minimum value of axis is fixed"
     else
       %{axis | min_value: new_min_value}
+    end
+  end
+
+  def put_limits(%__MODULE__{} = axis, new_min_value, new_max_value) do
+    cond do
+      axis.max_value_fixed ->
+        raise RuntimeError, "maximum value of axis is fixed"
+
+      axis.min_value_fixed ->
+        raise RuntimeError, "minimum value of axis is fixed"
+
+      true ->
+        %{axis | min_value: new_min_value, max_value: new_max_value}
     end
   end
 

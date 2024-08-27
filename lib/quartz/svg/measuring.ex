@@ -27,10 +27,11 @@ defmodule Quartz.SVG.Measuring do
       File.write!(tmp_path, contents)
 
       # Create a map with the sketches we want to measure
-      quartz_sketches = for sketch <- sketches, into: %{} do
-        # The keys must be strings because Resvg will convert all ids into strings
-        {to_string(sketch.id), sketch}
-      end
+      quartz_sketches =
+        for sketch <- sketches, into: %{} do
+          # The keys must be strings because Resvg will convert all ids into strings
+          {to_string(sketch.id), sketch}
+        end
 
       # Ask Resvg for the dimensions of the elements.
       # This will give us a list of nodes.

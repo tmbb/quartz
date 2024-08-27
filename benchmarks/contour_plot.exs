@@ -32,7 +32,7 @@ defmodule Quartz.Benchmarks.ContourPlot do
 
   def run_benchee() do
     Benchee.run(%{
-      "line_plot" => fn -> build_plot() end
+      "draw_line_plot" => fn -> build_plot() end
       },
       time: 5,
       memory_time: 3,
@@ -42,7 +42,7 @@ defmodule Quartz.Benchmarks.ContourPlot do
 
   # def run_incendium() do
   #   Incendium.run(%{
-  #     "line_plot" => fn -> build_plot() end
+  #     "draw_line_plot" => fn -> build_plot() end
   #     },
   #     time: 5,
   #     memory_time: 3,

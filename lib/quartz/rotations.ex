@@ -1,5 +1,6 @@
 defmodule Quartz.Rotations do
   @moduledoc false
+
   alias Quartz.Point2D
   alias Dantzig.Polynomial
   use Dantzig.Polynomial.Operators
@@ -7,7 +8,8 @@ defmodule Quartz.Rotations do
   @deg_to_rad_scale Kernel./(:math.pi(), 180.0)
 
   defp cos_degrees(0), do: 1
-  defp cos_degrees(0.0), do: 1.0
+  defp cos_degrees(+0.0), do: 1.0
+  defp cos_degrees(-0.0), do: 1.0
   defp cos_degrees(90), do: 0
   defp cos_degrees(90.0), do: 0.0
   defp cos_degrees(180), do: 1
@@ -23,7 +25,8 @@ defmodule Quartz.Rotations do
   end
 
   defp sin_degrees(0), do: 0
-  defp sin_degrees(0.0), do: 0.0
+  defp sin_degrees(+0.0), do: 0.0
+  defp sin_degrees(-0.0), do: 0.0
   defp sin_degrees(90), do: 1
   defp sin_degrees(90.0), do: 1.0
   defp sin_degrees(180), do: 0.0
@@ -68,16 +71,16 @@ defmodule Quartz.Rotations do
 
     cond do
       0 <= theta and theta < 90 ->
-        {{0 + x, w*cos + h*sin + x}, {0 + y, w*sin + h*cos + y}}
+        {{0 + x, w * cos + h * sin + x}, {0 + y, w * sin + h * cos + y}}
 
       90 <= theta and theta < 180 ->
-        {{w*cos + x, h*sin + x}, {w*cos + y, w*sin + y}}
+        {{w * cos + x, h * sin + x}, {w * cos + y, w * sin + y}}
 
       180 < theta and theta < 270 ->
-        {{w*cos + h*sin + x, 0 + x}, {w*sin + h*cos + y, 0 + y}}
+        {{w * cos + h * sin + x, 0 + x}, {w * sin + h * cos + y, 0 + y}}
 
       270 <= theta and theta <= 360 ->
-        {{h*sin + x, w*cos + x}, {w*sin + y, h*cos + y}}
+        {{h * sin + x, w * cos + x}, {w * sin + y, h * cos + y}}
     end
   end
 end

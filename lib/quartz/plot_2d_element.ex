@@ -1,4 +1,8 @@
 defprotocol Quartz.Plot2DElement do
+  @moduledoc false
+
+  # Keep this private for now
+
   alias Dantzig.Polynomial
   alias Quartz.Plot2D
 
