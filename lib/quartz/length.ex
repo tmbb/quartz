@@ -11,27 +11,64 @@ defmodule Quartz.Length do
   to their arguments.
   """
 
+  @type t() :: %__MODULE__{}
+
+  defstruct value: nil,
+            unit: nil
+
+  alias Quartz.AxisData
+  require Quartz.KeywordSpec, as: KeywordSpec
+  require Dantzig.Polynomial, as: Polynomial
+
   @cm_factor 72 / 2.54
   @mm_factor 72 / 25.4
   @inch_factor 72
 
-  @doc """
-  Distance in inches.
-  """
-  def inch(value), do: @inch_factor * value
+  def inch_to_pt_conversion_factor(), do: @inch_factor
+  def mm_to_pt_conversion_factor(), do: @mm_factor
+  def cm_to_pt_conversion_factor(), do: @cm_factor
+
+  def inch(value) do
+    Polynomial.monomial(value, "U_inch")
+  end
+
+  def pt(value) do
+    Polynomial.monomial(value, "U_pt")
+  end
+
+  def mm(value) do
+    Polynomial.monomial(value, "U_mm")
+  end
+
+  def cm(value) do
+    Polynomial.monomial(value, "U_cm")
+  end
 
   @doc """
-  Distance in points (72pt = 1in).
+  Data units.
   """
-  def pt(value), do: value
+  def data(value, opts \\ []) do
+    KeywordSpec.validate!(opts, [
+      plot_id: nil,
+      axis_name: nil
+    ])
 
-  @doc """
-  Distance in millimeters.
-  """
-  def mm(value), do: @mm_factor * value
+    axis_data = %AxisData{value: value, plot_id: plot_id, axis_name: axis_name}
 
-  @doc """
-  Distance in centimeters.
-  """
-  def cm(value), do: @cm_factor * value
+    Polynomial.monomial(1, axis_data)
+  end
+
+  def axis_fraction(value, opts \\ []) do
+    KeywordSpec.validate!(opts, [
+      axis: nil
+    ])
+
+    case axis do
+      nil ->
+        Polynomial.monomial(value, "AXIS_SIZE")
+
+      axis ->
+        Polynomial.monomial(value, axis.size)
+    end
+  end
 end

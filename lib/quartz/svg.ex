@@ -64,7 +64,7 @@ defmodule Quartz.SVG do
 
   @doc """
   SVG `<title/>` element.
-  
+
   This element is not rendered but is very useful for debugging.
   """
   def title(attrs, content) do
@@ -80,14 +80,13 @@ defmodule Quartz.SVG do
     # If we make the viewPort width == to the SVG width
     # and the viewPort height == to the SVG height, then
     # each unitless value will correspond to the value in pts.
-    # That way, all unitless values inside
     {width, attrs} = Keyword.pop(attrs, :width)
     {height, attrs} = Keyword.pop(attrs, :height)
 
     first_attrs = [
       {"xmlns", "http://www.w3.org/2000/svg"},
-      width: "#{width}pt",
-      height: "#{height}pt"
+      width: "#{pp_float(width)}pt",
+      height: "#{pp_float(height)}pt"
     ]
 
     {"svg", first_attrs ++ attrs, contents}
@@ -276,16 +275,16 @@ defmodule Quartz.SVG do
 
   @doc ~S"""
   Escapes the given HTML to iodata.
-  
+
       iex> Quartz.SVG.xml_escape_to_iodata("foo")
       {:escaped_iodata, "foo"}
-  
+
       iex> Quartz.SVG.xml_escape_to_iodata("<foo>")
       {:escaped_iodata, [[[] | "&lt;"], "foo" | "&gt;"]}
-  
+
       iex> Quartz.SVG.xml_escape_to_iodata("quotes: \" & \'")
       {:escaped_iodata, [[[[], "quotes: " | "&quot;"], " " | "&amp;"], " " | "&#39;"]}
-  
+
   """
   @spec xml_escape_to_iodata(String.t()) :: {:escaped_iodata, iodata}
   def xml_escape_to_iodata(data) when is_binary(data) do
@@ -333,7 +332,9 @@ defmodule Quartz.SVG do
     [acc | binary_part(original, skip, len)]
   end
 
-  defp pp_float(float) do
-    :erlang.float_to_binary(float, decimals: 6)
+  defp pp_float(value) when is_integer(value), do: to_string(value)
+
+  defp pp_float(float) when is_float(float) do
+    :erlang.float_to_binary(float, decimals: 5)
   end
 end

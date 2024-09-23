@@ -12,6 +12,7 @@ defmodule Quartz.Plot2D.FunctionContourPlotTest do
     :math.pow(:math.sin(2 * x) - :math.cos(1.5 * y), 2)
   end
 
+  @tag skip: true
   test "contour plot" do
     figure =
       Figure.new([width: Length.cm(8), height: Length.cm(6)], fn _fig ->

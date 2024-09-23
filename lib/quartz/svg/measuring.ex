@@ -19,7 +19,7 @@ defmodule Quartz.SVG.Measuring do
     end
 
     svg_elements = Enum.map(sketches, &Sketch.to_unpositioned_svg/1)
-    svg = SVG.svg([x: "72pt", y: "72pt", viewBox: "0 0 72 72"], svg_elements)
+    svg = SVG.svg([width: 72, height: 72, viewBox: "0 0 72 72"], svg_elements)
     contents = SVG.to_iodata(svg)
 
     Utilities.with_tmp_file!("-MEASUREMENT.svg", fn tmp_path ->

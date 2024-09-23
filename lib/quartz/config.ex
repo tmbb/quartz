@@ -2,7 +2,10 @@ defmodule Quartz.Config do
   alias Quartz.Figure
   alias Quartz.Length
   alias Quartz.Color.RGB
+
+  # Debugging
   alias Quartz.Canvas.CanvasDebugProperties
+  alias Quartz.Text.TextDebugProperties
 
   defstruct text_font: "Ubuntu",
             text_style: nil,
@@ -35,6 +38,22 @@ defmodule Quartz.Config do
             plot_title_fractions: nil,
             plot_title_features: nil,
             plot_title_escape: true,
+            # Title attributes
+            plot_text_font: nil,
+            plot_text_style: nil,
+            plot_text_weight: nil,
+            plot_text_stretch: nil,
+            plot_text_size: nil,
+            plot_text_fill: nil,
+            plot_text_ligatures: nil,
+            plot_text_discretionary_ligatures: nil,
+            plot_text_historical_ligatures: nil,
+            plot_text_number_type: nil,
+            plot_text_number_width: nil,
+            plot_text_slashed_zero: nil,
+            plot_text_fractions: nil,
+            plot_text_features: nil,
+            plot_text_escape: true,
             # Axis label attributes
             axis_label_font: nil,
             axis_label_style: nil,
@@ -116,9 +135,14 @@ defmodule Quartz.Config do
             plot2d_axis_stroke_width: nil,
             # Debug values
             debug_canvas_stroke: RGB.gray(),
-            debug_canvas_stroke_width: Length.pt(0.5),
+            debug_canvas_stroke_width: Length.pt(0.3),
             debug_canvas_stroke_dash_array: "2 4",
-            debug_canvas_fill: RGB.white(0)
+            debug_canvas_fill: RGB.white(0),
+            # Debug values
+            debug_text_stroke: RGB.red(),
+            debug_text_stroke_width: Length.pt(0.3),
+            debug_text_stroke_dash_array: nil,
+            debug_text_fill: RGB.white(0)
 
   def new(opts \\ []) do
     struct(__MODULE__, opts)
@@ -140,8 +164,23 @@ defmodule Quartz.Config do
     }
   end
 
+  def get_text_debug_properties() do
+    config = get_config()
+
+    %TextDebugProperties{
+      fill: config.debug_text_fill,
+      stroke: config.debug_text_stroke,
+      stroke_width: config.debug_text_stroke_width,
+      stroke_dash_array: config.debug_text_stroke_dash_array
+    }
+  end
+
   def get_plot_title_text_attributes(opts \\ []) do
     plot_title_text_attributes(get_config(), opts)
+  end
+
+  def get_plot_text_attributes(opts \\ []) do
+    plot_text_attributes(get_config(), opts)
   end
 
   def get_axis_label_text_attributes(opts \\ []) do
@@ -258,6 +297,28 @@ defmodule Quartz.Config do
       fractions: {:major_tick_label_fractions, [:text_title_fractions]},
       features: {:major_tick_label_features, [:text_features]},
       escape: {:major_tick_label_escape, [:text_escape]}
+    )
+  end
+
+  def plot_text_attributes(%__MODULE__{} = config, opts) do
+    get_many_with_fallbacks(opts, config,
+      font: {:plot_text_font, [:text_font]},
+      style: {:plot_text_style, [:text_style]},
+      weight: {:plot_text_weight, [:text_weight]},
+      stretch: {:plot_text_stretch, [:text_stretch]},
+      size: {:plot_text_size, [:text_size]},
+      fill: {:plot_text_fill, [:text_fill]},
+      ligatures: {:plot_text_ligatures, [:text_ligatures]},
+      discretionary_ligatures:
+        {:plot_text_discretionary_ligatures, [:text_discretionary_ligatures]},
+      historical_ligatures:
+        {:plot_text_historical_ligatures, [:text_historical_ligatures]},
+      number_type: {:plot_text_number_type, [:text_number_type]},
+      number_width: {:plot_text_number_width, [:text_number_width]},
+      slashed_zero: {:plot_text_slashed_zero, [:text_slashed_zero]},
+      fractions: {:plot_text_fractions, [:text_title_fractions]},
+      features: {:plot_text_features, [:text_features]},
+      escape: {:plot_text_escape, [:text_escape]}
     )
   end
 

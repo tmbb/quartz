@@ -15,11 +15,13 @@ defmodule Quartz.Text do
   Text element.
   """
 
+  alias Quartz.Config
   alias Quartz.Variable
   alias Quartz.Figure
   alias Quartz.SVG
   alias Quartz.Sketch.BBoxBounds
   alias Quartz.Formatter
+  alias Quartz.Text.TextDebugProperties
 
   @type t() :: %__MODULE__{}
 
@@ -92,7 +94,7 @@ defmodule Quartz.Text do
     id = Figure.get_id()
 
     debug = Figure.debug?()
-    debug_properties = nil
+    debug_properties = if debug, do: Config.get_text_debug_properties(), else: nil
 
     all_opts =
       opts
@@ -118,7 +120,6 @@ defmodule Quartz.Text do
 
   defimpl Quartz.Sketch.Protocol do
     require Dantzig.Polynomial, as: Polynomial
-    use Dantzig.Polynomial.Operators
 
     @impl true
     def bbox_bounds(text) do
@@ -143,13 +144,26 @@ defmodule Quartz.Text do
       transformed_height = fun.(text.height)
       transformed_depth = fun.(text.depth)
 
+      debug_properties =
+        case text.debug_properties do
+          %TextDebugProperties{} ->
+            %{
+              text.debug_properties
+              | stroke_width: fun.(text.debug_properties.stroke_width)
+            }
+
+          other ->
+            other
+        end
+
       %{
         text
         | x: transformed_x,
           y: transformed_y,
           width: transformed_width,
           height: transformed_height,
-          depth: transformed_depth
+          depth: transformed_depth,
+          debug_properties: debug_properties
       }
     end
 
@@ -185,10 +199,15 @@ defmodule Quartz.Text do
           "&#160;&#160;font-size: #{text.size}&#13;"
         ]
 
+        rect_attrs = debug_rect_svg_properties(text)
+
         # SVG text element with extra debug data
-        SVG.text(common_attributes, [
-          SVG.title([], SVG.escaped_iodata(tooltip_text)),
-          text.content
+        SVG.g([], [
+          SVG.rect(rect_attrs, []),
+          SVG.text(common_attributes, [
+            SVG.title([], SVG.escaped_iodata(tooltip_text)),
+            text.content
+          ])
         ])
       else
         # SVG text element without extra debug data
@@ -206,6 +225,19 @@ defmodule Quartz.Text do
       # TODO: If we ever implement text stretching, we will
       # have to handle the width better.
       to_svg(%{text | x: 0, y: 0, width: 0, height: 0, depth: 0, rotation: 0, debug: false})
+    end
+
+    defp debug_rect_svg_properties(text) do
+      geom_properties = [
+        x: text.x,
+        y: text.y - text.height,
+        width: text.width,
+        height: text.height
+      ]
+
+      style_properties = TextDebugProperties.to_svg_attributes(text.debug_properties)
+
+      geom_properties ++ style_properties
     end
   end
 end

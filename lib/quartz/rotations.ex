@@ -9,7 +9,6 @@ defmodule Quartz.Rotations do
 
   defp cos_degrees(0), do: 1
   defp cos_degrees(+0.0), do: 1.0
-  defp cos_degrees(-0.0), do: 1.0
   defp cos_degrees(90), do: 0
   defp cos_degrees(90.0), do: 0.0
   defp cos_degrees(180), do: 1
@@ -26,7 +25,6 @@ defmodule Quartz.Rotations do
 
   defp sin_degrees(0), do: 0
   defp sin_degrees(+0.0), do: 0.0
-  defp sin_degrees(-0.0), do: 0.0
   defp sin_degrees(90), do: 1
   defp sin_degrees(90.0), do: 1.0
   defp sin_degrees(180), do: 0.0

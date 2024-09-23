@@ -1,25 +1,23 @@
 Running HiGHS 1.4.0 [date: 1970-01-01, git hash: bcf6c0b22]
 Copyright (c) 2022 ERGO-Code under MIT licence terms
-LP   H10730_model has 216 rows; 162 cols; 579 nonzeros
+LP   3HJ1N0F_model has 190 rows; 151 cols; 538 nonzeros
 Presolving model
-109 rows, 52 cols, 297 nonzeros
-82 rows, 34 cols, 242 nonzeros
-27 rows, 23 cols, 72 nonzeros
-22 rows, 19 cols, 63 nonzeros
-19 rows, 15 cols, 56 nonzeros
-16 rows, 12 cols, 50 nonzeros
-8 rows, 9 cols, 23 nonzeros
-6 rows, 8 cols, 18 nonzeros
-5 rows, 4 cols, 12 nonzeros
-5 rows, 4 cols, 12 nonzeros
-Presolve : Reductions: rows 5(-211); columns 4(-158); elements 12(-567)
+90 rows, 45 cols, 249 nonzeros
+67 rows, 31 cols, 200 nonzeros
+43 rows, 22 cols, 135 nonzeros
+16 rows, 16 cols, 51 nonzeros
+10 rows, 12 cols, 37 nonzeros
+7 rows, 7 cols, 17 nonzeros
+5 rows, 6 cols, 12 nonzeros
+4 rows, 3 cols, 9 nonzeros
+Presolve : Reductions: rows 4(-186); columns 3(-148); elements 9(-529)
 Solving the presolved LP
 Using EKK dual simplex solver - serial
   Iteration        Objective     Infeasibilities num(sum)
-          0    -3.0009999724e+04 Ph1: 4(3002); Du: 2(39.9997) 0s
-          3     7.3267056821e+03 Pr: 0(0) 0s
+          0    -9.9999650717e+00 Ph1: 4(2.92915); Du: 1(9.99997) 0s
+          1     1.7161346276e+05 Pr: 0(0) 0s
 Solving the original LP from the solution after postsolve
 Model   status      : Optimal
-Simplex   iterations: 3
-Objective value     : -7.3267056821e+03
+Simplex   iterations: 1
+Objective value     : -1.7161346276e+05
 HiGHS run time      :          0.00

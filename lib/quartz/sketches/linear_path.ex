@@ -10,6 +10,7 @@ defmodule Quartz.LinearPath do
             points: [],
             closed: false,
             fill: nil,
+            opacity: nil,
             stroke_paint: nil,
             stroke_cap: nil,
             stroke_thickness: nil,
@@ -26,6 +27,7 @@ defmodule Quartz.LinearPath do
       points: [],
       closed: false,
       fill: RGB.white(0),
+      opacity: 1,
       stroke_thickness: 1,
       stroke_paint: "black",
       stroke_cap: "square"
@@ -46,6 +48,7 @@ defmodule Quartz.LinearPath do
       points: points,
       closed: closed,
       fill: fill,
+      opacity: opacity,
       stroke_join: stroke_join,
       stroke_paint: stroke_paint,
       stroke_thickness: stroke_thickness,
@@ -123,6 +126,7 @@ defmodule Quartz.LinearPath do
         d: svg_points,
         stroke: path.stroke_paint,
         fill: path.fill,
+        opacity: path.opacity,
         "stroke-linejoin": path.stroke_join,
         "stroke-linecap": path.stroke_cap
       ]
@@ -131,7 +135,8 @@ defmodule Quartz.LinearPath do
         tooltip_text = [
           "LinearPath [#{path.id}] #{path.prefix} &#13;",
           "&#160;&#160;stroke: #{pprint_color(path.stroke_paint)}&#13;",
-          "&#160;&#160;fill: #{pprint_color(path.fill)}&#13;"
+          "&#160;&#160;fill: #{pprint_color(path.fill)}&#13;",
+          "&#160;&#160;opacity: #{path.opacity}&#13;"
         ]
 
         SVG.path(common_attributes, [

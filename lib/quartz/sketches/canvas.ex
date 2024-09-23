@@ -83,12 +83,25 @@ defmodule Quartz.Canvas do
       transformed_width = fun.(canvas.width)
       transformed_height = fun.(canvas.height)
 
+      debug_properties =
+        case canvas.debug_properties do
+          %CanvasDebugProperties{} ->
+            %{
+              canvas.debug_properties
+              | stroke_width: fun.(canvas.debug_properties.stroke_width)
+            }
+
+          other ->
+            other
+        end
+
       %{
         canvas
         | x: transformed_x,
           y: transformed_y,
           width: transformed_width,
-          height: transformed_height
+          height: transformed_height,
+          debug_properties: debug_properties
       }
     end
 

@@ -86,12 +86,20 @@ defmodule Quartz.Line do
 
     @impl true
     def transform_lengths(line, fun) do
-      transform_x = fun.(line.x1)
-      transform_y = fun.(line.y1)
-      transform_x2 = fun.(line.x2)
-      transform_y2 = fun.(line.y2)
+      t_x = fun.(line.x1)
+      t_y = fun.(line.y1)
+      t_x2 = fun.(line.x2)
+      t_y2 = fun.(line.y2)
+      t_stroke_thickness = fun.(line.stroke_thickness)
 
-      %{line | x1: transform_x, y1: transform_y, x2: transform_x2, y2: transform_y2}
+      %{
+        line
+        | x1: t_x,
+          y1: t_y,
+          x2: t_x2,
+          y2: t_y2,
+          stroke_thickness: t_stroke_thickness
+      }
     end
 
     @impl true

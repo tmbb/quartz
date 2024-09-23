@@ -7,7 +7,11 @@ defmodule Quartz.MixProject do
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env()),
+      docs: [
+        assets: %{"assets" => "assets"}
+      ]
     ]
   end
 
@@ -18,13 +22,13 @@ defmodule Quartz.MixProject do
     ]
   end
 
+  defp elixirc_paths(:test), do: ["lib/", "test/support"]
+  defp elixirc_paths(:dev), do: ["lib/", "demo/lib/"]
+  defp elixirc_paths(_env), do: ["lib/"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:approval, path: "../approval"},
-      # {:plug_cowboy, "~> 2.5"},
-      # {:phoenix, "~> 1.7"},
-      # {:phoenix_live_view, "~> 0.18"},
       {:dantzig, path: "../dantzig"},
       {:incendium, path: "../incendium", only: [:dev, :test]},
       {:statistics, "~> 0.6", only: [:dev, :test]},

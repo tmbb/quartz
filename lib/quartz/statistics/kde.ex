@@ -1,6 +1,8 @@
 defmodule Quartz.Statistics.KDE do
   require Explorer.DataFrame, as: DataFrame
   alias Explorer.Series
+
+  require Quartz.KeywordSpec, as: KeywordSpec
   alias Quartz.Statistics.KDE.DensityEstimator1D
 
   # A constant used by the gaussian distribution
@@ -68,25 +70,14 @@ defmodule Quartz.Statistics.KDE do
   end
 
   def kde(observations, nr_of_points, opts \\ []) do
-    estimator =
-      Keyword.get(
-        opts,
-        :estimator,
-        gaussian_kernel_estimator()
-      )
-
-    bandwidth =
-      Keyword.get(
-        opts,
-        :bandwidth,
-        DensityEstimator1D.select_bandwidth(estimator, observations)
-      )
+    KeywordSpec.validate!(opts, [
+      estimator: gaussian_kernel_estimator(),
+      bandwidth: DensityEstimator1D.select_bandwidth(estimator, observations),
+      min: Series.min(observations),
+      max: Series.max(observations)
+    ])
 
     n_observations = Series.size(observations)
-    min = Series.min(observations)
-    max = Series.max(observations)
-
-    # Estimate the bandwidth
 
     # Use some Explorar-based programming to keep the number-crunching
     # out of the BEAM and offload the hard calculations to Rust.

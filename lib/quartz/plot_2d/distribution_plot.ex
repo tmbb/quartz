@@ -13,7 +13,9 @@ defmodule Quartz.Plot2D.DistributionPlot do
 
   alias Quartz.Plot2D.DistributionPlots.BoxAndWhiskers
 
-  def kde_plot(plot, values, opts \\ []) do
+  def draw_kde_plot(plot, values, opts \\ []) do
+    KeywordSpec.validate!(opts, [fill: false])
+
     value_series =
       case values do
         %Series{} ->
@@ -24,15 +26,20 @@ defmodule Quartz.Plot2D.DistributionPlot do
           Series.from_list(float_values)
       end
 
-    df = KDE.kde(value_series, 200)
+    df = KDE.kde(value_series, 200, opts)
 
     xs = Series.to_list(df[:x])
     ys = Series.to_list(df[:y])
 
-    PairwiseDataPlot.draw_line_plot(plot, xs, ys, opts)
+    if fill do
+      new_opts = Keyword.put(opts, :bottom, 0.0)
+      PairwiseDataPlot.draw_filled_between_y(plot, xs, ys, new_opts)
+    else
+      PairwiseDataPlot.draw_line_plot(plot, xs, ys, opts)
+    end
   end
 
-  def kde_plot_groups_from_dataframe(plot, %DataFrame{} = dataframe, group_column, values_column, color_picker, opts \\ []) do
+  def draw_kde_plot_groups_from_dataframe(plot, %DataFrame{} = dataframe, group_column, values_column, color_picker, opts \\ []) do
     groups =
       dataframe[group_column]
       |> Series.distinct()
@@ -47,7 +54,7 @@ defmodule Quartz.Plot2D.DistributionPlot do
           fn df -> Series.equal(df[group_column], new_group) end
         )[values_column]
 
-      kde_plot(new_plot, values, new_opts)
+      draw_kde_plot(new_plot, values, new_opts)
     end)
   end
 
@@ -108,10 +115,16 @@ defmodule Quartz.Plot2D.DistributionPlot do
     series = to_series(data)
 
     KeywordSpec.validate!(opts, [
+      !style,
       x_axis: "x",
       y_axis: "y",
       normalized: false,
       ideal_bin_width: default_bin_width_for_histogram(series)
+    ])
+
+    KeywordSpec.validate!(style, [
+      !color,
+      opacity: 1.0
     ])
 
     to_x_axis_data = fn value ->
@@ -172,7 +185,8 @@ defmodule Quartz.Plot2D.DistributionPlot do
       points: all_points,
       stroke_paint: "none",
       closed: true,
-      fill: "cyan"
+      fill: color,
+      opacity: opacity
     )
 
     plot

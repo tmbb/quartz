@@ -2,6 +2,7 @@ defmodule Quartz.Plot2D do
   require Quartz.Figure, as: Figure
   alias Quartz.Canvas
   alias Quartz.Axis2D
+  alias Quartz.AxisData
   alias Quartz.AxisReference
   alias Quartz.Plot2DElement
   alias Quartz.Length
@@ -20,8 +21,8 @@ defmodule Quartz.Plot2D do
 
   require Dantzig.Polynomial, as: Polynomial
 
-  @decorations_area_content_padding Length.pt(7)
-  @boundaries_padding Length.pt(10)
+  @decorations_area_content_padding Length.pt(5)
+  @boundaries_padding Length.pt(5)
   @title_inner_padding Length.pt(6)
 
   @default_color_map ColorMap.tab10()
@@ -41,6 +42,7 @@ defmodule Quartz.Plot2D do
             bottom: nil,
             left: nil,
             right: nil,
+            bounds_set: false,
             current_top_bound: nil,
             current_left_bound: nil,
             current_right_bound: nil,
@@ -203,6 +205,7 @@ defmodule Quartz.Plot2D do
       bottom: bottom,
       left: left,
       right: right,
+      bounds_set: false,
       current_top_bound: nil,
       current_bottom_bound: nil,
       current_left_bound: nil,
@@ -253,7 +256,8 @@ defmodule Quartz.Plot2D do
 
     %{
       plot
-      | current_top_bound: top_bound_with_margin,
+      | bounds_set: true,
+        current_top_bound: top_bound_with_margin,
         current_right_bound: right_bound_with_margin,
         current_bottom_bound: bottom_bound_with_margin,
         current_left_bound: left_bound_with_margin
@@ -560,14 +564,12 @@ defmodule Quartz.Plot2D do
 
   def draw_title(plot) do
     if plot.title do
-      y_offset = Polynomial.algebra(-1 * plot.title_inner_padding)
-
       Figure.position_with_location_and_alignment(
         plot.title,
         plot.title_area,
         x_location: :left,
         y_location: :bottom,
-        y_offset: y_offset,
+        y_offset: 0,
         contains_vertically?: true
       )
     end
@@ -679,18 +681,18 @@ defmodule Quartz.Plot2D do
   @doc """
   Draw a distribution using a kernel density estimate.
   """
-  def kde_plot(plot, values, opts \\ []) do
+  def draw_kde_plot(plot, values, opts \\ []) do
     # Choose the color here to avoid recursive cross-module calls
     {new_plot, new_opts} = maybe_add_color_to_opts_from_colormap(plot, opts)
     # Plot the line with the color already picked
-    DistributionPlot.kde_plot(new_plot, values, new_opts)
+    DistributionPlot.draw_kde_plot(new_plot, values, new_opts)
   end
 
   @doc """
   Draw a distribution using a kernel density estimate.
   """
-  def kde_plot_groups_from_dataframe(plot, %DataFrame{} = dataframe, group_column, values_column, opts \\ []) do
-    DistributionPlot.kde_plot_groups_from_dataframe(
+  def draw_kde_plot_groups_from_dataframe(plot, %DataFrame{} = dataframe, group_column, values_column, opts \\ []) do
+    DistributionPlot.draw_kde_plot_groups_from_dataframe(
       plot,
       dataframe,
       group_column,
@@ -726,5 +728,107 @@ defmodule Quartz.Plot2D do
     {new_plot, new_opts} = maybe_add_color_to_opts_from_colormap(plot, opts)
     # Plot the line with the color already picked
     DistributionPlot.histogram(new_plot, data, new_opts)
+  end
+
+  defp axis_full_size(axis) do
+    Polynomial.algebra(
+      axis.margin_start +
+      axis.size +
+      axis.margin_end
+    )
+  end
+
+  def draw_text(plot, text, opts \\ []) do
+    prefix = "plot_text"
+
+    KeywordSpec.validate!(opts, [
+      !x,
+      !y,
+      x_axis: "x",
+      y_axis: "y",
+      x_alignment: :left,
+      y_alignment: :bottom,
+      style: []
+    ])
+
+    # Merge the user-given text options with the default options for this figure
+    text_opts = Config.get_plot_text_attributes(style)
+    # Add the prefix for better debugging
+    text_opts = [{:prefix, prefix} | text_opts]
+
+    x_axis_struct = get_axis(plot, x_axis)
+    y_axis_struct = get_axis(plot, y_axis)
+
+    x_full_axis_size = axis_full_size(x_axis_struct)
+    y_full_axis_size = axis_full_size(y_axis_struct)
+
+    x_replacer = fn x ->
+      case x do
+        %AxisData{value: value} ->
+          %AxisData{value: value, plot_id: plot.id, axis_name: x_axis}
+
+        "AXIS_SIZE" ->
+          x_full_axis_size
+
+        other ->
+          other
+      end
+    end
+
+    y_replacer = fn y ->
+      case y do
+        %AxisData{value: value} ->
+          %AxisData{value: value, plot_id: plot.id, axis_name: y_axis}
+
+        "AXIS_SIZE" ->
+          y_full_axis_size
+
+        other ->
+          other
+      end
+    end
+
+    relative_x_coord = Polynomial.replace(x, x_replacer)
+    relative_y_coord = Polynomial.replace(y, y_replacer)
+
+    x_coord = Polynomial.algebra(x_axis_struct.x + relative_x_coord)
+    y_coord = Polynomial.algebra(y_axis_struct.y + relative_y_coord)
+
+    text_sketch =
+      case text do
+        %Text{} ->
+          # Return the text as it was given
+          text
+
+        binary when is_binary(binary) ->
+          # Create text from tyhe binary
+          Text.new(binary, text_opts)
+      end
+
+    bbox = Sketch.bbox_bounds(text_sketch)
+
+    case x_alignment do
+      :left ->
+        Figure.assert(bbox.x_min == x_coord)
+
+      :right ->
+        Figure.assert(bbox.x_max == x_coord)
+
+      :center ->
+        Figure.assert((bbox.x_min + bbox.x_max / 2) == x_coord)
+    end
+
+    case y_alignment do
+      :top ->
+        Figure.assert(bbox.y_min == y_coord)
+
+      :bottom ->
+        Figure.assert(bbox.y_max == y_coord)
+
+      :horizon ->
+        Figure.assert((bbox.y_min + bbox.y_max / 2) == y_coord)
+    end
+
+    plot
   end
 end

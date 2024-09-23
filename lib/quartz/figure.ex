@@ -71,8 +71,8 @@ defmodule Quartz.Figure do
     horizontal_padding = Keyword.get(opts, :horizontal_padding, padding)
     vertical_padding = Keyword.get(opts, :vertical_padding, padding)
 
-    half_horizontal_padding = horizontal_padding / 2
-    half_vertical_padding = vertical_padding / 2
+    half_horizontal_padding = Polynomial.algebra(horizontal_padding / 2)
+    half_vertical_padding = Polynomial.algebra(vertical_padding / 2)
 
     x = Keyword.get(opts, :x, 0.0)
     y = Keyword.get(opts, :y, 0.0)
@@ -268,7 +268,11 @@ defmodule Quartz.Figure do
 
     view_box = "0 0 #{figure.width} #{figure.height}"
 
-    svg = SVG.svg([width: figure.width, height: figure.height, viewBox: view_box], svg_elements)
+    svg =
+      SVG.svg(
+        [width: figure.width, height: figure.height, viewBox: view_box],
+        svg_elements
+      )
 
     SVG.to_iodata(svg)
   end
@@ -398,10 +402,6 @@ defmodule Quartz.Figure do
           {1, id, other}
       end
     end)
-  end
-
-  defp finalize(figure) do
-    %{figure | finalized: true}
   end
 
   defp get_lengths_from_constraints(figure) do
@@ -989,6 +989,10 @@ defmodule Quartz.Figure do
     :ok
   end
 
+  defp finalize(figure) do
+    %{figure | finalized: true}
+  end
+
   @doc """
   Create a new figure.
   """
@@ -1025,14 +1029,37 @@ defmodule Quartz.Figure do
       # Put the figure so that we can generate variables for the width and height
       Process.put(:"$quartz_figure", figure)
 
+      # Add units of measurement
+      :ok =
+        update_current_figure_problem(fn problem ->
+          {problem, u_cm} = Problem.new_unmangled_variable(problem, "U_cm")
+          {problem, u_mm} = Problem.new_unmangled_variable(problem, "U_mm")
+          {problem, u_in} = Problem.new_unmangled_variable(problem, "U_in")
+          {problem, u_pt} = Problem.new_unmangled_variable(problem, "U_pt")
+
+          c_cm = Constraint.new(u_cm, :==, Length.cm_to_pt_conversion_factor())
+          c_mm = Constraint.new(u_mm, :==, Length.mm_to_pt_conversion_factor())
+          c_in = Constraint.new(u_in, :==, Length.inch_to_pt_conversion_factor())
+          c_pt = Constraint.new(u_pt, :==, 1.0)
+
+          updated_problem =
+            problem
+            |> Problem.add_constraint(c_cm)
+            |> Problem.add_constraint(c_mm)
+            |> Problem.add_constraint(c_in)
+            |> Problem.add_constraint(c_pt)
+
+          {updated_problem, :ok}
+        end)
+
       # Now that we have a figure, we can generate variables for the width and height.
       # Quartz will try to design the smallest figure that fits the elements,
       # with minimum values for width and height as given by the user.
-      width = variable("figure_width", min: min_width)
-      height = variable("figure_height", min: min_height)
+      width = variable("figure_width")
+      height = variable("figure_height")
 
-      minimize(width)
-      minimize(height)
+      assert(width >= min_width)
+      assert(height >= min_height)
 
       # Update the figure with the height and width variables
       update_current_figure(fn fig ->
@@ -1063,6 +1090,7 @@ defmodule Quartz.Figure do
       |> draw_plots()
       |> get_measurements()
       |> apply_scales_to_data()
+      |> dynamically_apply_coefficients_to_figure_dimensions()
       |> solve_problem()
       |> solve_figure_dimensions()
       |> solve_sketches()
@@ -1070,5 +1098,39 @@ defmodule Quartz.Figure do
     after
       Process.delete(:"$quartz_figure")
     end
+  end
+
+  @doc false
+  def dump_to_debug_file(figure) do
+    File.write!("debug.exs", inspect(figure.problem, pretty: true, limit: :infinity))
+    figure
+  end
+
+  defp dynamically_apply_coefficients_to_figure_dimensions(figure) do
+    max_coeff =
+      figure.problem.objective
+      |> Polynomial.coefficients()
+      |> Enum.map(&abs/1)
+      |> Enum.sum()
+
+    minimization_level = 2 * max_coeff
+
+    minimize(figure.width, level: minimization_level)
+    minimize(figure.height, level: minimization_level)
+
+    objective = figure.problem.objective
+
+    new_objective =
+      Polynomial.algebra(
+        objective - max_coeff * figure.width - max_coeff * figure.height
+      )
+
+    %{figure | problem: %{figure.problem | objective: new_objective}}
+  end
+
+  def add_plot_2d(fun) do
+    Plot2D.new()
+    |> fun.()
+    |> Plot2D.finalize()
   end
 end
