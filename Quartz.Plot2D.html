@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.34.2">
+    <meta name="project" content="quartz v0.1.0">
+
+
+    <title>Quartz.Plot2D — quartz v0.1.0</title>
+    <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-K7URE6B4.js"></script>
+    <script src="dist/sidebar_items-298D1EC2.js"></script>
+    <script src="docs_config.js"></script>
+    <script async src="dist/html-YIPIRHGU.js"></script>
+
+  </head>
+  <body data-type="modules" class="page-module">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+      <div>
+        <a href="api-reference.html" class="sidebar-projectName" translate="no">
+quartz
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v0.1.0
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-listNav" class="sidebar-listNav" role="tablist">
+      <li>
+        <button id="extras-list-tab-button" role="tab" data-type="extras" aria-controls="extras-tab-panel" aria-selected="true" tabindex="0">
+Pages
+        </button>
+      </li>
+
+        <li>
+          <button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-tab-panel" aria-selected="false" tabindex="-1">
+            Modules
+          </button>
+        </li>
+
+
+    </ul>
+  </div>
+
+  <div id="extras-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="extras-list-tab-button">
+    <ul id="extras-full-list" class="full-list"></ul>
+  </div>
+
+    <div id="modules-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>
+      <ul id="modules-full-list" class="full-list"></ul>
+    </div>
+
+
+</nav>
+
+<main class="content">
+  <output role="status" id="toast"></output>
+
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of quartz</span>
+            <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </label>
+          <button type="submit" class="search-button" aria-label="Submit Search">
+            <i class="ri-search-2-line ri-lg" aria-hidden="true" title="Submit search"></i>
+          </button>
+          <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+            <i class="ri-close-line ri-lg" title="Cancel search"></i>
+          </button>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <h1>
+
+    <span translate="no">Quartz.Plot2D</span> 
+    <small class="app-vsn" translate="no">(quartz v0.1.0)</small>
+
+  </h1>
+
+
+    <section id="moduledoc">
+<p>The module responsible for drawing and customizing 2D plots.</p>
+    </section>
+
+</div>
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Summary</span>
+    </h1>
+<div class="summary-types summary">
+  <h2>
+    <a href="#types">Types</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#t:t/0" data-no-tooltip translate="no">t()</a>
+
+      </div>
+
+    </div>
+
+</div>
+<div class="summary-functions summary">
+  <h2>
+    <a href="#functions">Functions</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#add_bottom_axis/3" data-no-tooltip translate="no">add_bottom_axis(plot, name, opts \\ [])</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Add bottom axis. Bottom axes are added below the axes already present.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#add_left_axis/3" data-no-tooltip translate="no">add_left_axis(plot, name, opts \\ [])</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Add left axis. Left axes are added to the left of the axes already present.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#add_right_axis/3" data-no-tooltip translate="no">add_right_axis(plot, name, opts \\ [])</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Add right axis. Right axes are added to the left of the axes already present.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#add_to_legend/3" data-no-tooltip translate="no">add_to_legend(plot, symbol, label)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#add_top_axis/3" data-no-tooltip translate="no">add_top_axis(plot, name, opts \\ [])</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Add top axis. Top axes are added below the axes already present.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#align_bbox/2" data-no-tooltip translate="no">align_bbox(elements, fun)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#align_bottom/1" data-no-tooltip translate="no">align_bottom(elements)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#align_left/1" data-no-tooltip translate="no">align_left(elements)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#align_right/1" data-no-tooltip translate="no">align_right(elements)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#align_top/1" data-no-tooltip translate="no">align_top(elements)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#box_plot/3" data-no-tooltip translate="no">box_plot(plot, groups, opts \\ [])</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#default_bin_width_for_histogram/1" data-no-tooltip translate="no">default_bin_width_for_histogram(series)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_bottom_content/2" data-no-tooltip translate="no">draw_bottom_content(plot, padding)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_function_contour_plot/8" data-no-tooltip translate="no">draw_function_contour_plot(plot, fun, x_min, x_max, y_min, y_max, countour_levels, opts \\ [])</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Draw a series of line segments between the given points.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_histogram/3" data-no-tooltip translate="no">draw_histogram(plot, data, opts \\ [])</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_kde_plot/3" data-no-tooltip translate="no">draw_kde_plot(plot, values, opts \\ [])</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Draw a distribution using a kernel density estimate.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_kde_plot_groups_from_dataframe/5" data-no-tooltip translate="no">draw_kde_plot_groups_from_dataframe(plot, dataframe, group_column, values_column, opts \\ [])</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Draw a distribution using a kernel density estimate.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_left_content/2" data-no-tooltip translate="no">draw_left_content(plot, padding)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_line_plot/4" data-no-tooltip translate="no">draw_line_plot(plot, data_x, data_y, opts \\ [])</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Draw a series of line segments between the given points.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_right_content/2" data-no-tooltip translate="no">draw_right_content(plot, padding)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_scatter_plot/4" data-no-tooltip translate="no">draw_scatter_plot(plot, data_x, data_y, opts \\ [])</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Draw a scatter plot for the given points.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_text/3" data-no-tooltip translate="no">draw_text(plot, text, opts \\ [])</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#draw_top_content/2" data-no-tooltip translate="no">draw_top_content(plot, padding)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#fetch_axis/2" data-no-tooltip translate="no">fetch_axis(plot, name)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#fetch_axis!/2" data-no-tooltip translate="no">fetch_axis!(plot, name)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#finalize/1" data-no-tooltip translate="no">finalize(plot)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#finalize_all/1" data-no-tooltip translate="no">finalize_all(plots)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#get_axis/2" data-no-tooltip translate="no">get_axis(plot, name)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#maybe_add_color_to_opts_from_colormap/2" data-no-tooltip translate="no">maybe_add_color_to_opts_from_colormap(plot, opts)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#new/1" data-no-tooltip translate="no">new(opts \\ [])</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#no_legend/1" data-no-tooltip translate="no">no_legend(plot)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_axes_margins/3" data-no-tooltip translate="no">put_axes_margins(plot, value, opts \\ [])</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_axis_label/4" data-no-tooltip translate="no">put_axis_label(plot, axis_name, text, opts \\ [])</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_axis_limits/4" data-no-tooltip translate="no">put_axis_limits(plot, axis_name, min_value, max_value)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_axis_major_tick_labels/3" data-no-tooltip translate="no">put_axis_major_tick_labels(plot, axis_name, labels)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_axis_major_tick_locations/3" data-no-tooltip translate="no">put_axis_major_tick_locations(plot, axis_name, locations)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_axis_max_value/3" data-no-tooltip translate="no">put_axis_max_value(plot, axis_name, value)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_axis_min_value/3" data-no-tooltip translate="no">put_axis_min_value(plot, axis_name, value)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_axis_scale/3" data-no-tooltip translate="no">put_axis_scale(plot, axis_name, scale)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_bounds/2" data-no-tooltip translate="no">put_bounds(plot, bounds)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Set the bounds of a plot.
+If the bounds are not set, by default the plot will occupy
+the total space given to the figure.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_legend_location/2" data-no-tooltip translate="no">put_legend_location(plot, location)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Put legend location.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_major_tick_labels_style/3" data-no-tooltip translate="no">put_major_tick_labels_style(plot, axes_name, style)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Set the style of the tick labels.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_minimum_axis_end_margin/3" data-no-tooltip translate="no">put_minimum_axis_end_margin(plot, axis_name, value)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_minimum_axis_margins/3" data-no-tooltip translate="no">put_minimum_axis_margins(plot, axis_name, common_margin_size)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_minimum_axis_margins/4" data-no-tooltip translate="no">put_minimum_axis_margins(plot, axis_name, margin_start, margin_end)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_minimum_axis_start_margin/3" data-no-tooltip translate="no">put_minimum_axis_start_margin(plot, axis_name, value)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_title/3" data-no-tooltip translate="no">put_title(plot, title, opts \\ [])</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#put_width_to_height_ratio/2" data-no-tooltip translate="no">put_width_to_height_ratio(plot, ratio)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#remove_axis_ticks/2" data-no-tooltip translate="no">remove_axis_ticks(plot, axis_name)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#stack_horizontally_inside_container/2" data-no-tooltip translate="no">stack_horizontally_inside_container(elements, container)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#stack_vertically_inside_container/2" data-no-tooltip translate="no">stack_vertically_inside_container(elements, container)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#update_axes/3" data-no-tooltip translate="no">update_axes(plot, axis_names, fun)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#update_axis/3" data-no-tooltip translate="no">update_axis(plot, axis_name, fun)</a>
+
+      </div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="types" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#types">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Types</span>
+    </h1>
+    <div class="types-list">
+<section class="detail" id="t:t/0">
+
+  <div class="detail-header">
+    <a href="#t:t/0" class="detail-link" data-no-tooltip title="Link to this type">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature" translate="no">t()</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@type</span> t() :: %Quartz.Plot2D{
+  axes: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  bottom: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  bottom_content: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  bottom_content_padding: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  bottom_decorations_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  bottom_left_decorations_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  bottom_margin: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  bottom_right_decorations_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  bounds_set: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  categorical_color_index: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  categorical_color_map: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  current_bottom_bound: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  current_left_bound: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  current_right_bound: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  current_top_bound: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  data_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  has_legend: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  id: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  left: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  left_content: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  left_content_padding: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  left_decorations_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  left_margin: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  legend_items: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  legend_location: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  padding_bottom: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  padding_left: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  padding_right: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  padding_top: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  plot_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  right: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  right_content: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  right_content_padding: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  right_decorations_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  right_margin: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  title: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  title_alignment: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  title_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  title_inner_padding: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  title_location: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  top: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  top_content: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  top_content_padding: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  top_decorations_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  top_left_decorations_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  top_margin: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  top_right_decorations_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  width_to_aspect_ratio: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>()
+}</pre>
+
+      </div>
+
+
+  </section>
+</section>
+
+    </div>
+  </section>
+
+  <section id="functions" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#functions">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Functions</span>
+    </h1>
+    <div class="functions-list">
+<section class="detail" id="add_bottom_axis/3">
+
+    <span id="add_bottom_axis/2"></span>
+
+  <div class="detail-header">
+    <a href="#add_bottom_axis/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">add_bottom_axis(plot, name, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Add bottom axis. Bottom axes are added below the axes already present.</p>
+  </section>
+</section>
+<section class="detail" id="add_left_axis/3">
+
+    <span id="add_left_axis/2"></span>
+
+  <div class="detail-header">
+    <a href="#add_left_axis/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">add_left_axis(plot, name, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Add left axis. Left axes are added to the left of the axes already present.</p>
+  </section>
+</section>
+<section class="detail" id="add_right_axis/3">
+
+    <span id="add_right_axis/2"></span>
+
+  <div class="detail-header">
+    <a href="#add_right_axis/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">add_right_axis(plot, name, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Add right axis. Right axes are added to the left of the axes already present.</p>
+  </section>
+</section>
+<section class="detail" id="add_to_legend/3">
+
+  <div class="detail-header">
+    <a href="#add_to_legend/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">add_to_legend(plot, symbol, label)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="add_top_axis/3">
+
+    <span id="add_top_axis/2"></span>
+
+  <div class="detail-header">
+    <a href="#add_top_axis/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">add_top_axis(plot, name, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Add top axis. Top axes are added below the axes already present.</p>
+  </section>
+</section>
+<section class="detail" id="align_bbox/2">
+
+  <div class="detail-header">
+    <a href="#align_bbox/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">align_bbox(elements, fun)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> align_bbox([<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()], (<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>() -&gt; <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>())) :: :ok</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="align_bottom/1">
+
+  <div class="detail-header">
+    <a href="#align_bottom/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">align_bottom(elements)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> align_bottom([<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()]) :: :ok</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="align_left/1">
+
+  <div class="detail-header">
+    <a href="#align_left/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">align_left(elements)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> align_left([<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()]) :: :ok</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="align_right/1">
+
+  <div class="detail-header">
+    <a href="#align_right/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">align_right(elements)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> align_right([<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()]) :: :ok</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="align_top/1">
+
+  <div class="detail-header">
+    <a href="#align_top/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">align_top(elements)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> align_top([<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()]) :: :ok</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="box_plot/3">
+
+    <span id="box_plot/2"></span>
+
+  <div class="detail-header">
+    <a href="#box_plot/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">box_plot(plot, groups, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="default_bin_width_for_histogram/1">
+
+  <div class="detail-header">
+    <a href="#default_bin_width_for_histogram/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">default_bin_width_for_histogram(series)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="draw_bottom_content/2">
+
+  <div class="detail-header">
+    <a href="#draw_bottom_content/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_bottom_content(plot, padding)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="draw_function_contour_plot/8">
+
+    <span id="draw_function_contour_plot/7"></span>
+
+  <div class="detail-header">
+    <a href="#draw_function_contour_plot/8" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_function_contour_plot(plot, fun, x_min, x_max, y_min, y_max, countour_levels, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Draw a series of line segments between the given points.</p>
+  </section>
+</section>
+<section class="detail" id="draw_histogram/3">
+
+    <span id="draw_histogram/2"></span>
+
+  <div class="detail-header">
+    <a href="#draw_histogram/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_histogram(plot, data, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="draw_kde_plot/3">
+
+    <span id="draw_kde_plot/2"></span>
+
+  <div class="detail-header">
+    <a href="#draw_kde_plot/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_kde_plot(plot, values, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Draw a distribution using a kernel density estimate.</p>
+  </section>
+</section>
+<section class="detail" id="draw_kde_plot_groups_from_dataframe/5">
+
+    <span id="draw_kde_plot_groups_from_dataframe/4"></span>
+
+  <div class="detail-header">
+    <a href="#draw_kde_plot_groups_from_dataframe/5" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_kde_plot_groups_from_dataframe(plot, dataframe, group_column, values_column, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Draw a distribution using a kernel density estimate.</p>
+  </section>
+</section>
+<section class="detail" id="draw_left_content/2">
+
+  <div class="detail-header">
+    <a href="#draw_left_content/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_left_content(plot, padding)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="draw_line_plot/4">
+
+    <span id="draw_line_plot/3"></span>
+
+  <div class="detail-header">
+    <a href="#draw_line_plot/4" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_line_plot(plot, data_x, data_y, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Draw a series of line segments between the given points.</p>
+  </section>
+</section>
+<section class="detail" id="draw_right_content/2">
+
+  <div class="detail-header">
+    <a href="#draw_right_content/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_right_content(plot, padding)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="draw_scatter_plot/4">
+
+    <span id="draw_scatter_plot/3"></span>
+
+  <div class="detail-header">
+    <a href="#draw_scatter_plot/4" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_scatter_plot(plot, data_x, data_y, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Draw a scatter plot for the given points.</p>
+  </section>
+</section>
+<section class="detail" id="draw_text/3">
+
+    <span id="draw_text/2"></span>
+
+  <div class="detail-header">
+    <a href="#draw_text/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_text(plot, text, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> draw_text(<a href="#t:t/0">t</a>(), <a href="Quartz.Text.html#t:text/0">Quartz.Text.text</a>(), <a href="https://hexdocs.pm/elixir/Keyword.html#t:t/0">Keyword.t</a>()) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="draw_top_content/2">
+
+  <div class="detail-header">
+    <a href="#draw_top_content/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">draw_top_content(plot, padding)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="fetch_axis/2">
+
+  <div class="detail-header">
+    <a href="#fetch_axis/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">fetch_axis(plot, name)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> fetch_axis(Plot2D.t(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>()) :: {:ok, <a href="Quartz.Axis2D.html#t:t/0">Quartz.Axis2D.t</a>()} | :error</pre>
+
+          <pre translate="no"><span class="attribute">@spec</span> fetch_axis(Plot2D.t(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>()) :: <a href="Quartz.Axis2D.html#t:t/0">Quartz.Axis2D.t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="fetch_axis!/2">
+
+  <div class="detail-header">
+    <a href="#fetch_axis!/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">fetch_axis!(plot, name)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="finalize/1">
+
+  <div class="detail-header">
+    <a href="#finalize/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">finalize(plot)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> finalize(<a href="#t:t/0">t</a>()) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="finalize_all/1">
+
+  <div class="detail-header">
+    <a href="#finalize_all/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">finalize_all(plots)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> finalize_all([<a href="#t:t/0">t</a>()] | [[<a href="#t:t/0">t</a>()]]) :: [<a href="#t:t/0">t</a>()]</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="get_axis/2">
+
+  <div class="detail-header">
+    <a href="#get_axis/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">get_axis(plot, name)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> get_axis(Plot2D.t(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>()) :: <a href="Quartz.Axis2D.html#t:t/0">Quartz.Axis2D.t</a>() | nil</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="maybe_add_color_to_opts_from_colormap/2">
+
+  <div class="detail-header">
+    <a href="#maybe_add_color_to_opts_from_colormap/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">maybe_add_color_to_opts_from_colormap(plot, opts)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="new/1">
+
+    <span id="new/0"></span>
+
+  <div class="detail-header">
+    <a href="#new/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">new(opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="no_legend/1">
+
+  <div class="detail-header">
+    <a href="#no_legend/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">no_legend(plot)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="put_axes_margins/3">
+
+    <span id="put_axes_margins/2"></span>
+
+  <div class="detail-header">
+    <a href="#put_axes_margins/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_axes_margins(plot, value, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="put_axis_label/4">
+
+    <span id="put_axis_label/3"></span>
+
+  <div class="detail-header">
+    <a href="#put_axis_label/4" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_axis_label(plot, axis_name, text, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> put_axis_label(<a href="#t:t/0">t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(), <a href="Quartz.Text.html#t:text/0">Quartz.Text.text</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="put_axis_limits/4">
+
+  <div class="detail-header">
+    <a href="#put_axis_limits/4" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_axis_limits(plot, axis_name, min_value, max_value)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> put_axis_limits(<a href="#t:t/0">t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="put_axis_major_tick_labels/3">
+
+  <div class="detail-header">
+    <a href="#put_axis_major_tick_labels/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_axis_major_tick_labels(plot, axis_name, labels)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> put_axis_major_tick_labels(<a href="#t:t/0">t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(), [<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>()]) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="put_axis_major_tick_locations/3">
+
+  <div class="detail-header">
+    <a href="#put_axis_major_tick_locations/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_axis_major_tick_locations(plot, axis_name, locations)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> put_axis_major_tick_locations(<a href="#t:t/0">t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(), [<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()]) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="put_axis_max_value/3">
+
+  <div class="detail-header">
+    <a href="#put_axis_max_value/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_axis_max_value(plot, axis_name, value)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> put_axis_max_value(<a href="#t:t/0">t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="put_axis_min_value/3">
+
+  <div class="detail-header">
+    <a href="#put_axis_min_value/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_axis_min_value(plot, axis_name, value)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> put_axis_min_value(<a href="#t:t/0">t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="put_axis_scale/3">
+
+  <div class="detail-header">
+    <a href="#put_axis_scale/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_axis_scale(plot, axis_name, scale)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> put_axis_scale(<a href="#t:t/0">t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(), <a href="Quartz.Scale.html#t:scale/0">Quartz.Scale.scale</a>()) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="put_bounds/2">
+
+  <div class="detail-header">
+    <a href="#put_bounds/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_bounds(plot, bounds)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Set the bounds of a plot.
+If the bounds are not set, by default the plot will occupy
+the total space given to the figure.</p><p>Expects bounds given as a keyword list or as a map.</p>
+  </section>
+</section>
+<section class="detail" id="put_legend_location/2">
+
+  <div class="detail-header">
+    <a href="#put_legend_location/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_legend_location(plot, location)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Put legend location.</p><p>Valid locations:</p><ul><li><code class="inline">:top</code></li><li><code class="inline">:top_right</code></li><li><code class="inline">:right</code></li><li><code class="inline">:bottom_right</code></li><li><code class="inline">:bottom</code></li><li><code class="inline">:bottom_left</code></li><li><code class="inline">:left</code></li></ul>
+  </section>
+</section>
+<section class="detail" id="put_major_tick_labels_style/3">
+
+  <div class="detail-header">
+    <a href="#put_major_tick_labels_style/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_major_tick_labels_style(plot, axes_name, style)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Set the style of the tick labels.</p>
+  </section>
+</section>
+<section class="detail" id="put_minimum_axis_end_margin/3">
+
+  <div class="detail-header">
+    <a href="#put_minimum_axis_end_margin/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_minimum_axis_end_margin(plot, axis_name, value)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="put_minimum_axis_margins/3">
+
+  <div class="detail-header">
+    <a href="#put_minimum_axis_margins/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_minimum_axis_margins(plot, axis_name, common_margin_size)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="put_minimum_axis_margins/4">
+
+  <div class="detail-header">
+    <a href="#put_minimum_axis_margins/4" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_minimum_axis_margins(plot, axis_name, margin_start, margin_end)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="put_minimum_axis_start_margin/3">
+
+  <div class="detail-header">
+    <a href="#put_minimum_axis_start_margin/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_minimum_axis_start_margin(plot, axis_name, value)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="put_title/3">
+
+    <span id="put_title/2"></span>
+
+  <div class="detail-header">
+    <a href="#put_title/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_title(plot, title, opts \\ [])</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="put_width_to_height_ratio/2">
+
+  <div class="detail-header">
+    <a href="#put_width_to_height_ratio/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_width_to_height_ratio(plot, ratio)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> put_width_to_height_ratio(<a href="#t:t/0">t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="remove_axis_ticks/2">
+
+  <div class="detail-header">
+    <a href="#remove_axis_ticks/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">remove_axis_ticks(plot, axis_name)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> remove_axis_ticks(<a href="#t:t/0">t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>()) :: <a href="#t:t/0">t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="stack_horizontally_inside_container/2">
+
+  <div class="detail-header">
+    <a href="#stack_horizontally_inside_container/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">stack_horizontally_inside_container(elements, container)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> stack_horizontally_inside_container([<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()], <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()) :: :ok</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="stack_vertically_inside_container/2">
+
+  <div class="detail-header">
+    <a href="#stack_vertically_inside_container/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">stack_vertically_inside_container(elements, container)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> stack_vertically_inside_container([<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()], <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()) :: :ok</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="update_axes/3">
+
+  <div class="detail-header">
+    <a href="#update_axes/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">update_axes(plot, axis_names, fun)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="update_axis/3">
+
+  <div class="detail-header">
+    <a href="#update_axis/3" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">update_axis(plot, axis_name, fun)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+
+    </div>
+  </section>
+
+    <footer class="footer">
+      <p>
+
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
+
+            <a href="quartz.epub" title="ePub version">
+              Download ePub version
+            </a>
+
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.34.2) for the
+
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+      </p>
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>
