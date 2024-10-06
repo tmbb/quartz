@@ -1,4 +1,5 @@
 defmodule Quartz.Circle do
+  alias Quartz.Sketch
   alias Quartz.Figure
   alias Quartz.Variable
   alias Quartz.SVG
@@ -62,11 +63,13 @@ defmodule Quartz.Circle do
       z_level: z_level
     }
 
-    # Add the circle to the figure
-    Figure.add_sketch(id, circle)
-
     # Return the circle, with no reference to the figure
     circle
+  end
+
+  def draw_new(opts \\ []) do
+    circle = new(opts)
+    Sketch.draw(circle)
   end
 
   defimpl Quartz.Sketch.Protocol do
@@ -96,10 +99,10 @@ defmodule Quartz.Circle do
     @impl true
     def bbox_bounds(circle) do
       %BBoxBounds{
-        x_min: Polynomial.algebra(circle.x - circle.radius),
-        x_max: Polynomial.algebra(circle.x + circle.radius),
-        y_min: Polynomial.algebra(circle.y - circle.radius),
-        y_max: Polynomial.algebra(circle.y + circle.radius)
+        x_min: Polynomial.algebra(circle.center_x - circle.radius),
+        x_max: Polynomial.algebra(circle.center_x + circle.radius),
+        y_min: Polynomial.algebra(circle.center_y - circle.radius),
+        y_max: Polynomial.algebra(circle.center_y + circle.radius)
       }
     end
 

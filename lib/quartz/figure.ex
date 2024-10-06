@@ -5,7 +5,7 @@ defmodule Quartz.Figure do
 
   alias Dantzig.Problem
   alias Dantzig.Constraint
-  alias Dantzig.Polynomial
+  alias Dantzig.Solution
 
   alias Quartz.Sketch
   alias Quartz.Scale
@@ -266,7 +266,8 @@ defmodule Quartz.Figure do
         Sketch.to_svg(sketch)
       end
 
-    view_box = "0 0 #{figure.width} #{figure.height}"
+    view_box =
+      "0 0 #{display_rounded_float(figure.width)} #{display_rounded_float(figure.height)}"
 
     svg =
       SVG.svg(
@@ -281,17 +282,16 @@ defmodule Quartz.Figure do
   TODO: document this
   """
   def position_with_location_and_alignment(sketch, container, opts \\ []) do
-    x_location = Keyword.get(opts, :x_location, :center)
-    y_location = Keyword.get(opts, :y_location, :horizon)
-
-    x_alignment = Keyword.get(opts, :x_alignment, x_location)
-    y_alignment = Keyword.get(opts, :y_alignment, y_location)
-
-    x_offset = Keyword.get(opts, :x_offset, 0)
-    y_offset = Keyword.get(opts, :y_offset, 0)
-
-    contains_vertically? = Keyword.get(opts, :contains_vertically?, false)
-    contains_horizontally? = Keyword.get(opts, :contains_horizontally?, false)
+    KeywordSpec.validate!(opts,
+      x_location: :center,
+      y_location: :horizon,
+      x_alignment: x_location,
+      y_alignment: y_location,
+      x_offset: 0,
+      y_offset: 0,
+      contains_vertically?: false,
+      contains_horizontally?: false
+    )
 
     x_left_hand_side =
       case x_location do
@@ -446,7 +446,9 @@ defmodule Quartz.Figure do
     # TODO: why are theres still leftover variables that haven't been substituted?
     # Should we replace them also in the `problem.variables`?
     variables_without_axis_data =
-      for {v, problem_v} <- unsubstituted_variables, not is_struct(v, Quartz.AxisData), into: %{} do
+      for {v, problem_v} <- unsubstituted_variables,
+          not is_struct(v, Quartz.AxisData),
+          into: %{} do
         {v, problem_v}
       end
 
@@ -511,12 +513,19 @@ defmodule Quartz.Figure do
   @doc false
   def solve(expression) do
     figure = get_current_figure()
-    Polynomial.evaluate(figure.solution, expression)
+
+    figure.solution
+    |> Solution.evaluate(expression)
+    |> Polynomial.to_number_if_possible()
   end
 
   def solve!(expression) do
     figure = get_current_figure()
-    result = Dantzig.Solution.evaluate(figure.solution, expression)
+
+    result =
+      figure.solution
+      |> Solution.evaluate(expression)
+      |> Polynomial.to_number_if_possible()
 
     if not is_number(result) do
       raise RuntimeError, "#{inspect(result)} is not a number"
@@ -703,7 +712,47 @@ defmodule Quartz.Figure do
     end
   end
 
-  defmacro minimize(expression, opts \\ []) do
+  defmacro minimize(expression, opts \\ [])
+
+  defmacro minimize({:abs, _meta, [expression]}, opts) do
+    transformed_expression = min_max_transform_expression_with_opts(expression, opts)
+
+    quote do
+      unquote(__MODULE__).update_current_figure_problem(fn problem ->
+        require Dantzig.Polynomial
+
+        # Cache the expression because we'll be using it twice
+        cached_expression = unquote(transformed_expression)
+
+        # Create a new dummy variable
+        {updated_problem, dummy_var} =
+          Dantzig.Problem.new_variable(
+            problem,
+            "dummy_var_for_absolute_value"
+          )
+
+        # Add the two constraints that will ensure we'll be minimizing the absolute value
+        c1 =
+          Dantzig.Constraint.new(
+            Dantzig.Polynomial.subtract(0, dummy_var),
+            :<=,
+            cached_expression
+          )
+
+        c2 = Dantzig.Constraint.new(dummy_var, :>=, cached_expression)
+
+        updated_problem =
+          updated_problem
+          |> Dantzig.Problem.add_constraint(c1)
+          |> Dantzig.Problem.add_constraint(c2)
+          |> Dantzig.Problem.decrement_objective(dummy_var)
+
+        {updated_problem, :ok}
+      end)
+    end
+  end
+
+  defmacro minimize(expression, opts) do
     transformed_expression = min_max_transform_expression_with_opts(expression, opts)
 
     quote do
@@ -999,7 +1048,7 @@ defmodule Quartz.Figure do
   def new(args, fun) do
     min_width = Keyword.get(args, :width, Length.cm(12))
     min_height = Keyword.get(args, :height, Length.cm(8))
-    config = Keyword.get(args, :config, Config.new())
+    config = Keyword.get(args, :config, Config.default_config())
     debug = Keyword.get(args, :debug, false)
 
     default_font_dir =
@@ -1121,9 +1170,7 @@ defmodule Quartz.Figure do
     objective = figure.problem.objective
 
     new_objective =
-      Polynomial.algebra(
-        objective - max_coeff * figure.width - max_coeff * figure.height
-      )
+      Polynomial.algebra(objective - max_coeff * figure.width - max_coeff * figure.height)
 
     %{figure | problem: %{figure.problem | objective: new_objective}}
   end
@@ -1132,5 +1179,11 @@ defmodule Quartz.Figure do
     Plot2D.new()
     |> fun.()
     |> Plot2D.finalize()
+  end
+
+  defp display_rounded_float(value) when is_integer(value), do: to_string(value)
+
+  defp display_rounded_float(float) when is_float(float) do
+    :erlang.float_to_binary(float, decimals: 5)
   end
 end

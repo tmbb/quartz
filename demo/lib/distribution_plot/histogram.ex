@@ -25,12 +25,6 @@ defmodule Quartz.Demo.DistributionPlot.Histogram do
           |> Plot2D.put_title("A. Probability distributions")
           |> Plot2D.put_axis_label("x", "𝜃")
           |> Plot2D.put_axis_label("y", "P(𝜃)")
-          |> Plot2D.draw_text("Label",
-              x: Length.axis_fraction(1.0) - Length.cm(0.25),
-              y: Length.axis_fraction(0.0) + Length.cm(0.25),
-              x_alignment: :right,
-              y_alignment: :top
-            )
           |> Plot2D.finalize()
       end)
 

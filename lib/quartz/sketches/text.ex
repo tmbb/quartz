@@ -1,29 +1,23 @@
-defmodule Quartz.TextSpan do
-  @moduledoc false
-
-  defstruct id: nil,
-            font: nil,
-            x: nil,
-            y: nil,
-            dx: nil,
-            dy: nil,
-            content: []
-end
-
 defmodule Quartz.Text do
   @moduledoc """
   Text element.
   """
 
+  alias Quartz.Sketch
   alias Quartz.Config
-  alias Quartz.Variable
   alias Quartz.Figure
   alias Quartz.SVG
   alias Quartz.Sketch.BBoxBounds
   alias Quartz.Formatter
   alias Quartz.Text.TextDebugProperties
+  alias Quartz.Text.Tspan
+
+  require Quartz.Figure, as: Figure
+  require Quartz.KeywordSpec, as: KeywordSpec
 
   @type t() :: %__MODULE__{}
+
+  @type text() :: t() | binary()
 
   defstruct id: nil,
             x: nil,
@@ -62,6 +56,7 @@ defmodule Quartz.Text do
             fractions: nil,
             features: nil,
             escape: true,
+            baseline_shift: nil,
             prefix: nil,
             debug: false,
             debug_properties: nil
@@ -69,26 +64,23 @@ defmodule Quartz.Text do
   @doc """
   Create a text element.
   """
-  def new(binary, opts \\ []) do
-    prefix = Keyword.get(opts, :prefix, nil)
-    # Assign variables (= Dantzig monomials) to the parameters of the canvas
-    x = Variable.maybe_variable(opts, :x, Variable.maybe_with_prefix(prefix, "text_x"), [])
-    y = Variable.maybe_variable(opts, :y, Variable.maybe_with_prefix(prefix, "text_y"), [])
+  def new(content, opts \\ []) do
+    KeywordSpec.validate!(opts,
+      prefix: nil,
+      x: nil,
+      y: nil
+    )
 
-    height =
-      Variable.maybe_variable(opts, :height, Variable.maybe_with_prefix(prefix, "text_height"),
-        min: 0
-      )
+    content = List.wrap(content)
 
-    width =
-      Variable.maybe_variable(opts, :width, Variable.maybe_with_prefix(prefix, "text_width"),
-        min: 0
-      )
+    text_x = Figure.variable("text_x", prefix: prefix)
+    text_y = Figure.variable("text_y", prefix: prefix)
+    text_width = Figure.variable("text_width", min: 0, prefix: prefix)
+    text_height = Figure.variable("text_height", min: 0, prefix: prefix)
+    text_depth = Figure.variable("text_depth", min: 0, prefix: prefix)
 
-    depths =
-      Variable.maybe_variable(opts, :depth, Variable.maybe_with_prefix(prefix, "text_depth"),
-        min: 0
-      )
+    if x, do: Figure.assert(text_x == x)
+    if y, do: Figure.assert(text_y == y)
 
     # Get the next available ID from the figure
     id = Figure.get_id()
@@ -98,28 +90,55 @@ defmodule Quartz.Text do
 
     all_opts =
       opts
-      |> Keyword.put(:content, binary)
+      |> Keyword.put(:content, content)
       |> Keyword.put(:id, id)
-      |> Keyword.put(:x, x)
-      |> Keyword.put(:y, y)
-      |> Keyword.put(:width, width)
-      |> Keyword.put(:height, height)
-      |> Keyword.put(:depth, depths)
+      |> Keyword.put(:x, text_x)
+      |> Keyword.put(:y, text_y)
+      |> Keyword.put(:width, text_width)
+      |> Keyword.put(:height, text_height)
+      |> Keyword.put(:depth, text_depth)
       |> Keyword.put(:debug, debug)
       |> Keyword.put(:debug_properties, debug_properties)
 
     # Create the text
     text = struct(__MODULE__, all_opts)
-    # Add the text to the current figure
-    Figure.add_sketch(id, text)
-    Figure.add_unmeasured_item(text)
 
     # Return the text element, with no reference to the figure
     text
   end
 
+  def draw_new(content, opts \\ []) do
+    text = new(content, opts)
+    Sketch.draw(text)
+    text
+  end
+
+  def tspan(content, attrs \\ []) do
+    Tspan.new(content, attrs)
+  end
+
+  def sub(content, attrs \\ []) do
+    new_attrs =
+      attrs
+      |> Keyword.put(:size, "65%")
+      |> Keyword.put(:baseline_shift, "-0.30em")
+
+    Tspan.new(content, new_attrs)
+  end
+
+  def sup(content, attrs \\ []) do
+    new_attrs =
+      attrs
+      |> Keyword.put(:size, "65%")
+      |> Keyword.put(:dx, "0.1em")
+      |> Keyword.put(:baseline_shift, "0.50em")
+
+    Tspan.new(content, new_attrs)
+  end
+
   defimpl Quartz.Sketch.Protocol do
     require Dantzig.Polynomial, as: Polynomial
+    alias Quartz.Sketch
 
     @impl true
     def bbox_bounds(text) do
@@ -182,6 +201,7 @@ defmodule Quartz.Text do
           "font-weight": text.weight,
           "font-style": text.style,
           "font-size": text.size,
+          "baseline-shift": text.baseline_shift,
           "text-anchor": "start",
           "alignment-baseline": "baseline"
         ] ++ transform_attrs
@@ -205,13 +225,16 @@ defmodule Quartz.Text do
         SVG.g([], [
           SVG.rect(rect_attrs, []),
           SVG.text(common_attributes, [
-            SVG.title([], SVG.escaped_iodata(tooltip_text)),
-            text.content
+            SVG.title([], SVG.escaped_iodata(tooltip_text))
+            | Enum.map(text.content, &Sketch.to_svg/1)
           ])
         ])
       else
         # SVG text element without extra debug data
-        SVG.text(common_attributes, text.content)
+        SVG.text(
+          common_attributes,
+          Enum.map(text.content, &Sketch.to_svg/1)
+        )
       end
     end
 

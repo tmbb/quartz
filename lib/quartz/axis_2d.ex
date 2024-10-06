@@ -46,6 +46,8 @@ defmodule Quartz.Axis2D do
             minor_tick_labels: nil,
             major_tick_labels_style: []
 
+  @type t :: %__MODULE__{}
+
   def new(axis_name, opts \\ []) do
     # Variables which we want to minimize or maximize
     size = Figure.variable("#{axis_name}_axis_size", min: 0.0)
@@ -166,19 +168,23 @@ defmodule Quartz.Axis2D do
 
       {locations, labels} when not is_nil(locations) and not is_nil(labels) ->
         axis
+
+      {locations, labels} when is_list(locations) and is_nil(labels) ->
+        new_labels = Enum.map(locations, &to_string/1)
+        put_major_tick_labels(axis, new_labels)
     end
   end
 
   # Gather all bookkeeping here because it iwll get more complex
   def make_major_tick_label(axis, label_text) do
     text_opts = Config.get_major_tick_label_text_attributes(axis.major_tick_labels_style)
-    Text.new(label_text, text_opts)
+    Text.draw_new(label_text, text_opts)
   end
 
   def draw_bottom_axis(plot, x, y, axis = %Axis2D{location: :bottom}) do
     full_axis_width = axis.margin_start + axis.size + axis.margin_end
 
-    canvas = Canvas.new(prefix: "bottom_axis_canvas")
+    canvas = Canvas.draw_new(prefix: "bottom_axis_canvas")
 
     Figure.minimize(canvas.height, level: 30)
 
@@ -196,7 +202,7 @@ defmodule Quartz.Axis2D do
 
     # Draw the axis itself
     _axis_line =
-      Line.new(
+      Line.draw_new(
         x1: x,
         x2: x + canvas.width,
         y1: y,
@@ -222,9 +228,9 @@ defmodule Quartz.Axis2D do
     Figure.assert(tick_label_bottom >= minimum_tick_label_top)
 
     for {tick_location, tick_label} <- Enum.zip(axis.major_tick_locations, axis.major_tick_labels) do
-      tick_x = Polynomial.variable(AxisData.new(tick_location, plot.id, axis.name))
+      tick_x = AxisData.new_variable(tick_location, plot.id, axis.name)
 
-      Line.new(
+      Line.draw_new(
         x1: tick_x,
         x2: tick_x,
         y1: y,
@@ -284,7 +290,7 @@ defmodule Quartz.Axis2D do
   end
 
   def draw_top_axis(plot, x, y, axis = %Axis2D{location: :top}) do
-    canvas = Canvas.new(prefix: "top_axis_canvas")
+    canvas = Canvas.draw_new(prefix: "top_axis_canvas")
 
     Figure.minimize(canvas.height, level: 30)
 
@@ -304,7 +310,7 @@ defmodule Quartz.Axis2D do
     major_tick_size = Config.get_major_tick_size(axis)
 
     _line =
-      Line.new(
+      Line.draw_new(
         x1: x,
         x2: x + canvas.width,
         y1: y,
@@ -329,7 +335,7 @@ defmodule Quartz.Axis2D do
     for {tick_location, tick_label} <- Enum.zip(axis.major_tick_locations, axis.major_tick_labels) do
       tick_x = Polynomial.variable(AxisData.new(tick_location, plot.id, axis.name))
 
-      Line.new(
+      Line.draw_new(
         x1: tick_x,
         x2: tick_x,
         y1: Polynomial.algebra(y - major_tick_size),
@@ -391,7 +397,7 @@ defmodule Quartz.Axis2D do
   def draw_left_axis(plot, x, y, axis = %Axis2D{location: :left}) do
     full_axis_height = axis.margin_start + axis.size + axis.margin_end
 
-    canvas = Canvas.new(prefix: "left_axis_canvas")
+    canvas = Canvas.draw_new(prefix: "left_axis_canvas")
 
     Figure.minimize(canvas.width, level: 30)
 
@@ -409,7 +415,7 @@ defmodule Quartz.Axis2D do
 
     # Draw the axis itself
     _axis_line =
-      Line.new(
+      Line.draw_new(
         x1: x,
         x2: x,
         y1: y,
@@ -429,7 +435,7 @@ defmodule Quartz.Axis2D do
         tick_y = Polynomial.variable(AxisData.new(tick_location, plot.id, axis.name))
 
         tick_line =
-          Line.new(
+          Line.draw_new(
             x1: Polynomial.algebra(x - major_tick_size),
             x2: x,
             y1: tick_y,
@@ -485,7 +491,7 @@ defmodule Quartz.Axis2D do
   end
 
   def draw_right_axis(plot, x, y, axis = %Axis2D{location: :right}) do
-    canvas = Canvas.new(prefix: "right_axis_canvas")
+    canvas = Canvas.draw_new(prefix: "right_axis_canvas")
 
     Figure.minimize(canvas.width, level: 30)
 
@@ -505,7 +511,7 @@ defmodule Quartz.Axis2D do
     major_tick_size = Config.get_major_tick_size(axis)
 
     _line =
-      Line.new(
+      Line.draw_new(
         x1: x,
         x2: x,
         y1: y,
@@ -522,7 +528,7 @@ defmodule Quartz.Axis2D do
         tick_y = Polynomial.variable(AxisData.new(tick_location, plot.id, axis.name))
 
         tick_line =
-          Line.new(
+          Line.draw_new(
             x1: x,
             x2: Polynomial.algebra(x + major_tick_size),
             y1: tick_y,
@@ -622,7 +628,7 @@ defmodule Quartz.Axis2D do
 
     cond do
       is_binary(label) ->
-        text = Text.new(label, Keyword.put_new(text_opts, :rotation, rotation))
+        text = Text.draw_new(label, Keyword.put_new(text_opts, :rotation, rotation))
         %{axis | label: text, label_location: location, label_alignment: alignment}
 
       # Find out how we should deal with this

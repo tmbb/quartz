@@ -4,6 +4,7 @@ defmodule Quartz.Canvas do
   alias Quartz.SVG
   alias Quartz.Canvas.CanvasDebugProperties
   alias Quartz.Config
+  alias Quartz.Sketch
 
   defstruct id: nil,
             x: nil,
@@ -49,10 +50,13 @@ defmodule Quartz.Canvas do
       debug_properties: debug_properties
     }
 
-    # Add the canvas to the figure
-    Figure.add_sketch(id, canvas)
-
     # Return the canvas, with no reference to the figure
+    canvas
+  end
+
+  def draw_new(opts \\ []) do
+    canvas = new(opts)
+    Sketch.draw(canvas)
     canvas
   end
 

@@ -1,7 +1,7 @@
 defmodule Quartz.TickManager do
   @moduledoc """
   Tick managers handle the placement of ticks in the plot
-  
+
   TODO: iron out the distinctions between major and minor tick managers.
   """
 

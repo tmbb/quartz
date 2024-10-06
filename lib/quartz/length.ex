@@ -11,11 +11,6 @@ defmodule Quartz.Length do
   to their arguments.
   """
 
-  @type t() :: %__MODULE__{}
-
-  defstruct value: nil,
-            unit: nil
-
   alias Quartz.AxisData
   require Quartz.KeywordSpec, as: KeywordSpec
   require Dantzig.Polynomial, as: Polynomial
@@ -48,10 +43,10 @@ defmodule Quartz.Length do
   Data units.
   """
   def data(value, opts \\ []) do
-    KeywordSpec.validate!(opts, [
+    KeywordSpec.validate!(opts,
       plot_id: nil,
       axis_name: nil
-    ])
+    )
 
     axis_data = %AxisData{value: value, plot_id: plot_id, axis_name: axis_name}
 
@@ -59,16 +54,16 @@ defmodule Quartz.Length do
   end
 
   def axis_fraction(value, opts \\ []) do
-    KeywordSpec.validate!(opts, [
+    KeywordSpec.validate!(opts,
       axis: nil
-    ])
+    )
 
     case axis do
       nil ->
         Polynomial.monomial(value, "AXIS_SIZE")
 
       axis ->
-        Polynomial.monomial(value, axis.size)
+        Polynomial.multiply(value, axis.size)
     end
   end
 end

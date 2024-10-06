@@ -1,5 +1,5 @@
 defmodule Quartz.ColorMap do
-  require Quartz.ColorMap.ColorMapBuilder, as: ColorMapBuilder
+  require Quartz.Color.ColorMapBuilder, as: ColorMapBuilder
 
   @derive {Inspect, only: [:name, :type]}
 
@@ -7,6 +7,9 @@ defmodule Quartz.ColorMap do
             type: nil,
             function: nil
 
+  @doc """
+  Get color from a `color_map` for a given `value`.
+  """
   def get_color(color_map, value) do
     case color_map.function do
       {m, f, opts} ->

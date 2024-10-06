@@ -45,20 +45,20 @@ defmodule Quartz.Demo.Layout.AspectRatioScatterPlot do
 
         _plot_A =
           prototype_plot.("plot_A")
-          |> Plot2D.set_bounds(bounds_A)
+          |> Plot2D.put_bounds(bounds_A)
           |> Plot2D.put_title("A. Default aspect ratio")
           |> Plot2D.finalize()
 
         _plot_B =
           prototype_plot.("plot_B")
-          |> Plot2D.set_bounds(bounds_B)
+          |> Plot2D.put_bounds(bounds_B)
           |> Plot2D.put_title("B. 1:1 aspect ratio")
           # |> Plot2D.put_width_to_height_ratio(1.0)
           |> Plot2D.finalize()
 
         _plot_C =
           prototype_plot.("plot_C")
-          |> Plot2D.set_bounds(bounds_C)
+          |> Plot2D.put_bounds(bounds_C)
           |> Plot2D.put_title("C. 1:2 aspect ratio")
           # |> Plot2D.put_width_to_height_ratio(0.5)
           |> Plot2D.finalize()

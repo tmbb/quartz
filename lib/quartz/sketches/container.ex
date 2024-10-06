@@ -2,6 +2,7 @@ defmodule Quartz.Container do
   @moduledoc false
 
   alias Quartz.Figure
+  alias Quartz.Sketch
   alias Quartz.Variable
   alias Quartz.Length
   alias Quartz.Color.RGB
@@ -65,11 +66,13 @@ defmodule Quartz.Container do
       stroke: stroke
     }
 
-    # Add the container to the figure
-    Figure.add_sketch(id, container)
-
     # Return the container, with no reference to the figure
     container
+  end
+
+  def draw_new(opts \\ []) do
+    container = new(opts)
+    Sketch.draw(container)
   end
 
   defimpl Quartz.Sketch.Protocol do

@@ -70,12 +70,12 @@ defmodule Quartz.Statistics.KDE do
   end
 
   def kde(observations, nr_of_points, opts \\ []) do
-    KeywordSpec.validate!(opts, [
+    KeywordSpec.validate!(opts,
       estimator: gaussian_kernel_estimator(),
       bandwidth: DensityEstimator1D.select_bandwidth(estimator, observations),
       min: Series.min(observations),
       max: Series.max(observations)
-    ])
+    )
 
     n_observations = Series.size(observations)
 

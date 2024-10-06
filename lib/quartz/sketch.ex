@@ -1,11 +1,28 @@
 defmodule Quartz.Sketch do
   require Dantzig.Polynomial, as: Polynomial
   # alias Quartz.Sketch.BBoxBounds
+  alias Quartz.Text
   alias Quartz.Sketch.Protocol
   alias Quartz.SVG
+  alias Quartz.Figure
 
   @type t() :: any()
   @type length :: Polynomial.t() | number()
+
+  @spec draw(t()) :: t()
+  def draw(obj) do
+    Figure.add_sketch(obj.id, obj)
+
+    case obj do
+      %Text{} ->
+        Figure.add_unmeasured_item(obj)
+
+      _other ->
+        :ok
+    end
+
+    obj
+  end
 
   @spec bbox_center(t()) :: length()
   def bbox_center(obj) do
@@ -69,9 +86,15 @@ defmodule Quartz.Sketch do
     Protocol.to_unpositioned_svg(obj)
   end
 
-  @spec to_svg(t()) :: SVG.t()
+  @spec to_svg(t() | binary()) :: SVG.t()
   def to_svg(obj) do
-    Protocol.to_svg(obj)
+    case obj do
+      bin when is_binary(bin) ->
+        SVG.escaped_iodata(bin)
+
+      other ->
+        Protocol.to_svg(other)
+    end
   end
 
   @spec transform_lengths(t(), (length() -> length())) :: t()

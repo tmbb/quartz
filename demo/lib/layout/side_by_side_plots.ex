@@ -22,7 +22,7 @@ defmodule Quartz.Demo.Layout.SideBySidePlots do
 
         _plot_task_A =
           Plot2D.new(id: "plot_task_A")
-          |> Plot2D.set_bounds(bounds_A)
+          |> Plot2D.put_bounds(bounds_A)
           |> Plot2D.draw_scatter_plot(x, y)
           |> Plot2D.put_title("A. Task A")
           |> Plot2D.put_axis_label("y", "Y-label (log scale)")
@@ -32,7 +32,7 @@ defmodule Quartz.Demo.Layout.SideBySidePlots do
 
         _plot_task_B =
           Plot2D.new(id: "plot_task_B")
-          |> Plot2D.set_bounds(bounds_B)
+          |> Plot2D.put_bounds(bounds_B)
           |> Plot2D.draw_scatter_plot(x, y)
           |> Plot2D.put_title("B. Task B")
           |> Plot2D.put_axis_label("y", "Y-label")

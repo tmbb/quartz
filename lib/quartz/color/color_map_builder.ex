@@ -1,4 +1,4 @@
-defmodule Quartz.ColorMap.ColorMapBuilder do
+defmodule Quartz.Color.ColorMapBuilder do
   @moduledoc false
 
   alias Quartz.Color.RGB
@@ -63,11 +63,11 @@ defmodule Quartz.ColorMap.ColorMapBuilder do
     quote do
       @doc """
       Cyclic colormap with #{unquote(length(colors))} colors.
-      
+
       From the [D3.js project](https://d3js.org/d3-scale-chromatic/categorical##{unquote(link)})
-      
+
       ## Colors
-      
+
       #{unquote(color_palette(colors))}
       """
       def unquote(function_name)() do
@@ -84,12 +84,8 @@ defmodule Quartz.ColorMap.ColorMapBuilder do
       @doc """
       Return a color for the given integer using the
       `#{unquote(function_name)}` colormap.
-      
+
       See `#{unquote(function_name)}/0`.
-      
-      ## Colors
-      
-      #{unquote(color_palette(colors))}
       """
       def unquote(function_name)(i) do
         color_map = apply(__MODULE__, unquote(function_name), [])

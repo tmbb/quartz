@@ -1,4 +1,6 @@
 defmodule Quartz.SVG.Measuring do
+  @moduledoc false
+
   alias Quartz.SVG
   alias Quartz.Sketch
   alias Quartz.Utilities

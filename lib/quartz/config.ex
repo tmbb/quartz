@@ -5,6 +5,7 @@ defmodule Quartz.Config do
 
   # Debugging
   alias Quartz.Canvas.CanvasDebugProperties
+  alias Quartz.Board.BoardDebugProperties
   alias Quartz.Text.TextDebugProperties
 
   defstruct text_font: "Ubuntu",
@@ -22,6 +23,12 @@ defmodule Quartz.Config do
             text_fractions: nil,
             text_features: nil,
             text_escape: true,
+            # Math characters data
+            math_font: "Linux Libertine",
+            math_style: nil,
+            math_weight: nil,
+            math_size: nil,
+            math_fill: nil,
             # Title attributes
             plot_title_font: nil,
             plot_title_style: nil,
@@ -70,6 +77,22 @@ defmodule Quartz.Config do
             axis_label_fractions: nil,
             axis_label_features: nil,
             axis_label_escape: true,
+            # Legend text attributes
+            legend_font: nil,
+            legend_style: nil,
+            legend_weight: nil,
+            legend_stretch: nil,
+            legend_size: 7,
+            legend_fill: nil,
+            legend_ligatures: nil,
+            legend_discretionary_ligatures: nil,
+            legend_historical_ligatures: nil,
+            legend_number_type: nil,
+            legend_number_width: nil,
+            legend_slashed_zero: nil,
+            legend_fractions: nil,
+            legend_features: nil,
+            legend_escape: true,
             # Major tick labels
             major_tick_label_font: nil,
             major_tick_label_style: nil,
@@ -134,25 +157,49 @@ defmodule Quartz.Config do
             plot2d_axis_stroke_opacity: nil,
             plot2d_axis_stroke_width: nil,
             # Debug values
+            # -------------------
+            # Canvas
             debug_canvas_stroke: RGB.gray(),
             debug_canvas_stroke_width: Length.pt(0.3),
-            debug_canvas_stroke_dash_array: "2 4",
+            debug_canvas_stroke_dash_array: "1 1",
             debug_canvas_fill: RGB.white(0),
-            # Debug values
+            # Board
+            debug_board_stroke: RGB.purple(),
+            debug_board_stroke_width: Length.pt(0.3),
+            debug_board_stroke_dash_array: nil,
+            debug_board_fill: RGB.white(0),
+            # Text
             debug_text_stroke: RGB.red(),
             debug_text_stroke_width: Length.pt(0.3),
             debug_text_stroke_dash_array: nil,
             debug_text_fill: RGB.white(0)
 
+  @doc """
+  TODO: Document this.
+  """
   def new(opts \\ []) do
     struct(__MODULE__, opts)
   end
 
+  def default_config() do
+    new()
+  end
+
+  def serif_config() do
+    new(text_font: "Linux Libertine")
+  end
+
+  @doc """
+  TODO: Document this.
+  """
   def get_config() do
     figure = Figure.get_current_figure()
     figure.config
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def get_canvas_debug_properties() do
     config = get_config()
 
@@ -164,6 +211,23 @@ defmodule Quartz.Config do
     }
   end
 
+  @doc """
+  TODO: Document this.
+  """
+  def get_board_debug_properties() do
+    config = get_config()
+
+    %BoardDebugProperties{
+      fill: config.debug_board_fill,
+      stroke: config.debug_board_stroke,
+      stroke_width: config.debug_board_stroke_width,
+      stroke_dash_array: config.debug_board_stroke_dash_array
+    }
+  end
+
+  @doc """
+  TODO: Document this.
+  """
   def get_text_debug_properties() do
     config = get_config()
 
@@ -175,34 +239,72 @@ defmodule Quartz.Config do
     }
   end
 
+  @doc """
+  TODO: Document this.
+  """
+  def get_math_character_attributes(opts \\ []) do
+    math_character_attributes(get_config(), opts)
+  end
+
+  @doc """
+  TODO: Document this.
+  """
   def get_plot_title_text_attributes(opts \\ []) do
     plot_title_text_attributes(get_config(), opts)
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def get_plot_text_attributes(opts \\ []) do
     plot_text_attributes(get_config(), opts)
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def get_axis_label_text_attributes(opts \\ []) do
     axis_label_text_attributes(get_config(), opts)
   end
 
+  @doc """
+  TODO: Document this.
+  """
+  def get_legend_text_attributes(opts \\ []) do
+    legend_text_attributes(get_config(), opts)
+  end
+
+  @doc """
+  TODO: Document this.
+  """
   def get_major_tick_label_text_attributes(opts \\ []) do
     major_tick_label_text_attributes(get_config(), opts)
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def get_major_tick_attributes(opts \\ []) do
     major_tick_attributes(get_config(), opts)
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def get_minor_tick_attributes(opts \\ []) do
     minor_tick_attributes(get_config(), opts)
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def get_major_tick_size(axis) do
     axis.major_tick_size || major_tick_size(get_config(), [])
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def major_tick_size(%__MODULE__{} = config, opts) do
     [major_tick_size: major_tick_size] =
       get_many_with_fallbacks(opts, config, major_tick_size: {:major_tick_size, []})
@@ -210,6 +312,9 @@ defmodule Quartz.Config do
     major_tick_size
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def major_tick_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
       stroke: {:major_tick_stroke, []},
@@ -223,6 +328,9 @@ defmodule Quartz.Config do
     )
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def minor_tick_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
       stroke: {:minor_tick_stroke, []},
@@ -236,6 +344,22 @@ defmodule Quartz.Config do
     )
   end
 
+  @doc """
+  TODO: Document this.
+  """
+  def math_character_attributes(%__MODULE__{} = config, opts) do
+    get_many_with_fallbacks(opts, config,
+      font: {:math_font, []},
+      style: {:math_style, []},
+      weight: {:math_weight, []},
+      size: {:math_size, []},
+      fill: {:math_fill, []}
+    )
+  end
+
+  @doc """
+  TODO: Document this.
+  """
   def plot_title_text_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
       font: {:plot_title_font, [:text_font]},
@@ -257,6 +381,9 @@ defmodule Quartz.Config do
     )
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def axis_label_text_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
       font: {:axis_label_font, [:text_font]},
@@ -278,6 +405,32 @@ defmodule Quartz.Config do
     )
   end
 
+  @doc """
+  TODO: Document this.
+  """
+  def legend_text_attributes(%__MODULE__{} = config, opts) do
+    get_many_with_fallbacks(opts, config,
+      font: {:legend_font, [:text_font]},
+      style: {:legend_style, [:text_style]},
+      weight: {:legend_weight, [:text_weight]},
+      stretch: {:legend_stretch, [:text_stretch]},
+      size: {:legend_size, [:text_size]},
+      fill: {:legend_fill, [:text_fill]},
+      ligatures: {:legend_ligatures, [:text_ligatures]},
+      discretionary_ligatures: {:legend_discretionary_ligatures, [:text_discretionary_ligatures]},
+      historical_ligatures: {:legend_historical_ligatures, [:text_historical_ligatures]},
+      number_type: {:legend_number_type, [:text_number_type]},
+      number_width: {:legend_number_width, [:text_number_width]},
+      slashed_zero: {:legend_slashed_zero, [:text_slashed_zero]},
+      fractions: {:legend_fractions, [:text_title_fractions]},
+      features: {:legend_features, [:text_features]},
+      escape: {:legend_escape, [:text_escape]}
+    )
+  end
+
+  @doc """
+  TODO: Document this.
+  """
   def major_tick_label_text_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
       font: {:major_tick_label_font, [:text_font]},
@@ -300,6 +453,9 @@ defmodule Quartz.Config do
     )
   end
 
+  @doc """
+  TODO: Document this.
+  """
   def plot_text_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
       font: {:plot_text_font, [:text_font]},
@@ -311,8 +467,7 @@ defmodule Quartz.Config do
       ligatures: {:plot_text_ligatures, [:text_ligatures]},
       discretionary_ligatures:
         {:plot_text_discretionary_ligatures, [:text_discretionary_ligatures]},
-      historical_ligatures:
-        {:plot_text_historical_ligatures, [:text_historical_ligatures]},
+      historical_ligatures: {:plot_text_historical_ligatures, [:text_historical_ligatures]},
       number_type: {:plot_text_number_type, [:text_number_type]},
       number_width: {:plot_text_number_width, [:text_number_width]},
       slashed_zero: {:plot_text_slashed_zero, [:text_slashed_zero]},
@@ -361,8 +516,8 @@ defmodule Quartz.Config do
   end
 end
 
-defmodule Quartz.Config2 do
-  # TODO: delete this?
+defmodule Quartz.MatplotlibConfig do
+  # TODO: modified from matplotlib
 
   @moduledoc false
 

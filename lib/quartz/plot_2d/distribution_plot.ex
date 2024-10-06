@@ -10,11 +10,30 @@ defmodule Quartz.Plot2D.DistributionPlot do
   alias Dantzig.Polynomial
   alias Quartz.Plot2D
   alias Quartz.AxisData
+  alias Quartz.Legend
 
   alias Quartz.Plot2D.DistributionPlots.BoxAndWhiskers
 
   def draw_kde_plot(plot, values, opts \\ []) do
-    KeywordSpec.validate!(opts, [fill: false])
+    KeywordSpec.validate!(opts,
+      style: [],
+      fill: false
+    )
+
+    KeywordSpec.validate!(style,
+      opacity: 1,
+      stroke_thickness:
+        if fill do
+          nil
+        else
+          1
+        end
+    )
+
+    new_style =
+      style
+      |> Keyword.put_new(:opacity, opacity)
+      |> Keyword.put_new(:stroke_thickness, stroke_thickness)
 
     value_series =
       case values do
@@ -31,15 +50,24 @@ defmodule Quartz.Plot2D.DistributionPlot do
     xs = Series.to_list(df[:x])
     ys = Series.to_list(df[:y])
 
-    if fill do
-      new_opts = Keyword.put(opts, :bottom, 0.0)
-      PairwiseDataPlot.draw_filled_between_y(plot, xs, ys, new_opts)
-    else
-      PairwiseDataPlot.draw_line_plot(plot, xs, ys, opts)
-    end
+    _plot =
+      if fill do
+        new_opts = opts |> Keyword.put(:bottom, 0.0) |> Keyword.put(:style, new_style)
+        PairwiseDataPlot.draw_filled_between_y(plot, xs, ys, new_opts)
+      else
+        new_opts = opts |> Keyword.put(:style, new_style)
+        PairwiseDataPlot.draw_line_plot(plot, xs, ys, new_opts)
+      end
   end
 
-  def draw_kde_plot_groups_from_dataframe(plot, %DataFrame{} = dataframe, group_column, values_column, color_picker, opts \\ []) do
+  def draw_kde_plot_groups_from_dataframe(
+        plot,
+        %DataFrame{} = dataframe,
+        group_column,
+        values_column,
+        color_picker,
+        opts \\ []
+      ) do
     groups =
       dataframe[group_column]
       |> Series.distinct()
@@ -48,6 +76,7 @@ defmodule Quartz.Plot2D.DistributionPlot do
 
     Enum.reduce(groups, plot, fn new_group, plot ->
       {new_plot, new_opts} = color_picker.(plot, opts)
+
       values =
         DataFrame.filter_with(
           dataframe,
@@ -73,12 +102,12 @@ defmodule Quartz.Plot2D.DistributionPlot do
   def box_plot(plot, groups, opts \\ []) when is_list(groups) do
     nr_of_groups = length(groups)
 
-    KeywordSpec.validate!(opts, [
+    KeywordSpec.validate!(opts,
       x_axis: "x",
       y_axis: "y",
       labels: box_plot_default_labels(nr_of_groups),
       x_tick_locations: box_plot_default_tick_locations(nr_of_groups)
-    ])
+    )
 
     draw_parameters =
       %BoxAndWhiskers.DrawParameters{
@@ -89,7 +118,7 @@ defmodule Quartz.Plot2D.DistributionPlot do
         nr_of_groups: length(groups)
       }
 
-      BoxAndWhiskers.draw_vertical_boxes_and_whiskers(groups, draw_parameters, opts)
+    BoxAndWhiskers.draw_vertical_boxes_and_whiskers(groups, draw_parameters, opts)
 
     plot
     |> Plot2D.put_axis_major_tick_locations(x_axis, x_tick_locations)
@@ -97,18 +126,16 @@ defmodule Quartz.Plot2D.DistributionPlot do
     |> Plot2D.put_axis_limits(x_axis, 0.0, 1.0)
   end
 
-
   defp to_series(%Series{} = s), do: s
   defp to_series(values) when is_list(values), do: Series.from_list(values)
 
-  @doc false
   def default_bin_width_for_histogram(series) do
     n = Series.count(series)
     q1 = Series.quantile(series, 0.25)
     q3 = Series.quantile(series, 0.75)
     iqr = q3 - q1
 
-    2 * iqr / (:math.pow(n, 1/3))
+    2 * iqr / :math.pow(n, 1 / 3)
   end
 
   def histogram(plot, data, opts \\ []) do
@@ -118,13 +145,20 @@ defmodule Quartz.Plot2D.DistributionPlot do
       !style,
       x_axis: "x",
       y_axis: "y",
+      label: nil,
+      legend_symbol: :rectangle,
       normalized: false,
       ideal_bin_width: default_bin_width_for_histogram(series)
     ])
 
     KeywordSpec.validate!(style, [
       !color,
-      opacity: 1.0
+      filled: true,
+      opacity: 1.0,
+      stroke: nil,
+      stroke_thickness: 1,
+      stroke_paint: color,
+      stroke_opacity: 1.0
     ])
 
     to_x_axis_data = fn value ->
@@ -141,7 +175,7 @@ defmodule Quartz.Plot2D.DistributionPlot do
     nr_of_points = Series.count(series)
 
     nr_of_bins = round(:math.ceil((max - min) / ideal_bin_width))
-    cut_points = for i <- 1..nr_of_bins, do: min + (i * (max - min) / (nr_of_bins + 1))
+    cut_points = for i <- 1..nr_of_bins, do: min + i * (max - min) / (nr_of_bins + 1)
 
     absolute_counts =
       series
@@ -167,28 +201,77 @@ defmodule Quartz.Plot2D.DistributionPlot do
 
     bounds = Enum.zip(lower_bounds, upper_bounds)
 
-    pairs_of_points =
+    top_points =
       for {count, {x1, x2}} <- Enum.zip(counts, bounds) do
         count_axis_data = to_y_axis_data.(count)
         [{x1, count_axis_data}, {x2, count_axis_data}]
       end
+      |> List.flatten()
 
     all_points =
       List.flatten([
         {to_x_axis_data.(min), to_y_axis_data.(0)},
-        pairs_of_points,
+        top_points,
         {to_x_axis_data.(max), to_y_axis_data.(0)}
       ])
 
-    LinearPath.new(
-      histogram: "histogram",
-      points: all_points,
-      stroke_paint: "none",
-      closed: true,
-      fill: color,
-      opacity: opacity
-    )
+    path_fill = if filled, do: color, else: "none"
 
-    plot
+    if filled do
+      # Draw the background of the histogram
+      LinearPath.draw_new(
+        histogram: "histogram",
+        points: all_points,
+        stroke_paint: "none",
+        closed: true,
+        fill: path_fill,
+        opacity: opacity
+      )
+    end
+
+    case stroke do
+      :top ->
+        LinearPath.draw_new(
+          histogram: "histogram",
+          points: top_points,
+          stroke_paint: stroke_paint,
+          closed: false,
+          fill: "none",
+          opacity: stroke_opacity
+        )
+
+      :around ->
+        LinearPath.draw_new(
+          histogram: "histogram",
+          points: all_points,
+          stroke_paint: stroke_paint,
+          closed: true,
+          fill: "none",
+          opacity: stroke_opacity
+        )
+
+      nil ->
+        # Don't draw
+        :ok
+    end
+
+    plot =
+      if label && plot.has_legend do
+        symbol_properties = [
+          fill: color,
+          opacity: opacity,
+          stroke_thickness: stroke_thickness,
+          stroke_paint: color
+        ]
+
+        symbol = Legend.symbol_for_color(legend_symbol, symbol_properties)
+        Plot2D.add_to_legend(plot, symbol, label)
+      else
+        plot
+      end
+
+    # Distribution plots (whether using counts or densities)
+    # should always use zero as a baseline.
+    Plot2D.put_axis_min_value(plot, y_axis, 0.0)
   end
 end

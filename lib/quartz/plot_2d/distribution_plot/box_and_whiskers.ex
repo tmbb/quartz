@@ -25,8 +25,8 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
     median = Series.quantile(s, 0.5)
     q3 = Series.quantile(s, 0.75)
     iqr = q3 - q1
-    whisker_bottom = median - (0.75 * iqr)
-    whisker_top = median + (0.75 * iqr)
+    whisker_bottom = median - 0.75 * iqr
+    whisker_top = median + 0.75 * iqr
     outliers_bottom = Series.filter(s, _ < ^whisker_bottom)
     outliers_top = Series.filter(s, _ > ^whisker_top)
 
@@ -59,12 +59,14 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
 
   defp mininum_distance_between_locations(locations) do
     sorted_locations = Enum.sort([1.0 | locations])
+
     {_loc, min_distance} =
       Enum.reduce(
         sorted_locations,
         {_loc = 0.0, _distance = 1.0},
         fn next_loc, {old_loc, old_distance} ->
           new_distance = next_loc - old_loc
+
           if new_distance < old_distance do
             {next_loc, new_distance}
           else
@@ -102,7 +104,6 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
         %DrawParameters{} = draw_parameters,
         _opts \\ []
       ) do
-
     plot_id = draw_parameters.plot_id
     x_axis = draw_parameters.x_axis
     y_axis = draw_parameters.y_axis
@@ -118,15 +119,15 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
     {left_x, right_x} =
       case box_and_whiskers.options.box_width do
         {:fractional, width} ->
-          left_x = axis_variable.(location - (0.5 * width))
-          right_x = axis_variable.(location + (0.5 * width))
+          left_x = axis_variable.(location - 0.5 * width)
+          right_x = axis_variable.(location + 0.5 * width)
 
           {left_x, right_x}
 
         box_width ->
           Polynomial.algebra do
-            left_x = loc - (0.5 * box_width)
-            right_x = loc + (0.5 * box_width)
+            left_x = loc - 0.5 * box_width
+            right_x = loc + 0.5 * box_width
 
             {left_x, right_x}
           end
@@ -135,15 +136,15 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
     {whisker_left_x, whisker_right_x} =
       case box_and_whiskers.options.whisker_tip_width do
         {:fractional, width} ->
-          whisker_left_x = axis_variable.(location - (0.5 * width))
-          whisker_right_x = axis_variable.(location + (0.5 * width))
+          whisker_left_x = axis_variable.(location - 0.5 * width)
+          whisker_right_x = axis_variable.(location + 0.5 * width)
 
           {whisker_left_x, whisker_right_x}
 
         whisker_tip_width ->
           Polynomial.algebra do
-            whisker_left_x = loc - (0.5 * whisker_tip_width)
-            whisker_right_x = loc + (0.5 * whisker_tip_width)
+            whisker_left_x = loc - 0.5 * whisker_tip_width
+            whisker_right_x = loc + 0.5 * whisker_tip_width
 
             {whisker_left_x, whisker_right_x}
           end
@@ -156,7 +157,7 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
     whisker_top = AxisData.new_variable(box_and_whiskers.whisker_top, plot_id, y_axis)
 
     _top_rect =
-      LinearPath.new(
+      LinearPath.draw_new(
         prefix: "box_and_whiskers_top_rect",
         points: [
           {left_x, median},
@@ -170,7 +171,7 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
       )
 
     _bottom_rect =
-      LinearPath.new(
+      LinearPath.draw_new(
         prefix: "box_and_whiskers_bottom_rect",
         points: [
           {left_x, median},
@@ -190,7 +191,7 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
     # The median line is drawn separately so that it can have custom properties
 
     _top_rect_open_stroke =
-      LinearPath.new(
+      LinearPath.draw_new(
         prefix: "box_and_whiskers_top_rect_stroke",
         points: [
           {left_x, median},
@@ -203,7 +204,7 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
       )
 
     _bottom_rect_open_stroke =
-      LinearPath.new(
+      LinearPath.draw_new(
         prefix: "box_and_whiskers_bottom_rect",
         points: [
           {left_x, median},
@@ -219,7 +220,7 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
     # ---------------------------------------------
 
     _median_line =
-      Line.new(
+      Line.draw_new(
         prefix: "bottom_whisker_shaft",
         x1: left_x,
         y1: median,
@@ -231,7 +232,7 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
     # ---------------------------------------------
 
     _bottom_whisker_shaft =
-      Line.new(
+      Line.draw_new(
         prefix: "bottom_whisker_shaft",
         x1: loc,
         y1: q3,
@@ -240,7 +241,7 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
       )
 
     _bottom_whisker_shaft =
-      Line.new(
+      Line.draw_new(
         prefix: "top_whisker_shaft",
         x1: loc,
         y1: q1,
@@ -249,7 +250,7 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
       )
 
     _top_whisker_tip =
-      Line.new(
+      Line.draw_new(
         prefix: "bottom_whisker_tip",
         x1: whisker_left_x,
         y1: whisker_bottom,
@@ -258,7 +259,7 @@ defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
       )
 
     _bottom_whisker_tip =
-      Line.new(
+      Line.draw_new(
         prefix: "bottom_whisker_tip",
         x1: whisker_left_x,
         y1: whisker_top,

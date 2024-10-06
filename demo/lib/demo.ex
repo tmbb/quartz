@@ -74,7 +74,14 @@ defmodule Quartz.Demo do
     Path.join([:code.priv_dir(:quartz), "demo", "samples.parquet"])
   end
 
-  alias Quartz.Demo.{Layout, DistributionPlot, Miscelaneous, PairwiseDataPlot}
+  alias Quartz.Figure
+  alias Quartz.Demo.{
+    Layout,
+    DistributionPlot,
+    Miscelaneous,
+    PairwiseDataPlot,
+    Text
+  }
 
   def draw_demo_plots(demo_dir) do
     # Layout.AspectRatioScatterPlot.draw(demo_dir)
@@ -88,5 +95,8 @@ defmodule Quartz.Demo do
     DistributionPlot.Histogram.draw(demo_dir)
 
     Miscelaneous.ContourPlot.draw(demo_dir)
+
+    Text.MathCharactersChart.draw(demo_dir)
+    Text.MathAndTextCharacters.draw(demo_dir)
   end
 end

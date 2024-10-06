@@ -1,4 +1,6 @@
 defmodule Quartz.Canvas.CanvasDebugProperties do
+  @moduledoc false
+
   defstruct stroke: nil,
             stroke_width: nil,
             stroke_dash_array: nil,

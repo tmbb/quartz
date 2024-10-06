@@ -1,5 +1,5 @@
 defmodule Quartz.TickManagers.AutoTickManager do
-  @doc false
+  @moduledoc false
 
   alias Quartz.Formatter
 

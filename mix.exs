@@ -37,6 +37,7 @@ defmodule Quartz.MixProject do
       {:conrex, "~> 1.0.0"},
       {:benchee, "~> 1.3"},
       {:explorer, "~> 0.8"},
+      {:floki, "~> 0.36"},
       {:rustler, "~> 0.31", override: true},
       {:rustler_precompiled, "~> 0.7", override: true},
       {:ex_doc, "~> 0.34", only: :dev}

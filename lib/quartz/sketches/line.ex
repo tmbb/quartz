@@ -1,5 +1,6 @@
 defmodule Quartz.Line do
   alias Quartz.Figure
+  alias Quartz.Sketch
   alias Quartz.Variable
   alias Quartz.SVG
   alias Quartz.Sketch.BBoxBounds
@@ -59,11 +60,13 @@ defmodule Quartz.Line do
       debug_properties: debug_properties
     }
 
-    # Add the line to the figure
-    Figure.add_sketch(id, line)
-
     # Return the line, with no reference to the figure
     line
+  end
+
+  def draw_new(opts \\ []) do
+    line = new(opts)
+    Sketch.draw(line)
   end
 
   defimpl Quartz.Sketch.Protocol do

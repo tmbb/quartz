@@ -1,5 +1,6 @@
 defmodule Quartz.LinearPath do
   alias Quartz.Figure
+  alias Quartz.Sketch
   alias Quartz.SVG
   alias Quartz.Color.RGB
   alias Quartz.Sketch.BBoxBounds
@@ -16,13 +17,12 @@ defmodule Quartz.LinearPath do
             stroke_thickness: nil,
             stroke_join: nil,
             stroke_dash: nil,
+            stroke_opacity: nil,
             debug: nil,
             debug_properties: nil
 
   def new(opts \\ []) do
-    KeywordSpec.validate!(opts, [
-      stroke_join,
-      stroke_dash,
+    KeywordSpec.validate!(opts,
       prefix: nil,
       points: [],
       closed: false,
@@ -30,8 +30,11 @@ defmodule Quartz.LinearPath do
       opacity: 1,
       stroke_thickness: 1,
       stroke_paint: "black",
-      stroke_cap: "square"
-    ])
+      stroke_cap: "square",
+      stroke_join: nil,
+      stroke_dash: nil,
+      stroke_opacity: nil
+    )
 
     _prefix = prefix
 
@@ -54,15 +57,18 @@ defmodule Quartz.LinearPath do
       stroke_thickness: stroke_thickness,
       stroke_dash: stroke_dash,
       stroke_cap: stroke_cap,
+      stroke_opacity: stroke_opacity,
       debug: debug,
       debug_properties: debug_properties
     }
 
-    # Add the line to the figure
-    Figure.add_sketch(id, path)
-
     # Return the line, with no reference to the figure
     path
+  end
+
+  def draw_new(opts \\ []) do
+    path = new(opts)
+    Sketch.draw(path)
   end
 
   defimpl Quartz.Sketch.Protocol do
@@ -127,6 +133,7 @@ defmodule Quartz.LinearPath do
         stroke: path.stroke_paint,
         fill: path.fill,
         opacity: path.opacity,
+        "stroke-width": path.stroke_thickness,
         "stroke-linejoin": path.stroke_join,
         "stroke-linecap": path.stroke_cap
       ]
@@ -134,9 +141,13 @@ defmodule Quartz.LinearPath do
       if path.debug do
         tooltip_text = [
           "LinearPath [#{path.id}] #{path.prefix} &#13;",
-          "&#160;&#160;stroke: #{pprint_color(path.stroke_paint)}&#13;",
           "&#160;&#160;fill: #{pprint_color(path.fill)}&#13;",
-          "&#160;&#160;opacity: #{path.opacity}&#13;"
+          "&#160;&#160;opacity: #{path.opacity}&#13;",
+          "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&#13;",
+          "&#160;&#160;stroke: #{pprint_color(path.stroke_paint)}&#13;",
+          "&#160;&#160;stroke-width: #{path.stroke_thickness}pt&#13;",
+          "&#160;&#160;stroke-join: #{path.stroke_join}&#13;",
+          "&#160;&#160;stroke-cap: #{path.stroke_cap}&#13;"
         ]
 
         SVG.path(common_attributes, [

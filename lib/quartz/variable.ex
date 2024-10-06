@@ -1,6 +1,8 @@
 defmodule Quartz.Variable do
   alias Quartz.Figure
 
+  @moduledoc false
+
   def maybe_variable(struct_opts, key, variable_name, variable_opts) do
     case Keyword.fetch(struct_opts, key) do
       {:ok, variable} ->

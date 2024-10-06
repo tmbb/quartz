@@ -1,4 +1,8 @@
 defmodule Quartz.Plot2D do
+  @moduledoc """
+  The module responsible for drawing and customizing 2D plots.
+  """
+
   require Quartz.Figure, as: Figure
   alias Quartz.Canvas
   alias Quartz.Axis2D
@@ -7,9 +11,11 @@ defmodule Quartz.Plot2D do
   alias Quartz.Plot2DElement
   alias Quartz.Length
   alias Quartz.Text
+  alias Quartz.Scale
   alias Quartz.Sketch
   alias Quartz.Config
   alias Quartz.ColorMap
+  alias Quartz.Legend
 
   alias Quartz.Plot2D.PairwiseDataPlot
   alias Quartz.Plot2D.DistributionPlot
@@ -73,7 +79,10 @@ defmodule Quartz.Plot2D do
             top_left_decorations_area: nil,
             categorical_color_map: @default_color_map,
             categorical_color_index: 0,
-            width_to_aspect_ratio: nil
+            width_to_aspect_ratio: nil,
+            has_legend: true,
+            legend_location: :top_right,
+            legend_items: []
 
   @type t :: %__MODULE__{}
 
@@ -100,17 +109,17 @@ defmodule Quartz.Plot2D do
 
     bounds = Keyword.get(opts, :bounds, [])
 
-    plot_area = Canvas.new(prefix: "plot_area")
-    title_area = Canvas.new(prefix: "title_area")
-    data_area = Canvas.new(prefix: "data_area")
-    top_decorations_area = Canvas.new(prefix: "top_decorations_area")
-    top_right_decorations_area = Canvas.new(prefix: "top_right_decorations_area")
-    right_decorations_area = Canvas.new(prefix: "right_decorations_area")
-    bottom_right_decorations_area = Canvas.new(prefix: "bottom_right_decorations_area")
-    bottom_decorations_area = Canvas.new(prefix: "bottom_decorations_area")
-    bottom_left_decorations_area = Canvas.new(prefix: "bottom_left_decorations_area")
-    left_decorations_area = Canvas.new(prefix: "left_decorations_area")
-    top_left_decorations_area = Canvas.new(prefix: "top_left_decorations_area")
+    plot_area = Canvas.draw_new(prefix: "plot_area")
+    title_area = Canvas.draw_new(prefix: "title_area")
+    data_area = Canvas.draw_new(prefix: "data_area")
+    top_decorations_area = Canvas.draw_new(prefix: "top_decorations_area")
+    top_right_decorations_area = Canvas.draw_new(prefix: "top_right_decorations_area")
+    right_decorations_area = Canvas.draw_new(prefix: "right_decorations_area")
+    bottom_right_decorations_area = Canvas.draw_new(prefix: "bottom_right_decorations_area")
+    bottom_decorations_area = Canvas.draw_new(prefix: "bottom_decorations_area")
+    bottom_left_decorations_area = Canvas.draw_new(prefix: "bottom_left_decorations_area")
+    left_decorations_area = Canvas.draw_new(prefix: "left_decorations_area")
+    top_left_decorations_area = Canvas.draw_new(prefix: "top_left_decorations_area")
 
     left_areas = [
       top_left_decorations_area,
@@ -198,6 +207,8 @@ defmodule Quartz.Plot2D do
         right_decorations_area.width == plot_area.width
     )
 
+    Figure.assert(title_area.width == plot_area.width)
+
     plot = %__MODULE__{
       id: id,
       title: nil,
@@ -225,14 +236,21 @@ defmodule Quartz.Plot2D do
     }
 
     plot
-    |> set_bounds(bounds)
+    |> put_bounds(bounds)
     |> add_bottom_axis("x")
     |> add_left_axis("y")
     |> add_top_axis("x2")
     |> add_right_axis("y2")
   end
 
-  def set_bounds(plot, bounds) do
+  @doc """
+  Set the bounds of a plot.
+  If the bounds are not set, by default the plot will occupy
+  the total space given to the figure.
+
+  Expects bounds given as a keyword list or as a map.
+  """
+  def put_bounds(plot, bounds) do
     top_bound = Access.get(bounds, :top, 0.0)
     bottom_bound = Access.get(bounds, :bottom, Figure.current_figure_height())
     left_bound = Access.get(bounds, :left, 0.0)
@@ -266,6 +284,9 @@ defmodule Quartz.Plot2D do
 
   defguardp is_axes(axes) when is_list(axes) or is_binary(axes)
 
+  @doc """
+  Set the style of the tick labels.
+  """
   def put_major_tick_labels_style(plot, axes_name, style) when is_axes(axes_name) do
     axes_name = List.wrap(axes_name)
 
@@ -274,8 +295,9 @@ defmodule Quartz.Plot2D do
     end)
   end
 
-
-
+  @doc """
+  Add bottom axis. Bottom axes are added below the axes already present.
+  """
   def add_bottom_axis(plot, name, opts \\ []) do
     axis = Axis2D.new(name, Keyword.put(opts, :location, :bottom))
     axis = Axis2D.put_plot_id(axis, plot.id)
@@ -285,6 +307,9 @@ defmodule Quartz.Plot2D do
     %{plot | axes: new_axes, bottom_content: new_bottom}
   end
 
+  @doc """
+  Add top axis. Top axes are added below the axes already present.
+  """
   def add_top_axis(plot, name, opts \\ []) do
     axis = Axis2D.new(name, Keyword.put(opts, :location, :top))
     axis = Axis2D.put_plot_id(axis, plot.id)
@@ -294,6 +319,9 @@ defmodule Quartz.Plot2D do
     %{plot | axes: new_axes, top_content: new_top}
   end
 
+  @doc """
+  Add left axis. Left axes are added to the left of the axes already present.
+  """
   def add_left_axis(plot, name, opts \\ []) do
     axis = Axis2D.new(name, Keyword.put(opts, :location, :left))
     axis = Axis2D.put_plot_id(axis, plot.id)
@@ -303,6 +331,9 @@ defmodule Quartz.Plot2D do
     %{plot | axes: new_axes, left_content: new_left}
   end
 
+  @doc """
+  Add right axis. Right axes are added to the left of the axes already present.
+  """
   def add_right_axis(plot, name, opts \\ []) do
     axis = Axis2D.new(name, Keyword.put(opts, :location, :right))
     axis = Axis2D.put_plot_id(axis, plot.id)
@@ -312,29 +343,43 @@ defmodule Quartz.Plot2D do
     %{plot | axes: new_axes, right_content: new_right}
   end
 
+  @spec get_axis(Plot2D.t(), binary()) :: Axis2D.t() | nil
   def get_axis(plot, name) do
     Map.get(plot.axes, name)
   end
 
+  @spec fetch_axis(Plot2D.t(), binary()) :: {:ok, Axis2D.t()} | :error
   def fetch_axis(plot, name) do
     Map.fetch(plot.axes, name)
   end
 
+  @spec fetch_axis(Plot2D.t(), binary()) :: Axis2D.t()
   def fetch_axis!(plot, name) do
     Map.fetch!(plot.axes, name)
   end
 
+  @spec align_bbox(list(any()), (any() -> any())) :: :ok
   def align_bbox(elements, fun) do
     for {e1, e2} <- Enum.zip(elements, Enum.drop(elements, 1)) do
       Figure.assert(fun.(e1) == fun.(e2))
     end
+
+    :ok
   end
 
+  @spec align_top(list(any())) :: :ok
   def align_top(elements), do: align_bbox(elements, &Sketch.bbox_top/1)
+
+  @spec align_left(list(any())) :: :ok
   def align_left(elements), do: align_bbox(elements, &Sketch.bbox_left/1)
+
+  @spec align_right(list(any())) :: :ok
   def align_right(elements), do: align_bbox(elements, &Sketch.bbox_right/1)
+
+  @spec align_bottom(list(any())) :: :ok
   def align_bottom(elements), do: align_bbox(elements, &Sketch.bbox_bottom/1)
 
+  @spec stack_horizontally_inside_container(list(any()), any()) :: :ok
   def stack_horizontally_inside_container(elements = [_first_element | _], container) do
     first = Enum.at(elements, 0)
     last = Enum.at(elements, -1)
@@ -345,8 +390,11 @@ defmodule Quartz.Plot2D do
 
     Figure.assert(Sketch.bbox_left(first) >= Sketch.bbox_left(container))
     Figure.assert(Sketch.bbox_right(last) <= Sketch.bbox_right(container))
+
+    :ok
   end
 
+  @spec stack_vertically_inside_container(list(any()), any()) :: :ok
   def stack_vertically_inside_container(elements = [_first_element | _], container) do
     first = Enum.at(elements, 0)
     last = Enum.at(elements, -1)
@@ -357,36 +405,44 @@ defmodule Quartz.Plot2D do
 
     Figure.assert(Sketch.bbox_top(first) >= Sketch.bbox_top(container))
     Figure.assert(Sketch.bbox_bottom(last) <= Sketch.bbox_bottom(container))
+
+    :ok
   end
 
+  @spec put_axis_max_value(t(), binary(), number()) :: t()
   def put_axis_max_value(plot, axis_name, value) do
     update_axis(plot, axis_name, fn axis ->
       Axis2D.put_max_value(axis, value)
     end)
   end
 
+  @spec put_axis_min_value(t(), binary(), number()) :: t()
   def put_axis_min_value(plot, axis_name, value) do
     update_axis(plot, axis_name, fn axis ->
-      Axis2D.put_max_value(axis, value)
+      Axis2D.put_min_value(axis, value)
     end)
   end
 
+  @spec put_axis_limits(t(), binary(), number(), number()) :: t()
   def put_axis_limits(plot, axis_name, min_value, max_value) do
     update_axis(plot, axis_name, fn axis ->
       Axis2D.put_limits(axis, min_value, max_value)
     end)
   end
 
+  @spec put_axis_label(t(), binary(), Text.text(), number()) :: t()
   def put_axis_label(plot, axis_name, text, opts \\ []) do
     update_axis(plot, axis_name, fn axis ->
       Axis2D.put_label(axis, text, opts)
     end)
   end
 
+  @spec put_width_to_height_ratio(t(), number()) :: t()
   def put_width_to_height_ratio(plot, ratio) when is_number(ratio) do
     %{plot | width_to_aspect_ratio: ratio}
   end
 
+  @spec remove_axis_ticks(t(), binary()) :: t()
   def remove_axis_ticks(plot, axis_name) do
     update_axis(plot, axis_name, fn axis ->
       axis
@@ -395,18 +451,21 @@ defmodule Quartz.Plot2D do
     end)
   end
 
+  @spec put_axis_major_tick_locations(t(), binary(), list(number())) :: t()
   def put_axis_major_tick_locations(plot, axis_name, locations) do
     update_axis(plot, axis_name, fn axis ->
       Axis2D.put_major_tick_locations(axis, locations)
     end)
   end
 
+  @spec put_axis_major_tick_labels(t(), binary(), list(binary())) :: t()
   def put_axis_major_tick_labels(plot, axis_name, labels) do
     update_axis(plot, axis_name, fn axis ->
       Axis2D.put_major_tick_labels(axis, labels)
     end)
   end
 
+  @spec put_axis_scale(t(), binary(), Scale.scale()) :: t()
   def put_axis_scale(plot, axis_name, scale) do
     update_axis(plot, axis_name, fn axis ->
       Axis2D.put_scale(axis, scale)
@@ -438,9 +497,19 @@ defmodule Quartz.Plot2D do
     end)
   end
 
-  def put_minimum_axis_margins(plot, axis_name, value) do
+  def put_minimum_axis_margins(plot, axis_name, common_margin_size) do
     update_axis(plot, axis_name, fn axis ->
-      Axis2D.put_minimum_margins(axis, value)
+      axis
+      |> Axis2D.put_minimum_start_margin(common_margin_size)
+      |> Axis2D.put_minimum_end_margin(common_margin_size)
+    end)
+  end
+
+  def put_minimum_axis_margins(plot, axis_name, margin_start, margin_end) do
+    update_axis(plot, axis_name, fn axis ->
+      axis
+      |> Axis2D.put_minimum_start_margin(margin_start)
+      |> Axis2D.put_minimum_end_margin(margin_end)
     end)
   end
 
@@ -470,8 +539,8 @@ defmodule Quartz.Plot2D do
     location = Keyword.get(opts, :location, :left)
 
     cond do
-      is_binary(title) ->
-        text = Text.new(title, text_opts)
+      is_binary(title) or is_list(title) ->
+        text = Text.draw_new(title, text_opts)
         %{plot | title: text, title_location: location, title_alignment: alignment}
 
       # Find out how we should deal with this
@@ -480,8 +549,12 @@ defmodule Quartz.Plot2D do
     end
   end
 
+  @spec finalize(t()) :: t()
   def finalize(plot) do
-    plot = fix_bounds(plot)
+    plot =
+      plot
+      |> fix_bounds()
+      |> maybe_draw_legend()
 
     # Set the aspect ratio if given
     if plot.width_to_aspect_ratio do
@@ -498,8 +571,11 @@ defmodule Quartz.Plot2D do
     plot
   end
 
-  def finalize_all(plots) do
-    Enum.map(plots, &finalize/1)
+  @spec finalize_all(list(t) | list(list(t))) :: list(t())
+  def finalize_all(plots) when is_list(plots) do
+    plots
+    |> List.flatten()
+    |> Enum.map(&finalize/1)
   end
 
   def draw_bottom_content(plot, padding) do
@@ -562,13 +638,15 @@ defmodule Quartz.Plot2D do
     :ok
   end
 
+  @doc false
   def draw_title(plot) do
     if plot.title do
       Figure.position_with_location_and_alignment(
         plot.title,
         plot.title_area,
-        x_location: :left,
+        x_location: plot.title_alignment,
         y_location: :bottom,
+        x_alignment: plot.title_alignment,
         y_offset: 0,
         contains_vertically?: true
       )
@@ -577,6 +655,7 @@ defmodule Quartz.Plot2D do
     :ok
   end
 
+  @doc false
   def draw(plot) do
     draw_title(plot)
     draw_left_content(plot, plot.left_content_padding)
@@ -585,6 +664,7 @@ defmodule Quartz.Plot2D do
     draw_bottom_content(plot, plot.bottom_content_padding)
   end
 
+  @doc false
   def maybe_next_color_from_colormap(plot, opts) do
     # Validate the color and alpha from the style
     KeywordSpec.validate!(opts, style: [])
@@ -691,7 +771,13 @@ defmodule Quartz.Plot2D do
   @doc """
   Draw a distribution using a kernel density estimate.
   """
-  def draw_kde_plot_groups_from_dataframe(plot, %DataFrame{} = dataframe, group_column, values_column, opts \\ []) do
+  def draw_kde_plot_groups_from_dataframe(
+        plot,
+        %DataFrame{} = dataframe,
+        group_column,
+        values_column,
+        opts \\ []
+      ) do
     DistributionPlot.draw_kde_plot_groups_from_dataframe(
       plot,
       dataframe,
@@ -720,7 +806,11 @@ defmodule Quartz.Plot2D do
     Figure.assert(plot.left == left_bound)
     Figure.assert(plot.right == right_bound)
 
-    set_bounds(plot, bounds)
+    put_bounds(plot, bounds)
+  end
+
+  def default_bin_width_for_histogram(series) do
+    DistributionPlot.default_bin_width_for_histogram(series)
   end
 
   def draw_histogram(plot, data, opts \\ []) do
@@ -733,11 +823,12 @@ defmodule Quartz.Plot2D do
   defp axis_full_size(axis) do
     Polynomial.algebra(
       axis.margin_start +
-      axis.size +
-      axis.margin_end
+        axis.size +
+        axis.margin_end
     )
   end
 
+  @spec draw_text(t(), Text.text(), Keyword.t()) :: t()
   def draw_text(plot, text, opts \\ []) do
     prefix = "plot_text"
 
@@ -765,7 +856,10 @@ defmodule Quartz.Plot2D do
     x_replacer = fn x ->
       case x do
         %AxisData{value: value} ->
-          %AxisData{value: value, plot_id: plot.id, axis_name: x_axis}
+          Polynomial.algebra(
+            %AxisData{value: value, plot_id: plot.id, axis_name: x_axis} -
+              x_axis_struct.x
+          )
 
         "AXIS_SIZE" ->
           x_full_axis_size
@@ -778,7 +872,10 @@ defmodule Quartz.Plot2D do
     y_replacer = fn y ->
       case y do
         %AxisData{value: value} ->
-          %AxisData{value: value, plot_id: plot.id, axis_name: y_axis}
+          Polynomial.algebra(
+            %AxisData{value: value, plot_id: plot.id, axis_name: y_axis} -
+              y_axis_struct.y
+          )
 
         "AXIS_SIZE" ->
           y_full_axis_size
@@ -802,7 +899,7 @@ defmodule Quartz.Plot2D do
 
         binary when is_binary(binary) ->
           # Create text from tyhe binary
-          Text.new(binary, text_opts)
+          Text.draw_new(binary, text_opts)
       end
 
     bbox = Sketch.bbox_bounds(text_sketch)
@@ -815,7 +912,7 @@ defmodule Quartz.Plot2D do
         Figure.assert(bbox.x_max == x_coord)
 
       :center ->
-        Figure.assert((bbox.x_min + bbox.x_max / 2) == x_coord)
+        Figure.assert(bbox.x_min + bbox.x_max / 2 == x_coord)
     end
 
     case y_alignment do
@@ -826,9 +923,57 @@ defmodule Quartz.Plot2D do
         Figure.assert(bbox.y_max == y_coord)
 
       :horizon ->
-        Figure.assert((bbox.y_min + bbox.y_max / 2) == y_coord)
+        Figure.assert(bbox.y_min + bbox.y_max / 2 == y_coord)
     end
 
     plot
   end
+
+  def no_legend(plot) do
+    %{plot | has_legend: false}
+  end
+
+  @doc """
+  Put legend location.
+
+  Valid locations:
+    - `:top`
+    - `:top_right`
+    - `:right`
+    - `:bottom_right`
+    - `:bottom`
+    - `:bottom_left`
+    - `:left`
+  """
+  def put_legend_location(plot, location)
+      when location in [
+             :top,
+             :top_right,
+             :right,
+             :bottom_right,
+             :bottom,
+             :bottom_left,
+             :left,
+             :top_left
+           ] do
+    %{plot | legend_location: location}
+  end
+
+  def add_to_legend(plot, symbol, label) do
+    label_sketch =
+      case label do
+        bin when is_binary(label) ->
+          text_attrs = Config.get_legend_text_attributes()
+          Text.draw_new(bin, text_attrs)
+
+        %Text{} ->
+          label
+      end
+
+    %{plot | legend_items: [{symbol, label_sketch} | plot.legend_items]}
+  end
+
+  defp maybe_draw_legend(%__MODULE__{legend_items: []} = plot), do: plot
+  defp maybe_draw_legend(%__MODULE__{has_legend: false} = plot), do: plot
+  defp maybe_draw_legend(%__MODULE__{} = plot), do: Legend.draw_legend(plot)
 end

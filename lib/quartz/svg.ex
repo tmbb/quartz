@@ -4,7 +4,11 @@ defmodule Quartz.SVG do
   """
 
   alias Quartz.Color.RGB
+  import Quartz.Utilities, only: [display_rounded_float: 1]
 
+  @typedoc """
+  An SVG element is represented by
+  """
   @type t :: {binary(), list(), list()}
 
   @doc false
@@ -63,9 +67,30 @@ defmodule Quartz.SVG do
   end
 
   @doc """
+  SVG `<tspan/>` element.
+  """
+  def tspan(attrs, content) do
+    contents = List.wrap(content)
+
+    escaped_contents =
+      for fragment <- contents do
+        case fragment do
+          binary when is_binary(binary) ->
+            xml_escape_to_iodata(binary)
+
+          other ->
+            other
+        end
+      end
+
+    {"tspan", attrs, escaped_contents}
+  end
+
+  @doc """
   SVG `<title/>` element.
 
   This element is not rendered but is very useful for debugging.
+  It can be used to show properties of the containing element.
   """
   def title(attrs, content) do
     wrapped_content = List.wrap(content)
@@ -85,8 +110,8 @@ defmodule Quartz.SVG do
 
     first_attrs = [
       {"xmlns", "http://www.w3.org/2000/svg"},
-      width: "#{pp_float(width)}pt",
-      height: "#{pp_float(height)}pt"
+      width: "#{display_rounded_float(width)}pt",
+      height: "#{display_rounded_float(height)}pt"
     ]
 
     {"svg", first_attrs ++ attrs, contents}
@@ -102,49 +127,56 @@ defmodule Quartz.SVG do
     {"path", new_attrs, wrapped_content}
   end
 
-  @doc false
-  def points_to_iodata(points), do: Enum.map(points, &point_to_iodata/1)
+  defp points_to_iodata(points), do: Enum.map(points, &point_to_iodata/1)
 
   # Move to point without drawing a line
-  def point_to_iodata({:M, {x, y}}), do: ["M ", pp_float(x), " ", pp_float(y)]
-  def point_to_iodata({:m, {dx, dy}}), do: ["m ", pp_float(dx), " ", pp_float(dy)]
+  defp point_to_iodata({:M, {x, y}}),
+    do: ["M ", display_rounded_float(x), " ", display_rounded_float(y)]
+
+  defp point_to_iodata({:m, {dx, dy}}),
+    do: ["m ", display_rounded_float(dx), " ", display_rounded_float(dy)]
+
   # Draw a line from the last point to the current point
-  def point_to_iodata({:L, {x, y}}), do: ["L ", pp_float(x), " ", pp_float(y)]
-  def point_to_iodata({:l, {dx, dy}}), do: ["l ", pp_float(dx), " ", pp_float(dy)]
+  defp point_to_iodata({:L, {x, y}}),
+    do: ["L ", display_rounded_float(x), " ", display_rounded_float(y)]
+
+  defp point_to_iodata({:l, {dx, dy}}),
+    do: ["l ", display_rounded_float(dx), " ", display_rounded_float(dy)]
+
   # Horizontal line
-  def point_to_iodata({:H, x}), do: ["H ", pp_float(x)]
-  def point_to_iodata({:h, dx}), do: ["h ", pp_float(dx)]
+  defp point_to_iodata({:H, x}), do: ["H ", display_rounded_float(x)]
+  defp point_to_iodata({:h, dx}), do: ["h ", display_rounded_float(dx)]
   # Vertical line
-  def point_to_iodata({:V, y}), do: ["V ", pp_float(y)]
-  def point_to_iodata({:v, dy}), do: ["v ", pp_float(dy)]
+  defp point_to_iodata({:V, y}), do: ["V ", display_rounded_float(y)]
+  defp point_to_iodata({:v, dy}), do: ["v ", display_rounded_float(dy)]
   # Bezier curves
-  def point_to_iodata({:C, {x1, y1, x2, y2, x, y}}),
+  defp point_to_iodata({:C, {x1, y1, x2, y2, x, y}}),
     do: [
       "C ",
-      pp_float(x1),
-      pp_float(y1),
+      display_rounded_float(x1),
+      display_rounded_float(y1),
       ", ",
-      pp_float(x2),
-      pp_float(y2),
+      display_rounded_float(x2),
+      display_rounded_float(y2),
       ", ",
-      pp_float(x),
-      pp_float(y)
+      display_rounded_float(x),
+      display_rounded_float(y)
     ]
 
-  def point_to_iodata({:c, {dx1, dy1, dx2, dy2, dx, dy}}),
+  defp point_to_iodata({:c, {dx1, dy1, dx2, dy2, dx, dy}}),
     do: [
       "c ",
-      pp_float(dx1),
-      pp_float(dy1),
+      display_rounded_float(dx1),
+      display_rounded_float(dy1),
       ", ",
-      pp_float(dx2),
-      pp_float(dy2),
+      display_rounded_float(dx2),
+      display_rounded_float(dy2),
       ", ",
-      pp_float(dx),
-      pp_float(dy)
+      display_rounded_float(dx),
+      display_rounded_float(dy)
     ]
 
-  def point_to_iodata(z) when z in [:z, :Z] do
+  defp point_to_iodata(z) when z in [:z, :Z] do
     "z"
   end
 
@@ -242,7 +274,7 @@ defmodule Quartz.SVG do
   end
 
   def attr_value_to_iodata(number) when is_float(number) do
-    pp_float(number)
+    display_rounded_float(number)
   end
 
   def attr_value_to_iodata(attr_value) do
@@ -330,11 +362,5 @@ defmodule Quartz.SVG do
 
   defp to_iodata(<<>>, skip, original, acc, len) do
     [acc | binary_part(original, skip, len)]
-  end
-
-  defp pp_float(value) when is_integer(value), do: to_string(value)
-
-  defp pp_float(float) when is_float(float) do
-    :erlang.float_to_binary(float, decimals: 5)
   end
 end

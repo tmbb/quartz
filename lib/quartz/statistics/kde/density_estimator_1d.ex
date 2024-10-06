@@ -1,4 +1,6 @@
 defmodule Quartz.Statistics.KDE.DensityEstimator1D do
+  @moduledoc false
+
   @derive {Inspect, only: [:name]}
 
   defstruct name: nil,

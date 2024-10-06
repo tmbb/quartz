@@ -55,7 +55,7 @@ defmodule Quartz.Plot2D.GriddedDataPlot do
         line_x2 = AxisData.new(x2, plot.id, x_axis) |> Figure.variable()
         line_y2 = AxisData.new(y2, plot.id, y_axis) |> Figure.variable()
 
-        Line.new(
+        Line.draw_new(
           x1: line_x1,
           y1: line_y1,
           x2: line_x2,
@@ -97,7 +97,7 @@ defmodule Quartz.Plot2D.GriddedDataPlot do
   #       line_x2 = AxisData.new(x2, plot.id, x_axis) |> Polynomial.variable()
   #       line_y2 = AxisData.new(y2, plot.id, y_axis) |> Polynomial.variable()
 
-  #       Line.new(
+  #       Line.draw_new(
   #         x1: line_x1,
   #         y1: line_y1,
   #         x2: line_x2,
