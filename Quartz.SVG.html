@@ -14,7 +14,7 @@
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
     <script src="dist/handlebars.templates-K7URE6B4.js"></script>
-    <script src="dist/sidebar_items-298D1EC2.js"></script>
+    <script src="dist/sidebar_items-E031779F.js"></script>
     <script src="docs_config.js"></script>
     <script async src="dist/html-YIPIRHGU.js"></script>
 
@@ -180,6 +180,26 @@ Pages
 
     <div class="summary-row">
       <div class="summary-signature">
+        <a href="#doc_to_binary/1" data-no-tooltip translate="no">doc_to_binary(doc)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Render a full document into a binary.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#doc_to_iolist/1" data-no-tooltip translate="no">doc_to_iolist(doc)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Render a full document into an iolist.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
         <a href="#escaped_iodata/1" data-no-tooltip translate="no">escaped_iodata(iodata)</a>
 
       </div>
@@ -241,6 +261,14 @@ Pages
       </div>
 
         <div class="summary-synopsis"><p>Build a top level SVG element.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#svg_doc_dimension/1" data-no-tooltip translate="no">svg_doc_dimension(dim)</a>
+
+      </div>
 
     </div>
 
@@ -417,6 +445,40 @@ Pages
 <p>SVG <code class="inline">&lt;circle/&gt;</code> element.</p>
   </section>
 </section>
+<section class="detail" id="doc_to_binary/1">
+
+  <div class="detail-header">
+    <a href="#doc_to_binary/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">doc_to_binary(doc)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Render a full document into a binary.</p>
+  </section>
+</section>
+<section class="detail" id="doc_to_iolist/1">
+
+  <div class="detail-header">
+    <a href="#doc_to_iolist/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">doc_to_iolist(doc)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Render a full document into an iolist.</p>
+  </section>
+</section>
 <section class="detail" id="escaped_iodata/1">
 
   <div class="detail-header">
@@ -540,6 +602,23 @@ Pages
   <section class="docstring">
 
 <p>Build a top level SVG element.</p>
+  </section>
+</section>
+<section class="detail" id="svg_doc_dimension/1">
+
+  <div class="detail-header">
+    <a href="#svg_doc_dimension/1" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">svg_doc_dimension(dim)</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+
   </section>
 </section>
 <section class="detail" id="text/2">
@@ -694,14 +773,14 @@ It can be used to show properties of the containing element.</p>
 
       </div>
 
-<p>Escapes the given HTML to iodata.</p><pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">Quartz.SVG</span><span class="o">.</span><span class="n">xml_escape_to_iodata</span><span class="p" data-group-id="2440193096-1">(</span><span class="s">&quot;foo&quot;</span><span class="p" data-group-id="2440193096-1">)</span><span class="w">
-</span><span class="p" data-group-id="2440193096-2">{</span><span class="ss">:escaped_iodata</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="p" data-group-id="2440193096-2">}</span><span class="w">
+<p>Escapes the given HTML to iodata.</p><pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">Quartz.SVG</span><span class="o">.</span><span class="n">xml_escape_to_iodata</span><span class="p" data-group-id="7787587660-1">(</span><span class="s">&quot;foo&quot;</span><span class="p" data-group-id="7787587660-1">)</span><span class="w">
+</span><span class="p" data-group-id="7787587660-2">{</span><span class="ss">:escaped_iodata</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="p" data-group-id="7787587660-2">}</span><span class="w">
 
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">Quartz.SVG</span><span class="o">.</span><span class="n">xml_escape_to_iodata</span><span class="p" data-group-id="2440193096-3">(</span><span class="s">&quot;&lt;foo&gt;&quot;</span><span class="p" data-group-id="2440193096-3">)</span><span class="w">
-</span><span class="p" data-group-id="2440193096-4">{</span><span class="ss">:escaped_iodata</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="2440193096-5">[</span><span class="p" data-group-id="2440193096-6">[</span><span class="p" data-group-id="2440193096-7">[</span><span class="p" data-group-id="2440193096-7">]</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;&amp;lt;&quot;</span><span class="p" data-group-id="2440193096-6">]</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;&amp;gt;&quot;</span><span class="p" data-group-id="2440193096-5">]</span><span class="p" data-group-id="2440193096-4">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Quartz.SVG</span><span class="o">.</span><span class="n">xml_escape_to_iodata</span><span class="p" data-group-id="7787587660-3">(</span><span class="s">&quot;&lt;foo&gt;&quot;</span><span class="p" data-group-id="7787587660-3">)</span><span class="w">
+</span><span class="p" data-group-id="7787587660-4">{</span><span class="ss">:escaped_iodata</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7787587660-5">[</span><span class="p" data-group-id="7787587660-6">[</span><span class="p" data-group-id="7787587660-7">[</span><span class="p" data-group-id="7787587660-7">]</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;&amp;lt;&quot;</span><span class="p" data-group-id="7787587660-6">]</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;&amp;gt;&quot;</span><span class="p" data-group-id="7787587660-5">]</span><span class="p" data-group-id="7787587660-4">}</span><span class="w">
 
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">Quartz.SVG</span><span class="o">.</span><span class="n">xml_escape_to_iodata</span><span class="p" data-group-id="2440193096-8">(</span><span class="s">&quot;quotes: </span><span class="se">\&quot;</span><span class="s"> &amp; </span><span class="se">\&#39;</span><span class="s">&quot;</span><span class="p" data-group-id="2440193096-8">)</span><span class="w">
-</span><span class="p" data-group-id="2440193096-9">{</span><span class="ss">:escaped_iodata</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="2440193096-10">[</span><span class="p" data-group-id="2440193096-11">[</span><span class="p" data-group-id="2440193096-12">[</span><span class="p" data-group-id="2440193096-13">[</span><span class="p" data-group-id="2440193096-13">]</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;quotes: &quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;&amp;quot;&quot;</span><span class="p" data-group-id="2440193096-12">]</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;&amp;amp;&quot;</span><span class="p" data-group-id="2440193096-11">]</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;&amp;#39;&quot;</span><span class="p" data-group-id="2440193096-10">]</span><span class="p" data-group-id="2440193096-9">}</span></code></pre>
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Quartz.SVG</span><span class="o">.</span><span class="n">xml_escape_to_iodata</span><span class="p" data-group-id="7787587660-8">(</span><span class="s">&quot;quotes: </span><span class="se">\&quot;</span><span class="s"> &amp; </span><span class="se">\&#39;</span><span class="s">&quot;</span><span class="p" data-group-id="7787587660-8">)</span><span class="w">
+</span><span class="p" data-group-id="7787587660-9">{</span><span class="ss">:escaped_iodata</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7787587660-10">[</span><span class="p" data-group-id="7787587660-11">[</span><span class="p" data-group-id="7787587660-12">[</span><span class="p" data-group-id="7787587660-13">[</span><span class="p" data-group-id="7787587660-13">]</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;quotes: &quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;&amp;quot;&quot;</span><span class="p" data-group-id="7787587660-12">]</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;&amp;amp;&quot;</span><span class="p" data-group-id="7787587660-11">]</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;&amp;#39;&quot;</span><span class="p" data-group-id="7787587660-10">]</span><span class="p" data-group-id="7787587660-9">}</span></code></pre>
   </section>
 </section>
 

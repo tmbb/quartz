@@ -14,7 +14,7 @@
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
     <script src="dist/handlebars.templates-K7URE6B4.js"></script>
-    <script src="dist/sidebar_items-298D1EC2.js"></script>
+    <script src="dist/sidebar_items-E031779F.js"></script>
     <script src="docs_config.js"></script>
     <script async src="dist/html-YIPIRHGU.js"></script>
 
@@ -119,17 +119,7 @@ Pages
 
 
     <section id="moduledoc">
-<p>Units of measurement for lengths.</p><h2 id="module-implementation-note" class="section-heading">
-  <a href="#module-implementation-note" class="hover-link">
-    <i class="ri-link-m" aria-hidden="true"></i>
-  </a>
-  <span class="text">Implementation note</span>
-</h2>
-<p>In Quartz, all lengths are represented in points (pt)
-as floating point values. They are unitless.
-The functions in this module return unitless values
-in points by applying the proper conversion factor
-to their arguments.</p>
+<p>Units of measurement for lengths.</p>
     </section>
 
 </div>
@@ -152,21 +142,27 @@ to their arguments.</p>
 
       </div>
 
-    </div>
-
-    <div class="summary-row">
-      <div class="summary-signature">
-        <a href="#cm/1" data-no-tooltip translate="no">cm(value)</a>
-
-      </div>
+        <div class="summary-synopsis"><p>A value that represents a fraction of the length of an axis (margins included).</p></div>
 
     </div>
 
     <div class="summary-row">
       <div class="summary-signature">
-        <a href="#cm_to_pt_conversion_factor/0" data-no-tooltip translate="no">cm_to_pt_conversion_factor()</a>
+        <a href="#cm/1" data-no-tooltip translate="no">cm(value \\ 1.0)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Length in mm (1in = 2.54cm).</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#cm_to_px_conversion_factor/0" data-no-tooltip translate="no">cm_to_px_conversion_factor()</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>The factor that converts inches to SVG pixels (4/3 ≅ 1.333).</p></div>
 
     </div>
 
@@ -182,41 +178,61 @@ to their arguments.</p>
 
     <div class="summary-row">
       <div class="summary-signature">
-        <a href="#inch/1" data-no-tooltip translate="no">inch(value)</a>
+        <a href="#inch/1" data-no-tooltip translate="no">inch(value \\ 1.0)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Length in inches.</p></div>
 
     </div>
 
     <div class="summary-row">
       <div class="summary-signature">
-        <a href="#inch_to_pt_conversion_factor/0" data-no-tooltip translate="no">inch_to_pt_conversion_factor()</a>
+        <a href="#inch_to_px_conversion_factor/0" data-no-tooltip translate="no">inch_to_px_conversion_factor()</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>The factor that converts inches to SVG pixels (96).</p></div>
 
     </div>
 
     <div class="summary-row">
       <div class="summary-signature">
-        <a href="#mm/1" data-no-tooltip translate="no">mm(value)</a>
+        <a href="#mm/1" data-no-tooltip translate="no">mm(value \\ 1.0)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Length in mm (1 in = 254 pt).</p></div>
 
     </div>
 
     <div class="summary-row">
       <div class="summary-signature">
-        <a href="#mm_to_pt_conversion_factor/0" data-no-tooltip translate="no">mm_to_pt_conversion_factor()</a>
+        <a href="#mm_to_px_conversion_factor/0" data-no-tooltip translate="no">mm_to_px_conversion_factor()</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>The factor that converts millimiters to SVG pixels (3.7795).</p></div>
 
     </div>
 
     <div class="summary-row">
       <div class="summary-signature">
-        <a href="#pt/1" data-no-tooltip translate="no">pt(value)</a>
+        <a href="#pt/1" data-no-tooltip translate="no">pt(value \\ 1.0)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Length in points (1 in = 96 pt).</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#pt_to_px_conversion_factor/0" data-no-tooltip translate="no">pt_to_px_conversion_factor()</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>The factor that converts points to SVG pixels (1.3333333333333333).</p></div>
 
     </div>
 
@@ -249,41 +265,54 @@ to their arguments.</p>
 
   <section class="docstring">
 
-
+<p>A value that represents a fraction of the length of an axis (margins included).</p><p>The value can be any real number, even though real numbers not between 0 an 1
+won't be very useful in practice.</p><p>Takes the optional keyword argument <code class="inline">:axis</code>, which must be an axis from a plot
+(not only an axis name). If the axis is not given, some functinos that accept
+axis fractions can infer it from the context.</p>
   </section>
 </section>
 <section class="detail" id="cm/1">
+
+    <span id="cm/0"></span>
 
   <div class="detail-header">
     <a href="#cm/1" class="detail-link" data-no-tooltip title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">cm(value)</h1>
+    <h1 class="signature" translate="no">cm(value \\ 1.0)</h1>
 
 
   </div>
 
   <section class="docstring">
 
-
+<p>Length in mm (1in = 2.54cm).</p>
   </section>
 </section>
-<section class="detail" id="cm_to_pt_conversion_factor/0">
+<section class="detail" id="cm_to_px_conversion_factor/0">
 
   <div class="detail-header">
-    <a href="#cm_to_pt_conversion_factor/0" class="detail-link" data-no-tooltip title="Link to this function">
+    <a href="#cm_to_px_conversion_factor/0" class="detail-link" data-no-tooltip title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">cm_to_pt_conversion_factor()</h1>
+    <h1 class="signature" translate="no">cm_to_px_conversion_factor()</h1>
 
 
   </div>
 
   <section class="docstring">
 
+      <div class="specs">
 
+          <pre translate="no"><span class="attribute">@spec</span> cm_to_px_conversion_factor() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()</pre>
+
+      </div>
+
+<p>The factor that converts inches to SVG pixels (4/3 ≅ 1.333).</p><p>As a user, you probably won't have to use these conversion functions,
+but they can be useful as reference.</p><blockquote><h4 class="info">Note</h4><p><em>Note</em>: SVG pixels (px) are not real pixels on the screen.
+The definition of an SVG pixel is much more complicated.</p></blockquote>
   </section>
 </section>
 <section class="detail" id="data/2">
@@ -307,87 +336,152 @@ to their arguments.</p>
 </section>
 <section class="detail" id="inch/1">
 
+    <span id="inch/0"></span>
+
   <div class="detail-header">
     <a href="#inch/1" class="detail-link" data-no-tooltip title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">inch(value)</h1>
+    <h1 class="signature" translate="no">inch(value \\ 1.0)</h1>
 
 
   </div>
 
   <section class="docstring">
 
+      <div class="specs">
 
+          <pre translate="no"><span class="attribute">@spec</span> inch(<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()) :: <a href="https://hexdocs.pm/dantzig/0.1.0/Dantzig.Polynomial.html#t:t/0">Dantzig.Polynomial.t</a>()</pre>
+
+      </div>
+
+<p>Length in inches.</p>
   </section>
 </section>
-<section class="detail" id="inch_to_pt_conversion_factor/0">
+<section class="detail" id="inch_to_px_conversion_factor/0">
 
   <div class="detail-header">
-    <a href="#inch_to_pt_conversion_factor/0" class="detail-link" data-no-tooltip title="Link to this function">
+    <a href="#inch_to_px_conversion_factor/0" class="detail-link" data-no-tooltip title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">inch_to_pt_conversion_factor()</h1>
+    <h1 class="signature" translate="no">inch_to_px_conversion_factor()</h1>
 
 
   </div>
 
   <section class="docstring">
 
+      <div class="specs">
 
+          <pre translate="no"><span class="attribute">@spec</span> inch_to_px_conversion_factor() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()</pre>
+
+      </div>
+
+<p>The factor that converts inches to SVG pixels (96).</p><p>As a user, you probably won't have to use these conversion functions,
+but they can be useful as reference.</p><blockquote><h4 class="info">Note</h4><p><em>Note</em>: SVG pixels (px) are not real pixels on the screen.
+The definition of an SVG pixel is much more complicated.</p></blockquote>
   </section>
 </section>
 <section class="detail" id="mm/1">
+
+    <span id="mm/0"></span>
 
   <div class="detail-header">
     <a href="#mm/1" class="detail-link" data-no-tooltip title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">mm(value)</h1>
+    <h1 class="signature" translate="no">mm(value \\ 1.0)</h1>
 
 
   </div>
 
   <section class="docstring">
 
+      <div class="specs">
 
+          <pre translate="no"><span class="attribute">@spec</span> mm(<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()) :: <a href="https://hexdocs.pm/dantzig/0.1.0/Dantzig.Polynomial.html#t:t/0">Dantzig.Polynomial.t</a>()</pre>
+
+      </div>
+
+<p>Length in mm (1 in = 254 pt).</p>
   </section>
 </section>
-<section class="detail" id="mm_to_pt_conversion_factor/0">
+<section class="detail" id="mm_to_px_conversion_factor/0">
 
   <div class="detail-header">
-    <a href="#mm_to_pt_conversion_factor/0" class="detail-link" data-no-tooltip title="Link to this function">
+    <a href="#mm_to_px_conversion_factor/0" class="detail-link" data-no-tooltip title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">mm_to_pt_conversion_factor()</h1>
+    <h1 class="signature" translate="no">mm_to_px_conversion_factor()</h1>
 
 
   </div>
 
   <section class="docstring">
 
+      <div class="specs">
 
+          <pre translate="no"><span class="attribute">@spec</span> mm_to_px_conversion_factor() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()</pre>
+
+      </div>
+
+<p>The factor that converts millimiters to SVG pixels (3.7795).</p><p>As a user, you probably won't have to use these conversion functions,
+but they can be useful as reference.</p><blockquote><h4 class="info">Note</h4><p><em>Note</em>: SVG pixels (px) are not real pixels on the screen.
+The definition of an SVG pixel is much more complicated.</p></blockquote>
   </section>
 </section>
 <section class="detail" id="pt/1">
+
+    <span id="pt/0"></span>
 
   <div class="detail-header">
     <a href="#pt/1" class="detail-link" data-no-tooltip title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">pt(value)</h1>
+    <h1 class="signature" translate="no">pt(value \\ 1.0)</h1>
 
 
   </div>
 
   <section class="docstring">
 
+      <div class="specs">
 
+          <pre translate="no"><span class="attribute">@spec</span> pt(<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()) :: <a href="https://hexdocs.pm/dantzig/0.1.0/Dantzig.Polynomial.html#t:t/0">Dantzig.Polynomial.t</a>()</pre>
+
+      </div>
+
+<p>Length in points (1 in = 96 pt).</p>
+  </section>
+</section>
+<section class="detail" id="pt_to_px_conversion_factor/0">
+
+  <div class="detail-header">
+    <a href="#pt_to_px_conversion_factor/0" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">pt_to_px_conversion_factor()</h1>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> pt_to_px_conversion_factor() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()</pre>
+
+      </div>
+
+<p>The factor that converts points to SVG pixels (1.3333333333333333).</p><p>As a user, you probably won't have to use these conversion functions,
+but they can be useful as reference.</p><blockquote><h4 class="info">Note</h4><p><em>Note</em>: SVG pixels (px) are not real pixels on the screen.
+The definition of an SVG pixel is much more complicated.</p></blockquote>
   </section>
 </section>
 
