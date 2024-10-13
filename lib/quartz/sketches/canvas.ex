@@ -14,6 +14,7 @@ defmodule Quartz.Canvas do
             height: nil,
             debug: false,
             debug_properties: nil,
+            z_index: -50,
             contents: nil
 
   def new(opts \\ []) do
@@ -71,7 +72,8 @@ defmodule Quartz.Canvas do
         x_min: canvas.x,
         x_max: Polynomial.algebra(canvas.x + canvas.width),
         y_min: canvas.y,
-        y_max: Polynomial.algebra(canvas.y + canvas.height)
+        y_max: Polynomial.algebra(canvas.y + canvas.height),
+        baseline: Polynomial.algebra(canvas.y + canvas.height)
       }
     end
 
@@ -132,9 +134,9 @@ defmodule Quartz.Canvas do
 
         tooltip_text = [
           "Canvas [#{canvas.id}] #{canvas.prefix} &#13;",
-          "&#160;↳&#160;x = #{Formatter.rounded_float(canvas.x, 2)}pt&#13;",
-          "&#160;↳&#160;y = #{Formatter.rounded_float(canvas.y, 2)}pt&#13;",
-          "&#160;↳&#160;width = #{Formatter.rounded_float(canvas.width, 2)}pt&#13;",
+          "&#160;↳&#160;x = #{Formatter.rounded_float(canvas.x, 2)}px&#13;",
+          "&#160;↳&#160;y = #{Formatter.rounded_float(canvas.y, 2)}px&#13;",
+          "&#160;↳&#160;width = #{Formatter.rounded_float(canvas.width, 2)}px&#13;",
           "&#160;↳&#160;height = #{Formatter.rounded_float(canvas.height, 2)}pt"
         ]
 
@@ -144,6 +146,11 @@ defmodule Quartz.Canvas do
       else
         SVG.g([id: canvas.id], [])
       end
+    end
+
+    @impl true
+    def assign_measurements_from_resvg_node(canvas, _resvg_node) do
+      canvas
     end
   end
 end

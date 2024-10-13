@@ -10,7 +10,7 @@ defmodule Quartz.Config do
 
   defstruct text_font: "Ubuntu",
             text_style: nil,
-            text_weight: "regular",
+            text_weight: "normal",
             text_stretch: nil,
             text_size: 9,
             text_fill: "black",
@@ -27,7 +27,7 @@ defmodule Quartz.Config do
             math_font: "Linux Libertine",
             math_style: nil,
             math_weight: nil,
-            math_size: nil,
+            math_size: "120%",
             math_fill: nil,
             # Title attributes
             plot_title_font: nil,
@@ -169,10 +169,17 @@ defmodule Quartz.Config do
             debug_board_stroke_dash_array: nil,
             debug_board_fill: RGB.white(0),
             # Text
-            debug_text_stroke: RGB.red(),
-            debug_text_stroke_width: Length.pt(0.3),
-            debug_text_stroke_dash_array: nil,
-            debug_text_fill: RGB.white(0)
+            debug_text_height_stroke: RGB.red(),
+            debug_text_height_stroke_width: Length.pt(0.3),
+            debug_text_height_stroke_dash_array: "2 2",
+            debug_text_height_fill: RGB.pink(0.3),
+            debug_text_baseline_stroke: RGB.red(),
+            debug_text_baseline_stroke_width: Length.pt(0.3),
+            debug_text_baseline_stroke_dash_array: nil,
+            debug_text_depth_stroke: RGB.red(),
+            debug_text_depth_stroke_width: Length.pt(0.3),
+            debug_text_depth_stroke_dash_array: "2 2",
+            debug_text_depth_fill: RGB.purple(0.1)
 
   @doc """
   TODO: Document this.
@@ -232,10 +239,17 @@ defmodule Quartz.Config do
     config = get_config()
 
     %TextDebugProperties{
-      fill: config.debug_text_fill,
-      stroke: config.debug_text_stroke,
-      stroke_width: config.debug_text_stroke_width,
-      stroke_dash_array: config.debug_text_stroke_dash_array
+      height_fill: config.debug_text_height_fill,
+      height_stroke: config.debug_text_height_stroke,
+      height_stroke_width: config.debug_text_height_stroke_width,
+      height_stroke_dash_array: config.debug_text_height_stroke_dash_array,
+      depth_fill: config.debug_text_depth_fill,
+      depth_stroke: config.debug_text_depth_stroke,
+      depth_stroke_width: config.debug_text_depth_stroke_width,
+      depth_stroke_dash_array: config.debug_text_depth_stroke_dash_array,
+      baseline_stroke: config.debug_text_baseline_stroke,
+      baseline_stroke_width: config.debug_text_baseline_stroke_width,
+      baseline_stroke_dash_array: config.debug_text_baseline_stroke_dash_array
     }
   end
 

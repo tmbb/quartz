@@ -7,7 +7,8 @@ defmodule Quartz.Sketch.BBoxBounds do
   defstruct x_min: nil,
             x_max: nil,
             y_min: nil,
-            y_max: nil
+            y_max: nil,
+            baseline: nil
 
   def new(arguments) do
     # Make sure all arguments are given

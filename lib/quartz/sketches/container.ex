@@ -1,7 +1,7 @@
 defmodule Quartz.Container do
   @moduledoc false
 
-  alias Quartz.Figure
+  require Quartz.Figure, as: Figure
   alias Quartz.Sketch
   alias Quartz.Variable
   alias Quartz.Length
@@ -20,7 +20,8 @@ defmodule Quartz.Container do
             width: nil,
             height: nil,
             stroke: nil,
-            contents: nil
+            contents: nil,
+            z_index: -10.0
 
   def new(opts \\ []) do
     prefix = Keyword.get(opts, :prefix, nil)
@@ -85,7 +86,8 @@ defmodule Quartz.Container do
         x_min: container.x,
         x_max: container.x + container.width,
         y_min: container.y,
-        y_max: container.y + container.height
+        y_max: container.y + container.height,
+        baseline: container.y + container.height
       }
     end
 
@@ -133,6 +135,17 @@ defmodule Quartz.Container do
       else
         SVG.g([id: container.id], [])
       end
+    end
+
+    @impl true
+    def assign_measurements_from_resvg_node(container, resvg_node) do
+      height = resvg_node.height
+      width = resvg_node.width
+
+      Figure.assert(container.width == width)
+      Figure.assert(container.height == height)
+
+      container
     end
   end
 end

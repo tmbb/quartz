@@ -1,5 +1,5 @@
 defmodule Quartz.LinearPath do
-  alias Quartz.Figure
+  require Quartz.Figure, as: Figure
   alias Quartz.Sketch
   alias Quartz.SVG
   alias Quartz.Color.RGB
@@ -19,7 +19,8 @@ defmodule Quartz.LinearPath do
             stroke_dash: nil,
             stroke_opacity: nil,
             debug: nil,
-            debug_properties: nil
+            debug_properties: nil,
+            z_index: 1.0
 
   def new(opts \\ []) do
     KeywordSpec.validate!(opts,
@@ -78,7 +79,8 @@ defmodule Quartz.LinearPath do
         x_min: nil,
         x_max: nil,
         y_min: nil,
-        y_max: nil
+        y_max: nil,
+        baseline: nil
       }
     end
 
@@ -145,7 +147,7 @@ defmodule Quartz.LinearPath do
           "&#160;&#160;opacity: #{path.opacity}&#13;",
           "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&#13;",
           "&#160;&#160;stroke: #{pprint_color(path.stroke_paint)}&#13;",
-          "&#160;&#160;stroke-width: #{path.stroke_thickness}pt&#13;",
+          "&#160;&#160;stroke-width: #{path.stroke_thickness}px&#13;",
           "&#160;&#160;stroke-join: #{path.stroke_join}&#13;",
           "&#160;&#160;stroke-cap: #{path.stroke_cap}&#13;"
         ]
@@ -156,6 +158,17 @@ defmodule Quartz.LinearPath do
       else
         SVG.path(common_attributes)
       end
+    end
+
+    @impl true
+    def assign_measurements_from_resvg_node(linear_path, resvg_node) do
+      height = - resvg_node.height
+      width = resvg_node.width
+
+      Figure.assert(linear_path.width == width)
+      Figure.assert(linear_path.height == height)
+
+      linear_path
     end
 
     defp pprint_color(color) when is_binary(color), do: color

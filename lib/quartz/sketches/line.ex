@@ -19,7 +19,8 @@ defmodule Quartz.Line do
             stroke_join: nil,
             stroke_dash: nil,
             debug: false,
-            debug_properties: nil
+            debug_properties: nil,
+            z_index: 1.0
 
   def new(opts \\ []) do
     KeywordSpec.validate!(opts, [
@@ -126,10 +127,10 @@ defmodule Quartz.Line do
       if line.debug do
         tooltip_text = [
           "Line [#{line.id}] #{line.prefix} &#13;",
-          "&#160;↳&#160;x1 = #{pprint(line.x1)}pt&#13;",
-          "&#160;↳&#160;y1 = #{pprint(line.y1)}pt&#13;",
-          "&#160;↳&#160;x2 = #{pprint(line.x2)}pt&#13;",
-          "&#160;↳&#160;y2 = #{pprint(line.y2)}pt&#13;&#13;"
+          "&#160;↳&#160;x1 = #{pprint(line.x1)}px&#13;",
+          "&#160;↳&#160;y1 = #{pprint(line.y1)}px&#13;",
+          "&#160;↳&#160;x2 = #{pprint(line.x2)}px&#13;",
+          "&#160;↳&#160;y2 = #{pprint(line.y2)}px&#13;&#13;"
         ]
 
         SVG.line(common_attributes, [
@@ -138,6 +139,11 @@ defmodule Quartz.Line do
       else
         SVG.line(common_attributes)
       end
+    end
+
+    @impl true
+    def assign_measurements_from_resvg_node(line, _resvg_node) do
+      line
     end
 
     defp pprint(number) when is_number(number) do

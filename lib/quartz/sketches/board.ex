@@ -17,6 +17,7 @@ defmodule Quartz.Board do
             prefix: nil,
             debug: nil,
             debug_properties: nil,
+            z_index: -100,
             panels: []
 
   def new(attrs) do
@@ -33,8 +34,8 @@ defmodule Quartz.Board do
     minimize_width = not maximize_width
     minimize_height = not maximize_height
 
-    board_width = Figure.variable("board_width")
-    board_height = Figure.variable("board_height")
+    board_width = Figure.variable("board_width", min: 0)
+    board_height = Figure.variable("board_height", min: 0)
 
     if minimize_width do
       Figure.assert(board_width >= width)
@@ -182,7 +183,8 @@ defmodule Quartz.Board do
         x_min: board.x,
         x_max: Polynomial.algebra(board.x + board.width),
         y_min: board.y,
-        y_max: Polynomial.algebra(board.y + board.height)
+        y_max: Polynomial.algebra(board.y + board.height),
+        baseline: Polynomial.algebra(board.y + board.height)
       }
     end
 
@@ -221,6 +223,11 @@ defmodule Quartz.Board do
     end
 
     @impl true
+    def assign_measurements_from_resvg_node(board, _resvg_node) do
+      board
+    end
+
+    @impl true
     def to_unpositioned_svg(board) do
       to_svg(board)
     end
@@ -243,9 +250,9 @@ defmodule Quartz.Board do
 
         tooltip_text = [
           "Board [#{board.id}] #{board.prefix} &#13;",
-          "&#160;↳&#160;x = #{Formatter.rounded_float(board.x, 2)}pt&#13;",
-          "&#160;↳&#160;y = #{Formatter.rounded_float(board.y, 2)}pt&#13;",
-          "&#160;↳&#160;width = #{Formatter.rounded_float(board.width, 2)}pt&#13;",
+          "&#160;↳&#160;x = #{Formatter.rounded_float(board.x, 2)}px&#13;",
+          "&#160;↳&#160;y = #{Formatter.rounded_float(board.y, 2)}px&#13;",
+          "&#160;↳&#160;width = #{Formatter.rounded_float(board.width, 2)}px&#13;",
           "&#160;↳&#160;height = #{Formatter.rounded_float(board.height, 2)}pt"
         ]
 

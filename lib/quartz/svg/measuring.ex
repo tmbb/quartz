@@ -4,7 +4,6 @@ defmodule Quartz.SVG.Measuring do
   alias Quartz.SVG
   alias Quartz.Sketch
   alias Quartz.Utilities
-  alias Quartz.Text
 
   require Logger
 
@@ -21,8 +20,8 @@ defmodule Quartz.SVG.Measuring do
     end
 
     svg_elements = Enum.map(sketches, &Sketch.to_unpositioned_svg/1)
-    svg = SVG.svg([width: 72, height: 72, viewBox: "0 0 72 72"], svg_elements)
-    contents = SVG.to_iodata(svg)
+    svg = SVG.svg([width: 1, height: 1], svg_elements)
+    contents = SVG.doc_to_iolist(svg)
 
     Utilities.with_tmp_file!("-MEASUREMENT.svg", fn tmp_path ->
       # Write the generated SVG file
@@ -45,23 +44,13 @@ defmodule Quartz.SVG.Measuring do
           # and this is why we need to create the quartz_sketches map withn string ids.
           sketch = Map.fetch!(quartz_sketches, resvg_node.id)
           # Add height and width to the current sketch
-          new_sketch = measure_sketch(sketch, resvg_node)
+          new_sketch = Sketch.assign_measurements_from_resvg_node(sketch, resvg_node)
+
           {sketch.id, new_sketch}
         end
 
       # Return the measured sketches
       measured_sketches
     end)
-  end
-
-  def measure_sketch(%Text{} = text, resvg_node) do
-    height = -resvg_node.y
-    depth = resvg_node.height + resvg_node.y
-
-    %{text | width: resvg_node.width, depth: depth, height: height}
-  end
-
-  def measure_sketch(sketch, resvg_node) do
-    %{sketch | width: resvg_node.width, height: resvg_node.height}
   end
 end

@@ -88,7 +88,8 @@ defmodule Quartz.Text.Tspan do
         x_min: 0,
         x_max: 0,
         y_min: 0,
-        y_max: 0
+        y_max: 0,
+        baseline: 0
       }
     end
 
@@ -112,6 +113,11 @@ defmodule Quartz.Text.Tspan do
         end
 
       %{tspan | debug_properties: debug_properties}
+    end
+
+    @impl true
+    def assign_measurements_from_resvg_node(tspan, _resvg_node) do
+      tspan
     end
 
     @impl true
@@ -146,23 +152,5 @@ defmodule Quartz.Text.Tspan do
       # have to handle the width better.
       to_svg(%{tspan | debug: false})
     end
-
-    # defp pprint(number) when is_number(number) do
-    #   # Round to two decimal places
-    #   Formatter.rounded_float(number, 2)
-    # end
-
-    # defp debug_rect_svg_properties(tspan) do
-    #   geom_properties = [
-    #     x: tspan.x,
-    #     y: tspan.y - tspan.height,
-    #     width: tspan.width,
-    #     height: tspan.height
-    #   ]
-
-    #   style_properties = TextDebugProperties.to_svg_attributes(tspan.debug_properties)
-
-    #   geom_properties ++ style_properties
-    # end
   end
 end

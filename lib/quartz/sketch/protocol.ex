@@ -18,4 +18,7 @@ defprotocol Quartz.Sketch.Protocol do
 
   @spec to_svg(t()) :: any()
   def to_svg(obj)
+
+  @spec assign_measurements_from_resvg_node(t(), %Resvg.Native.Node{}) :: t()
+  def assign_measurements_from_resvg_node(obj, resvg_node)
 end

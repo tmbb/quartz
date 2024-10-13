@@ -1,7 +1,6 @@
 defmodule Quartz.Rectangle do
-  alias Quartz.Figure
+  require Quartz.Figure, as: Figure
   alias Quartz.Sketch
-  alias Quartz.Variable
   alias Quartz.SVG
   require Quartz.KeywordSpec, as: KeywordSpec
 
@@ -19,10 +18,17 @@ defmodule Quartz.Rectangle do
             stroke_join: nil,
             stroke_dash: nil,
             stroke_opacity: nil,
-            debug: false
+            debug: false,
+            z_index: 1.0
 
   def new(opts \\ []) do
     KeywordSpec.validate!(opts,
+      id: Figure.get_id(),
+      debug: Figure.debug?(),
+      x: nil,
+      y: nil,
+      height: nil,
+      width: nil,
       prefix: nil,
       fill: nil,
       opacity: 1,
@@ -34,39 +40,25 @@ defmodule Quartz.Rectangle do
       stroke_opacity: nil
     )
 
-    # Assign variables (= Dantzig monomials) to the parameters of the rectangle
-    x =
-      Variable.maybe_variable(opts, :x, Variable.maybe_with_prefix(prefix, "rectangle_x"), min: 0)
 
-    y =
-      Variable.maybe_variable(opts, :y, Variable.maybe_with_prefix(prefix, "rectangle_y"), min: 0)
+    rect_x = Figure.variable("rectangle_x", min: 0, prefix: prefix)
+    rect_y = Figure.variable("rectangle_y", min: 0, prefix: prefix)
+    rect_height = Figure.variable("rectangle_height", min: 0, prefix: prefix)
+    rect_width = Figure.variable("rectanle_width", min: 0, prefix: prefix)
 
-    height =
-      Variable.maybe_variable(
-        opts,
-        :height,
-        Variable.maybe_with_prefix(prefix, "rectangle_height"),
-        min: 0
-      )
-
-    width =
-      Variable.maybe_variable(opts, :width, Variable.maybe_with_prefix(prefix, "rectangle_width"),
-        min: 0
-      )
-
-    # Get the next available ID from the figure
-    id = Figure.get_id()
-
-    debug = Figure.debug?()
+    if rect_x, do: Figure.assert(rect_height == x)
+    if rect_y, do: Figure.assert(rect_width == y)
+    if rect_height, do: Figure.assert(rect_height == height)
+    if rect_width, do: Figure.assert(rect_width == width)
 
     # Create the actual rectangle
     rectangle = %__MODULE__{
       id: id,
-      x: x,
-      y: y,
+      x: rect_x,
+      y: rect_y,
       prefix: prefix,
-      height: height,
-      width: width,
+      height: rect_height,
+      width: rect_width,
       fill: fill,
       opacity: opacity,
       stroke_join: stroke_join,
@@ -98,7 +90,8 @@ defmodule Quartz.Rectangle do
         x_min: rectangle.x,
         x_max: Polynomial.algebra(rectangle.x + rectangle.width),
         y_min: rectangle.y,
-        y_max: Polynomial.algebra(rectangle.y + rectangle.height)
+        y_max: Polynomial.algebra(rectangle.y + rectangle.height),
+        baseline: Polynomial.algebra(rectangle.y + rectangle.height)
       }
     end
 
@@ -149,9 +142,9 @@ defmodule Quartz.Rectangle do
       if rectangle.debug do
         tooltip_text = [
           "rectangle [#{rectangle.id}] #{rectangle.prefix} &#13;",
-          "&#160;↳&#160;x = #{Formatter.rounded_float(rectangle.x, 2)}pt&#13;",
-          "&#160;↳&#160;y = #{Formatter.rounded_float(rectangle.y, 2)}pt&#13;",
-          "&#160;↳&#160;width = #{Formatter.rounded_float(rectangle.width, 2)}pt&#13;",
+          "&#160;↳&#160;x = #{Formatter.rounded_float(rectangle.x, 2)}px&#13;",
+          "&#160;↳&#160;y = #{Formatter.rounded_float(rectangle.y, 2)}px&#13;",
+          "&#160;↳&#160;width = #{Formatter.rounded_float(rectangle.width, 2)}px&#13;",
           "&#160;↳&#160;height = #{Formatter.rounded_float(rectangle.height, 2)}pt"
         ]
 
@@ -161,6 +154,11 @@ defmodule Quartz.Rectangle do
       else
         SVG.rect(rect_attrs, [])
       end
+    end
+
+    @impl true
+    def assign_measurements_from_resvg_node(rectangle, _resvg_node) do
+      rectangle
     end
   end
 end

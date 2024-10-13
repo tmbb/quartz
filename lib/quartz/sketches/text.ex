@@ -59,16 +59,19 @@ defmodule Quartz.Text do
             baseline_shift: nil,
             prefix: nil,
             debug: false,
-            debug_properties: nil
+            debug_properties: nil,
+            z_index: 1.0
 
   @doc """
   Create a text element.
   """
   def new(content, opts \\ []) do
     KeywordSpec.validate!(opts,
+      id: Figure.get_id(),
       prefix: nil,
       x: nil,
-      y: nil
+      y: nil,
+      debug: Figure.debug?()
     )
 
     content = List.wrap(content)
@@ -83,9 +86,6 @@ defmodule Quartz.Text do
     if y, do: Figure.assert(text_y == y)
 
     # Get the next available ID from the figure
-    id = Figure.get_id()
-
-    debug = Figure.debug?()
     debug_properties = if debug, do: Config.get_text_debug_properties(), else: nil
 
     all_opts =
@@ -121,7 +121,7 @@ defmodule Quartz.Text do
     new_attrs =
       attrs
       |> Keyword.put(:size, "65%")
-      |> Keyword.put(:baseline_shift, "-0.30em")
+      |> Keyword.put(:baseline_shift, "-0.50em")
 
     Tspan.new(content, new_attrs)
   end
@@ -131,7 +131,7 @@ defmodule Quartz.Text do
       attrs
       |> Keyword.put(:size, "65%")
       |> Keyword.put(:dx, "0.1em")
-      |> Keyword.put(:baseline_shift, "0.50em")
+      |> Keyword.put(:baseline_shift, "0.65em")
 
     Tspan.new(content, new_attrs)
   end
@@ -146,7 +146,8 @@ defmodule Quartz.Text do
         x_min: text.x,
         x_max: Polynomial.algebra(text.x + text.width),
         y_min: Polynomial.algebra(text.y - text.height),
-        y_max: Polynomial.algebra(text.y + text.depth)
+        y_max: Polynomial.algebra(text.y + text.depth),
+        baseline: text.y
       }
     end
 
@@ -168,7 +169,9 @@ defmodule Quartz.Text do
           %TextDebugProperties{} ->
             %{
               text.debug_properties
-              | stroke_width: fun.(text.debug_properties.stroke_width)
+              | height_stroke_width: fun.(text.debug_properties.height_stroke_width),
+                depth_stroke_width: fun.(text.debug_properties.depth_stroke_width),
+                baseline_stroke_width: fun.(text.debug_properties.baseline_stroke_width),
             }
 
           other ->
@@ -209,25 +212,31 @@ defmodule Quartz.Text do
       if text.debug do
         tooltip_text = [
           "Text [#{text.id}] #{text.prefix} &#13;",
-          "&#160;↳&#160;x = #{pprint(text.x)}pt&#13;",
-          "&#160;↳&#160;y = #{pprint(text.y)}pt&#13;",
-          "&#160;↳&#160;width = #{pprint(text.width)}pt&#13;",
-          "&#160;↳&#160;height = #{pprint(text.height)}pt&#13;",
-          "&#160;↳&#160;depth = #{pprint(text.depth)}pt&#13;&#13;",
+          "&#160;↳&#160;x = #{pprint(text.x)}px&#13;",
+          "&#160;↳&#160;y = #{pprint(text.y)}px&#13;",
+          "&#160;↳&#160;width = #{pprint(text.width)}px&#13;",
+          "&#160;↳&#160;height = #{pprint(text.height)}px&#13;",
+          "&#160;↳&#160;depth = #{pprint(text.depth)}px&#13;&#13;",
           "&#160;&#160;font: #{text.font}&#13;",
           "&#160;&#160;font-weight: #{text.weight}&#13;",
           "&#160;&#160;font-size: #{text.size}&#13;"
         ]
 
-        rect_attrs = debug_rect_svg_properties(text)
+        height_rect_attrs = debug_height_rect_svg_properties(text)
+        depth_rect_attrs = debug_depth_rect_svg_properties(text)
+        baseline_attrs = debug_baseline_svg_properties(text)
 
         # SVG text element with extra debug data
         SVG.g([], [
-          SVG.rect(rect_attrs, []),
-          SVG.text(common_attributes, [
-            SVG.title([], SVG.escaped_iodata(tooltip_text))
-            | Enum.map(text.content, &Sketch.to_svg/1)
-          ])
+          SVG.rect(height_rect_attrs),
+          SVG.rect(depth_rect_attrs),
+          SVG.line(baseline_attrs),
+          SVG.text(common_attributes,
+            [
+              SVG.title([], SVG.escaped_iodata(tooltip_text)) |
+              Enum.map(text.content, &Sketch.to_svg/1)
+            ]
+          )
         ])
       else
         # SVG text element without extra debug data
@@ -238,19 +247,29 @@ defmodule Quartz.Text do
       end
     end
 
-    defp pprint(number) when is_number(number) do
-      # Round to two decimal places
-      Formatter.rounded_float(number, 2)
+    @impl true
+    def assign_measurements_from_resvg_node(text, resvg_node) do
+      height = - resvg_node.y
+      _depth = resvg_node.height + resvg_node.y
+      width = resvg_node.width
+
+      Figure.assert(text.width == width)
+      Figure.assert(text.height == height)
+      Figure.assert(text.depth == 0.0)
+
+      text
     end
 
     @impl true
     def to_unpositioned_svg(text) do
       # TODO: If we ever implement text stretching, we will
       # have to handle the width better.
-      to_svg(%{text | x: 0, y: 0, width: 0, height: 0, depth: 0, rotation: 0, debug: false})
+      to_svg(%{text |
+                x: 0, y: 0, width: nil, height: nil, depth: nil,
+                rotation: nil, debug: false})
     end
 
-    defp debug_rect_svg_properties(text) do
+    defp debug_height_rect_svg_properties(text) do
       geom_properties = [
         x: text.x,
         y: text.y - text.height,
@@ -258,9 +277,40 @@ defmodule Quartz.Text do
         height: text.height
       ]
 
-      style_properties = TextDebugProperties.to_svg_attributes(text.debug_properties)
+      style_properties = TextDebugProperties.to_height_svg_attributes(text.debug_properties)
 
       geom_properties ++ style_properties
+    end
+
+    defp debug_depth_rect_svg_properties(text) do
+      geom_properties = [
+        x: text.x,
+        y: text.y,
+        width: text.width,
+        height: text.depth
+      ]
+
+      style_properties = TextDebugProperties.to_depth_svg_attributes(text.debug_properties)
+
+      geom_properties ++ style_properties
+    end
+
+    defp debug_baseline_svg_properties(text) do
+      geom_properties = [
+        x1: text.x,
+        y1: text.y,
+        x2: text.x + text.width,
+        y2: text.y
+      ]
+
+      style_properties = TextDebugProperties.to_baseline_svg_attributes(text.debug_properties)
+
+      geom_properties ++ style_properties
+    end
+
+    defp pprint(number) when is_number(number) do
+      # Round to two decimal places
+      Formatter.rounded_float(number, 2)
     end
   end
 end

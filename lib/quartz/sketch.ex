@@ -24,6 +24,12 @@ defmodule Quartz.Sketch do
     obj
   end
 
+  @spec bbox_baseline(t()) :: length()
+  def bbox_baseline(obj) do
+    bounds = Protocol.bbox_bounds(obj)
+    bounds.baseline
+  end
+
   @spec bbox_center(t()) :: length()
   def bbox_center(obj) do
     bounds = Protocol.bbox_bounds(obj)
@@ -105,5 +111,10 @@ defmodule Quartz.Sketch do
   @spec lengths(t()) :: list(length())
   def lengths(obj) do
     Protocol.lengths(obj)
+  end
+
+  @spec assign_measurements_from_resvg_node(t(), %Resvg.Native.Node{}) :: t()
+  def assign_measurements_from_resvg_node(obj, resvg_node) do
+    Protocol.assign_measurements_from_resvg_node(obj, resvg_node)
   end
 end

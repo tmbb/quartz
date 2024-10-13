@@ -118,21 +118,6 @@ defmodule Quartz.MathHelpers do
     "OMEGA"
   ]
 
-
-  alias Quartz.Math.UnicodeDatabase
-
-  def dummy() do
-    characters = ~c[ABCDEFGHIJKLMNOPQRSTUVWXYZ]
-    capital_letters = for c <- characters, do: {"CAPITAL #{<<c::utf8>>}", c}
-    small_letters = for c <- characters, do: {"SMALL #{<<c::utf8>>}", c + 32}
-    letters = capital_letters ++ small_letters
-
-    dbg(Enum.into(letters, %{}), limit: :infinity)
-
-    :ok
-  end
-
-
   def long_character_names_for_group(group) do
     case group do
       :latin ->
@@ -225,18 +210,9 @@ defmodule Quartz.MathHelpers do
       end)
 
     for {name, short_name, code} <- Enum.zip([long_names, short_names, codes]) do
-      last_component = name |> String.split(" ") |> Enum.at(-1)
-
-      ascii_equivalent =
-        case last_component do
-          <<c::8>> when c < 256 -> c
-          _other -> nil
-        end
-
       %UnicodeChar{
         name: name,
         short_name: short_name,
-        ascii_equivalent: ascii_equivalent,
         code: code
       }
     end
@@ -265,9 +241,17 @@ defmodule Quartz.MathHelpers do
           |> Kernel.<>("_sketches")
           |> String.to_atom()
 
+        human_category_name =
+          category.unicode
+          |> String.downcase()
+          |> String.capitalize()
+
         quote do
           unquote_splicing(function_definitions)
 
+          @doc """
+          Math characters belonging to the *#{unquote(human_category_name)}* category.
+          """
           @spec unquote(cat_function_name)(Keyword.t()) ::
                   {Quartz.MathHelpers.UnicodeCatergory.t(), Quartz.Sketch.t()}
           def unquote(cat_function_name)(opts \\ []) do

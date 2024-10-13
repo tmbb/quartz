@@ -27,8 +27,7 @@ defmodule Quartz.Demo.Text.MathCharactersChart do
             Panel.new(
               left_index: 3 * col_nr + 2,
               top_index: row_nr,
-              padding: Length.pt(4),
-              padding_right: Length.pt(14)
+              padding: Length.pt(4)
             )
 
           text_attrs =
@@ -81,8 +80,8 @@ defmodule Quartz.Demo.Text.MathCharactersChart do
 
   def draw(dir) do
     figure =
-      Figure.new([height: Length.cm(50), width: Length.cm(16)], fn fig ->
-        opts = [font: "Linux Libertine", size: 14]
+      Figure.new([height: Length.cm(0), width: Length.cm(0)], fn fig ->
+        opts = [size: 14]
 
         data = [
           {Math.mathematical_italic_sketches(opts), 4},
@@ -112,7 +111,6 @@ defmodule Quartz.Demo.Text.MathCharactersChart do
             Figure.assert(Sketch.bbox_top(table) == y_table)
             Figure.assert(Sketch.bbox_left(table) == Length.pt(4))
 
-
             Figure.assert(fig.width >= Sketch.bbox_right(table) + Length.pt(4))
 
             _new_y = algebra(y_table + Sketch.bbox_height(table) + Length.pt(20))
@@ -122,15 +120,5 @@ defmodule Quartz.Demo.Text.MathCharactersChart do
       end)
 
     Demo.example_to_png_and_svg(figure, dir, "math_characters_chart")
-  end
-
-  def run_incendium(dir) do
-    Incendium.run(%{
-      "scatter_plot" => fn -> draw(dir) end
-      },
-      time: 5,
-      memory_time: 3,
-      title: "Scatter plot"
-    )
   end
 end

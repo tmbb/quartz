@@ -85,18 +85,18 @@ defmodule Quartz.Demo do
 
   def draw_demo_plots(demo_dir) do
     # Layout.AspectRatioScatterPlot.draw(demo_dir)
-    Layout.SideBySidePlots.draw(demo_dir)
+    # Layout.SideBySidePlots.draw(demo_dir)
 
-    PairwiseDataPlot.LinePlot.draw(demo_dir)
-    PairwiseDataPlot.ScatterPlot.draw(demo_dir)
+    # PairwiseDataPlot.LinePlot.draw(demo_dir)
+    # PairwiseDataPlot.ScatterPlot.draw(demo_dir)
 
-    DistributionPlot.BoxPlot.draw(demo_dir)
-    DistributionPlot.KDEPlot.draw(demo_dir)
-    DistributionPlot.Histogram.draw(demo_dir)
+    # DistributionPlot.BoxPlot.draw(demo_dir)
+    # DistributionPlot.KDEPlot.draw(demo_dir)
+    # DistributionPlot.Histogram.draw(demo_dir)
 
-    Miscelaneous.ContourPlot.draw(demo_dir)
+    # Miscelaneous.ContourPlot.draw(demo_dir)
 
     Text.MathCharactersChart.draw(demo_dir)
-    Text.MathAndTextCharacters.draw(demo_dir)
+    # Text.MathAndTextCharacters.draw(demo_dir)
   end
 end

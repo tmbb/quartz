@@ -15,7 +15,8 @@ defmodule Quartz.Panel do
             padding_left: nil,
             padding_right: nil,
             background_fill: nil,
-            canvas: nil
+            canvas: nil,
+            z_index: 1.0
 
   defp first_non_nil([]), do: nil
 

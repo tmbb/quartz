@@ -31,13 +31,14 @@ defmodule Quartz.MixProject do
     [
       {:dantzig, path: "../dantzig"},
       {:incendium, path: "../incendium", only: [:dev, :test]},
-      {:statistics, "~> 0.6", only: [:dev, :test]},
-      {:resvg, "~> 0.3"},
+      {:resvg, path: "../resvg_nif"},
+      # {:resvg, "~> 0.3"},
       {:decimal, "> 0.0.0"},
       {:conrex, "~> 1.0.0"},
       {:benchee, "~> 1.3"},
       {:explorer, "~> 0.8"},
       {:floki, "~> 0.36"},
+      {:statistics, "~> 0.6", only: [:dev, :test]},
       {:rustler, "~> 0.31", override: true},
       {:rustler_precompiled, "~> 0.7", override: true},
       {:ex_doc, "~> 0.34", only: :dev}

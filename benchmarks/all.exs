@@ -8,13 +8,13 @@ defmodule Quartz.Benchmarks.All do
 
   def run() do
     benchmark_dir = "benchmarks"
-    # Layout.AspectRatioScatterPlot.draw(benchmark_dir)
-    # Layout.SideBySidePlots.run_incendium(benchmark_dir)
+    Layout.AspectRatioScatterPlot.draw(benchmark_dir)
+    Layout.SideBySidePlots.run_incendium(benchmark_dir)
 
-    # PairwiseDataPlot.LinePlot.run_incendium(benchmark_dir)
-    # PairwiseDataPlot.ScatterPlot.run_incendium(benchmark_dir)
+    PairwiseDataPlot.LinePlot.run_incendium(benchmark_dir)
+    PairwiseDataPlot.ScatterPlot.run_incendium(benchmark_dir)
 
-    # DistributionPlot.BoxPlot.run_incendium(benchmark_dir)
+    DistributionPlot.BoxPlot.run_incendium(benchmark_dir)
     DistributionPlot.KDEPlot.run_incendium(benchmark_dir)
     DistributionPlot.Histogram.run_incendium(benchmark_dir)
 

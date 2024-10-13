@@ -13,7 +13,7 @@ defmodule Quartz.Circle do
             stroke_thickness: 1,
             stroke_paint: nil,
             stroke_dash: nil,
-            z_level: 1.0
+            z_index: 1.0
 
   def new(opts \\ []) do
     prefix = Keyword.get(opts, :prefix, nil)
@@ -43,7 +43,7 @@ defmodule Quartz.Circle do
       fill,
       stroke_paint,
       stroke_dash,
-      z_level: 1.0,
+      z_index: 1.0,
       stroke_thickness: 1
     ])
 
@@ -60,7 +60,7 @@ defmodule Quartz.Circle do
       stroke_thickness: stroke_thickness,
       stroke_paint: stroke_paint,
       stroke_dash: stroke_dash,
-      z_level: z_level
+      z_index: z_index
     }
 
     # Return the circle, with no reference to the figure
@@ -102,7 +102,8 @@ defmodule Quartz.Circle do
         x_min: Polynomial.algebra(circle.center_x - circle.radius),
         x_max: Polynomial.algebra(circle.center_x + circle.radius),
         y_min: Polynomial.algebra(circle.center_y - circle.radius),
-        y_max: Polynomial.algebra(circle.center_y + circle.radius)
+        y_max: Polynomial.algebra(circle.center_y + circle.radius),
+        baseline: Polynomial.algebra(circle.center_y + circle.radius)
       }
     end
 
@@ -121,6 +122,11 @@ defmodule Quartz.Circle do
         stroke: circle.stroke_paint,
         "stroke-width": circle.stroke_thickness
       )
+    end
+
+    @impl true
+    def assign_measurements_from_resvg_node(circle, _resvg_node) do
+      circle
     end
   end
 end

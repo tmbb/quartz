@@ -29,7 +29,7 @@ defmodule Quartz.SVG do
       for {key, value} <- unquote(attrs) do
         case key do
           attr_with_units when is_number(value) and key in unquote(all_attrs_with_units) ->
-            {key, "#{value}px"}
+            {key, "#{display_rounded_float(value)}"}
 
           _other ->
             {key, value}
@@ -49,7 +49,7 @@ defmodule Quartz.SVG do
   SVG `<text/>` element.
   """
   def text(attrs, content) do
-    attrs = handle_units_of_measurement(attrs, [:x, :y, :width, :height])
+    attrs = handle_units_of_measurement(attrs, [:x, :y])
     contents = List.wrap(content)
 
     escaped_contents =
@@ -70,6 +70,7 @@ defmodule Quartz.SVG do
   SVG `<tspan/>` element.
   """
   def tspan(attrs, content) do
+    attrs = handle_units_of_measurement(attrs, [:dx, :dy, :"baseline-shift", :"font-size"])
     contents = List.wrap(content)
 
     escaped_contents =
@@ -98,20 +99,50 @@ defmodule Quartz.SVG do
   end
 
   @doc """
+  Render a full document into an iolist.
+  """
+  def doc_to_iolist(doc) do
+    [
+      to_iodata(doc)
+    ]
+  end
+
+  @doc """
+  Render a full document into a binary.
+  """
+  def doc_to_binary(doc) do
+    to_string(doc_to_iolist(doc))
+  end
+
+  alias Quartz.Length
+
+  def svg_doc_dimension(dim) do
+    case dim do
+      d when is_number(d) ->
+        "#{display_rounded_float(d / Length.pt_to_px_conversion_factor())}pt"
+
+      d when is_binary(d) ->
+        d
+
+      other ->
+        other
+    end
+  end
+
+  @doc """
   Build a top level SVG element.
   """
   def svg(attrs, contents) do
-    # The width and height will be in pts.
-    # If we make the viewPort width == to the SVG width
-    # and the viewPort height == to the SVG height, then
-    # each unitless value will correspond to the value in pts.
     {width, attrs} = Keyword.pop(attrs, :width)
     {height, attrs} = Keyword.pop(attrs, :height)
 
+    width = svg_doc_dimension(width)
+    height = svg_doc_dimension(height)
+
     first_attrs = [
       {"xmlns", "http://www.w3.org/2000/svg"},
-      width: "#{display_rounded_float(width)}pt",
-      height: "#{display_rounded_float(height)}pt"
+      width: width,
+      height: height
     ]
 
     {"svg", first_attrs ++ attrs, contents}

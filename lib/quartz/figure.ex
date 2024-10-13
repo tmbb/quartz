@@ -11,7 +11,6 @@ defmodule Quartz.Figure do
   alias Quartz.Scale
   alias Quartz.Point2D
   alias Quartz.Config
-  alias Quartz.Canvas
   alias Quartz.AxisData
   alias Quartz.Axis2D
   alias Quartz.Plot2D
@@ -275,7 +274,7 @@ defmodule Quartz.Figure do
         svg_elements
       )
 
-    SVG.to_iodata(svg)
+    SVG.doc_to_iolist(svg)
   end
 
   @doc """
@@ -364,19 +363,23 @@ defmodule Quartz.Figure do
   def add_unmeasured_item(object) do
     figure = get_current_figure()
     updated_figure = %{figure | unmeasured: [object | figure.unmeasured]}
+
     put_current_figure(updated_figure)
   end
 
   defp get_measurements(figure) do
-    measured = Measuring.measure(figure.unmeasured, figure.resvg_options)
+    _measured = Measuring.measure(figure.unmeasured, figure.resvg_options)
 
-    for {element_id, measured_element} <- measured do
-      # Map.put(figure.sketch, element_id, measured_element)
-      unmeasured_element = figure.sketches[element_id]
-      # Add the new measurements to the constraints
-      assert(unmeasured_element.width, :==, measured_element.width)
-      assert(unmeasured_element.height, :==, measured_element.height)
-    end
+    # for {element_id, measured_element} <- measured do
+    #   # Map.put(figure.sketch, element_id, measured_element)
+    #   unmeasured_element = figure.sketches[element_id]
+    #   # Add the new measurements to the constraints
+    #   assert(unmeasured_element.width, :==, measured_element.width)
+    #   assert(unmeasured_element.height, :==, measured_element.height)
+    #   if is_struct(measured_element, Text) do
+    #     assert(unmeasured_element.depth, :==, measured_element.depth)
+    #   end
+    # end
 
     # Get the current figure, which already reflects the new constraints
     figure = get_current_figure()
@@ -394,13 +397,7 @@ defmodule Quartz.Figure do
 
   defp sort_while_keeping_canvases_behind(sketches) do
     Enum.sort_by(sketches, fn {id, sketch} ->
-      case sketch do
-        %Canvas{} ->
-          {0, id, sketch}
-
-        other ->
-          {1, id, other}
-      end
+      {sketch.z_index, id, sketch}
     end)
   end
 
@@ -820,7 +817,7 @@ defmodule Quartz.Figure do
       case vertical_alignment do
         :top -> Sketch.bbox_top(sketch)
         :horizon -> Sketch.bbox_horizon(sketch)
-        :baseline -> Sketch.bbox_bottom(sketch)
+        :baseline -> Sketch.bbox_baseline(sketch)
         :bottom -> Sketch.bbox_bottom(sketch)
       end
 
@@ -1046,22 +1043,29 @@ defmodule Quartz.Figure do
   Create a new figure.
   """
   def new(args, fun) do
-    min_width = Keyword.get(args, :width, Length.cm(12))
-    min_height = Keyword.get(args, :height, Length.cm(8))
-    config = Keyword.get(args, :config, Config.default_config())
-    debug = Keyword.get(args, :debug, false)
-
     default_font_dir =
       Path.join(
         to_string(:code.priv_dir(:quartz)),
         "fonts"
       )
 
+    KeywordSpec.validate!(args,
+      debug: false,
+      config: Config.default_config(),
+      skip_system_fonts: true,
+      resources_dir: ".",
+      font_dirs: [default_font_dir],
+      dpi: 300
+    )
+
+    min_width = Keyword.get(args, :width, Length.cm(12))
+    min_height = Keyword.get(args, :height, Length.cm(8))
+
     resvg_options = [
-      resources_dir: Keyword.get(args, :resources_dir, "."),
-      skip_system_fonts: Keyword.get(args, :skip_system_fonts, true),
-      font_dirs: Keyword.get(args, :font_dirs, [default_font_dir]),
-      dpi: Keyword.get(args, :dpi, 300)
+      resources_dir: resources_dir,
+      skip_system_fonts: skip_system_fonts,
+      font_dirs: font_dirs,
+      dpi: dpi
     ]
 
     try do
@@ -1086,10 +1090,10 @@ defmodule Quartz.Figure do
           {problem, u_in} = Problem.new_unmangled_variable(problem, "U_in")
           {problem, u_pt} = Problem.new_unmangled_variable(problem, "U_pt")
 
-          c_cm = Constraint.new(u_cm, :==, Length.cm_to_pt_conversion_factor())
-          c_mm = Constraint.new(u_mm, :==, Length.mm_to_pt_conversion_factor())
-          c_in = Constraint.new(u_in, :==, Length.inch_to_pt_conversion_factor())
-          c_pt = Constraint.new(u_pt, :==, 1.0)
+          c_cm = Constraint.new(u_cm, :==, Length.cm_to_px_conversion_factor())
+          c_mm = Constraint.new(u_mm, :==, Length.mm_to_px_conversion_factor())
+          c_in = Constraint.new(u_in, :==, Length.inch_to_px_conversion_factor())
+          c_pt = Constraint.new(u_pt, :==, Length.pt_to_px_conversion_factor())
 
           updated_problem =
             problem
@@ -1151,7 +1155,7 @@ defmodule Quartz.Figure do
 
   @doc false
   def dump_to_debug_file(figure) do
-    File.write!("debug.exs", inspect(figure.problem, pretty: true, limit: :infinity))
+    File.write!("problem.lp", Dantzig.HiGHS.to_lp_iodata(figure.problem))
     figure
   end
 
