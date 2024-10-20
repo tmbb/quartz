@@ -40,7 +40,6 @@ defmodule Quartz.Rectangle do
       stroke_opacity: nil
     )
 
-
     rect_x = Figure.variable("rectangle_x", min: 0, prefix: prefix)
     rect_y = Figure.variable("rectangle_y", min: 0, prefix: prefix)
     rect_height = Figure.variable("rectangle_height", min: 0, prefix: prefix)

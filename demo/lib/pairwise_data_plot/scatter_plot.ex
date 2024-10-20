@@ -49,14 +49,4 @@ defmodule Quartz.Demo.PairwiseDataPlot.ScatterPlot do
 
     Demo.example_to_png_and_svg(figure, dir, "scatter_plot")
   end
-
-  def run_incendium(dir) do
-    Incendium.run(%{
-      "scatter_plot" => fn -> draw(dir) end
-      },
-      time: 5,
-      memory_time: 3,
-      title: "Scatter plot"
-    )
-  end
 end

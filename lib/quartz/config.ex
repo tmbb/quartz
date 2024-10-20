@@ -8,6 +8,16 @@ defmodule Quartz.Config do
   alias Quartz.Board.BoardDebugProperties
   alias Quartz.Text.TextDebugProperties
 
+  @repeated_doc_paragraph """
+    Optional arguments:
+
+      - `opts` (default: `[]`): a keyword list of options
+        that override the default values taken from the config
+        passed as an argument.
+
+    This function can be used outside a figure context.
+    """
+
   defstruct text_font: "Ubuntu",
             text_style: nil,
             text_weight: "normal",
@@ -96,7 +106,7 @@ defmodule Quartz.Config do
             # Major tick labels
             major_tick_label_font: nil,
             major_tick_label_style: nil,
-            major_tick_label_weight: "regular",
+            major_tick_label_weight: "normal",
             major_tick_label_stretch: nil,
             major_tick_label_size: nil,
             major_tick_label_fill: nil,
@@ -192,6 +202,19 @@ defmodule Quartz.Config do
     new()
   end
 
+  @doc """
+  TODO: Document this.
+  """
+  def put_new_attributes(item, attributes) do
+    # Treat the struct as a map
+    Enum.reduce(attributes, item, fn {key, value} ->
+      case value do
+        nil -> item
+        _other -> Map.put_new(item, key, value)
+      end
+    end)
+  end
+
   def serif_config() do
     new(text_font: "Linux Libertine")
   end
@@ -253,61 +276,23 @@ defmodule Quartz.Config do
     }
   end
 
-  @doc """
-  TODO: Document this.
-  """
-  def get_math_character_attributes(opts \\ []) do
-    math_character_attributes(get_config(), opts)
-  end
+  import Quartz.ConfigHelper
 
-  @doc """
-  TODO: Document this.
-  """
-  def get_plot_title_text_attributes(opts \\ []) do
-    plot_title_text_attributes(get_config(), opts)
-  end
+  def_getter_and_setter(:math_character_attributes, "math character attributes")
 
-  @doc """
-  TODO: Document this.
-  """
-  def get_plot_text_attributes(opts \\ []) do
-    plot_text_attributes(get_config(), opts)
-  end
+  def_getter_and_setter(:plot_title_text_attributes, "plot title attributes")
 
-  @doc """
-  TODO: Document this.
-  """
-  def get_axis_label_text_attributes(opts \\ []) do
-    axis_label_text_attributes(get_config(), opts)
-  end
+  def_getter_and_setter(:plot_text_attributes, "plot text attributes")
 
-  @doc """
-  TODO: Document this.
-  """
-  def get_legend_text_attributes(opts \\ []) do
-    legend_text_attributes(get_config(), opts)
-  end
+  def_getter_and_setter(:axis_label_text_attributes, "axis label text attributes")
 
-  @doc """
-  TODO: Document this.
-  """
-  def get_major_tick_label_text_attributes(opts \\ []) do
-    major_tick_label_text_attributes(get_config(), opts)
-  end
+  def_getter_and_setter(:legend_text_attributes, "legend text attributes")
 
-  @doc """
-  TODO: Document this.
-  """
-  def get_major_tick_attributes(opts \\ []) do
-    major_tick_attributes(get_config(), opts)
-  end
+  def_getter_and_setter(:major_tick_label_text_attributes, "major tick label text attributes")
 
-  @doc """
-  TODO: Document this.
-  """
-  def get_minor_tick_attributes(opts \\ []) do
-    minor_tick_attributes(get_config(), opts)
-  end
+  def_getter_and_setter(:major_tick_attributes, "major tick attributes")
+
+  def_getter_and_setter(:minor_tick_attributes, "minor tick attributes")
 
   @doc """
   TODO: Document this.
@@ -327,7 +312,9 @@ defmodule Quartz.Config do
   end
 
   @doc """
-  TODO: Document this.
+  Extract major tick attributes from a config.
+
+  #{@repeated_doc_paragraph}
   """
   def major_tick_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
@@ -343,7 +330,9 @@ defmodule Quartz.Config do
   end
 
   @doc """
-  TODO: Document this.
+  xtract major tick attributes from a config.
+
+  #{@repeated_doc_paragraph}
   """
   def minor_tick_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
@@ -360,6 +349,8 @@ defmodule Quartz.Config do
 
   @doc """
   TODO: Document this.
+
+  #{@repeated_doc_paragraph}
   """
   def math_character_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
@@ -373,6 +364,8 @@ defmodule Quartz.Config do
 
   @doc """
   TODO: Document this.
+
+  #{@repeated_doc_paragraph}
   """
   def plot_title_text_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
@@ -397,6 +390,8 @@ defmodule Quartz.Config do
 
   @doc """
   TODO: Document this.
+
+  #{@repeated_doc_paragraph}
   """
   def axis_label_text_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
@@ -421,6 +416,8 @@ defmodule Quartz.Config do
 
   @doc """
   TODO: Document this.
+
+  #{@repeated_doc_paragraph}
   """
   def legend_text_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
@@ -444,6 +441,8 @@ defmodule Quartz.Config do
 
   @doc """
   TODO: Document this.
+
+  #{@repeated_doc_paragraph}
   """
   def major_tick_label_text_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,
@@ -469,6 +468,8 @@ defmodule Quartz.Config do
 
   @doc """
   TODO: Document this.
+
+  #{@repeated_doc_paragraph}
   """
   def plot_text_attributes(%__MODULE__{} = config, opts) do
     get_many_with_fallbacks(opts, config,

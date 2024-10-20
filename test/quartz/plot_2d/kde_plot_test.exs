@@ -1,19 +1,19 @@
 defmodule Quartz.Plot2D.KDEPlotTest do
   use ExUnit.Case, async: true
+  import Approval
 
   require Quartz.Figure, as: Figure
   require Explorer.DataFrame, as: DataFrame
 
   alias Quartz.Plot2D
   alias Quartz.Length
-  # alias Quartz.Color.RGB
 
-  @out_dir Path.join(__DIR__, "kde_plot_test")
-
-  @tag skip: true
   test "bernoulli distribution KDE plot (1 chain)" do
     data_path = "test/data/bernoulli_samples.parquet"
     samples = DataFrame.from_parquet!(data_path)
+
+    snapshot = "test/quartz/plot_2d/kde_plot_test/kde_single_snapshot.png"
+    reference = "test/quartz/plot_2d/kde_plot_test/kde_single_reference.png"
 
     theta_1 = DataFrame.filter(samples, chain_id__ == 1)["theta"]
 
@@ -29,20 +29,19 @@ defmodule Quartz.Plot2D.KDEPlotTest do
           |> Plot2D.finalize()
       end)
 
-    svg_path = Path.join(@out_dir, "kde_plot_1.svg")
-    png_path = Path.join(@out_dir, "kde_plot_1.png")
+    Figure.render_to_png_file!(figure, snapshot)
 
-    File.write!(svg_path, Figure.render_to_svg_binary(figure))
-    File.write!(png_path, Figure.render_to_png_binary(figure))
-
-    assert Figure.render_to_svg_binary(figure) == File.read!(svg_path)
-    assert Figure.render_to_png_binary(figure) == File.read!(png_path)
+    approve snapshot: File.read!(snapshot),
+            reference: File.read!(reference),
+            reviewed: true
   end
 
-  @tag skip: true
   test "plot individual bernoulli distribution KDEs plot (4 chains)" do
     data_path = "test/data/bernoulli_samples.parquet"
     samples = DataFrame.from_parquet!(data_path)
+
+    snapshot = "test/quartz/plot_2d/kde_plot_test/kde_snapshot.png"
+    reference = "test/quartz/plot_2d/kde_plot_test/kde_reference.png"
 
     theta_1 = DataFrame.filter(samples, chain_id__ == 1)["theta"]
     theta_2 = DataFrame.filter(samples, chain_id__ == 2)["theta"]
@@ -64,16 +63,19 @@ defmodule Quartz.Plot2D.KDEPlotTest do
           |> Plot2D.finalize()
       end)
 
-    Figure.render_to_png_file(figure, "test/quartz/plot_2d/kde_plot_test/snapshot.png")
+    Figure.render_to_png_file(figure, snapshot)
 
-    # approve snapshot: "test/quartz/plot_2d/kde_plot_test/snapshot.png",
-    #         reference: "test/quartz/plot_2d/kde_plot_test/reference.png"
+    approve snapshot: File.read!(snapshot),
+            reference: File.read!(reference),
+            reviewed: true
   end
 
-  @tag skip: true
   test "plot grouped bernoulli distributions KDE (4 chains)" do
     data_path = "test/data/bernoulli_samples.parquet"
     samples = DataFrame.from_parquet!(data_path)
+
+    snapshot = "test/quartz/plot_2d/kde_plot_test/kde_grouped_snapshot.png"
+    reference = "test/quartz/plot_2d/kde_plot_test/kde_grouped_reference.png"
 
     figure =
       Figure.new([width: Length.cm(8), height: Length.cm(4)], fn _fig ->
@@ -87,9 +89,10 @@ defmodule Quartz.Plot2D.KDEPlotTest do
           |> Plot2D.finalize()
       end)
 
-    Figure.render_to_png_file(figure, "test/quartz/plot_2d/kde_plot_test/grouped-snapshot.png")
+    Figure.render_to_png_file(figure, snapshot)
 
-    # approve snapshot: "test/quartz/plot_2d/kde_plot_test/grouped-snapshot.png",
-    #         reference: "test/quartz/plot_2d/kde_plot_test/reference.png"
+    approve snapshot: File.read!(snapshot),
+            reference: File.read!(reference),
+            reviewed: true
   end
 end

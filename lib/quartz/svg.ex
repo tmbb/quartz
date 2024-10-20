@@ -4,7 +4,7 @@ defmodule Quartz.SVG do
   """
 
   alias Quartz.Color.RGB
-  import Quartz.Utilities, only: [display_rounded_float: 1]
+  import Quartz.Formatter, only: [rounded_length: 1]
 
   @typedoc """
   An SVG element is represented by
@@ -29,7 +29,7 @@ defmodule Quartz.SVG do
       for {key, value} <- unquote(attrs) do
         case key do
           attr_with_units when is_number(value) and key in unquote(all_attrs_with_units) ->
-            {key, "#{display_rounded_float(value)}"}
+            {key, "#{rounded_length(value)}"}
 
           _other ->
             {key, value}
@@ -119,7 +119,7 @@ defmodule Quartz.SVG do
   def svg_doc_dimension(dim) do
     case dim do
       d when is_number(d) ->
-        "#{display_rounded_float(d / Length.pt_to_px_conversion_factor())}pt"
+        "#{rounded_length(d / Length.pt_to_px_conversion_factor())}pt"
 
       d when is_binary(d) ->
         d
@@ -162,49 +162,49 @@ defmodule Quartz.SVG do
 
   # Move to point without drawing a line
   defp point_to_iodata({:M, {x, y}}),
-    do: ["M ", display_rounded_float(x), " ", display_rounded_float(y)]
+    do: ["M ", rounded_length(x), " ", rounded_length(y)]
 
   defp point_to_iodata({:m, {dx, dy}}),
-    do: ["m ", display_rounded_float(dx), " ", display_rounded_float(dy)]
+    do: ["m ", rounded_length(dx), " ", rounded_length(dy)]
 
   # Draw a line from the last point to the current point
   defp point_to_iodata({:L, {x, y}}),
-    do: ["L ", display_rounded_float(x), " ", display_rounded_float(y)]
+    do: ["L ", rounded_length(x), " ", rounded_length(y)]
 
   defp point_to_iodata({:l, {dx, dy}}),
-    do: ["l ", display_rounded_float(dx), " ", display_rounded_float(dy)]
+    do: ["l ", rounded_length(dx), " ", rounded_length(dy)]
 
   # Horizontal line
-  defp point_to_iodata({:H, x}), do: ["H ", display_rounded_float(x)]
-  defp point_to_iodata({:h, dx}), do: ["h ", display_rounded_float(dx)]
+  defp point_to_iodata({:H, x}), do: ["H ", rounded_length(x)]
+  defp point_to_iodata({:h, dx}), do: ["h ", rounded_length(dx)]
   # Vertical line
-  defp point_to_iodata({:V, y}), do: ["V ", display_rounded_float(y)]
-  defp point_to_iodata({:v, dy}), do: ["v ", display_rounded_float(dy)]
+  defp point_to_iodata({:V, y}), do: ["V ", rounded_length(y)]
+  defp point_to_iodata({:v, dy}), do: ["v ", rounded_length(dy)]
   # Bezier curves
   defp point_to_iodata({:C, {x1, y1, x2, y2, x, y}}),
     do: [
       "C ",
-      display_rounded_float(x1),
-      display_rounded_float(y1),
+      rounded_length(x1),
+      rounded_length(y1),
       ", ",
-      display_rounded_float(x2),
-      display_rounded_float(y2),
+      rounded_length(x2),
+      rounded_length(y2),
       ", ",
-      display_rounded_float(x),
-      display_rounded_float(y)
+      rounded_length(x),
+      rounded_length(y)
     ]
 
   defp point_to_iodata({:c, {dx1, dy1, dx2, dy2, dx, dy}}),
     do: [
       "c ",
-      display_rounded_float(dx1),
-      display_rounded_float(dy1),
+      rounded_length(dx1),
+      rounded_length(dy1),
       ", ",
-      display_rounded_float(dx2),
-      display_rounded_float(dy2),
+      rounded_length(dx2),
+      rounded_length(dy2),
       ", ",
-      display_rounded_float(dx),
-      display_rounded_float(dy)
+      rounded_length(dx),
+      rounded_length(dy)
     ]
 
   defp point_to_iodata(z) when z in [:z, :Z] do
@@ -305,7 +305,7 @@ defmodule Quartz.SVG do
   end
 
   def attr_value_to_iodata(number) when is_float(number) do
-    display_rounded_float(number)
+    rounded_length(number)
   end
 
   def attr_value_to_iodata(attr_value) do

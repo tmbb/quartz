@@ -6,12 +6,14 @@ defmodule Quartz.Math do
   together with the functions that return them can be
   seen in this chart:
 
-  ![Supported characters chart](assets/math_characters_chart/example.png)
+  ![Supported characters chart](assets/math_characters_chart/full_chart.png)
   """
 
-  # Pretty much everythin in this module is generated at compile-time
+  # Pretty much everything in this module is generated at compile-time
   # by macros and functions in the `Quartz.MathHelpers` module.
   require Quartz.MathHelpers, as: MathHelpers
+
+  MathHelpers.build_sym_category()
 
   MathHelpers.build_function_clauses()
 end

@@ -5,6 +5,7 @@ defmodule Quartz.Figure do
 
   alias Dantzig.Problem
   alias Dantzig.Constraint
+  alias Dantzig.ConstraintMetadata
   alias Dantzig.Solution
 
   alias Quartz.Sketch
@@ -266,7 +267,7 @@ defmodule Quartz.Figure do
       end
 
     view_box =
-      "0 0 #{display_rounded_float(figure.width)} #{display_rounded_float(figure.height)}"
+      "0 0 #{rounded_length(figure.width)} #{rounded_length(figure.height)}"
 
     svg =
       SVG.svg(
@@ -275,81 +276,6 @@ defmodule Quartz.Figure do
       )
 
     SVG.doc_to_iolist(svg)
-  end
-
-  @doc """
-  TODO: document this
-  """
-  def position_with_location_and_alignment(sketch, container, opts \\ []) do
-    KeywordSpec.validate!(opts,
-      x_location: :center,
-      y_location: :horizon,
-      x_alignment: x_location,
-      y_alignment: y_location,
-      x_offset: 0,
-      y_offset: 0,
-      contains_vertically?: false,
-      contains_horizontally?: false
-    )
-
-    x_left_hand_side =
-      case x_location do
-        :left ->
-          Sketch.bbox_left(sketch)
-
-        :center ->
-          Sketch.bbox_center(sketch)
-
-        :right ->
-          Sketch.bbox_right(sketch)
-      end
-
-    y_left_hand_side =
-      case y_location do
-        :top ->
-          Sketch.bbox_top(sketch)
-
-        :horizon ->
-          Sketch.bbox_horizon(sketch)
-
-        :bottom ->
-          Sketch.bbox_bottom(sketch)
-      end
-
-    x_right_hand_side =
-      case x_alignment do
-        :left ->
-          Sketch.bbox_left(container)
-
-        :center ->
-          Sketch.bbox_center(container)
-
-        :right ->
-          Sketch.bbox_right(container)
-      end
-
-    y_right_hand_side =
-      case y_alignment do
-        :top ->
-          Sketch.bbox_top(container)
-
-        :horizon ->
-          Sketch.bbox_horizon(container)
-
-        :bottom ->
-          Sketch.bbox_bottom(container)
-      end
-
-    assert(x_left_hand_side, :==, Polynomial.add(x_right_hand_side, x_offset))
-    assert(y_left_hand_side, :==, Polynomial.add(y_right_hand_side, y_offset))
-
-    if contains_vertically? do
-      assert_contains_vertically(container, sketch)
-    end
-
-    if contains_horizontally? do
-      assert_contains_horizontally(container, sketch)
-    end
   end
 
   @doc """
@@ -368,19 +294,7 @@ defmodule Quartz.Figure do
   end
 
   defp get_measurements(figure) do
-    _measured = Measuring.measure(figure.unmeasured, figure.resvg_options)
-
-    # for {element_id, measured_element} <- measured do
-    #   # Map.put(figure.sketch, element_id, measured_element)
-    #   unmeasured_element = figure.sketches[element_id]
-    #   # Add the new measurements to the constraints
-    #   assert(unmeasured_element.width, :==, measured_element.width)
-    #   assert(unmeasured_element.height, :==, measured_element.height)
-    #   if is_struct(measured_element, Text) do
-    #     assert(unmeasured_element.depth, :==, measured_element.depth)
-    #   end
-    # end
-
+    Measuring.measure(figure.unmeasured, figure.resvg_options)
     # Get the current figure, which already reflects the new constraints
     figure = get_current_figure()
     # Clear the measurement queue
@@ -503,8 +417,15 @@ defmodule Quartz.Figure do
   end
 
   defp solve_problem(figure) do
-    solution = Dantzig.solve(figure.problem)
-    %{figure | solution: solution}
+    case Dantzig.solve(figure.problem) do
+      {:ok, solution} ->
+        %{figure | solution: solution}
+
+      :error ->
+        raise ArgumentError, """
+        The given contraints are not solvable, and as a result the figure can't be drawn.
+        """
+    end
   end
 
   @doc false
@@ -606,23 +527,27 @@ defmodule Quartz.Figure do
     result
   end
 
-  def assert(%Point2D{} = left, :==, %Point2D{} = right) do
+  def assert(left, operator, right, metadata \\ nil)
+
+  def assert(%Point2D{} = left, :==, %Point2D{} = right, metadata) do
+    full_metadata = ConstraintMetadata.update(metadata, tags: ["Point2D_equality"])
+
     update_current_figure_problem(fn problem ->
       constraint_x = Constraint.new(left.x, :==, right.x)
       constraint_y = Constraint.new(left.y, :==, right.y)
 
       updated_problem =
         problem
-        |> Problem.add_constraint(constraint_x)
-        |> Problem.add_constraint(constraint_y)
+        |> Problem.add_constraint(constraint_x, full_metadata)
+        |> Problem.add_constraint(constraint_y, full_metadata)
 
       {updated_problem, {:ok, [constraint_x, constraint_y]}}
     end)
   end
 
-  alias Quartz.Sketch
+  def assert(contained, :in, container, metadata) do
+    full_metadata = metadata && %{metadata | tags: ["in_operator" | metadata.tags]}
 
-  def assert(contained, :in, container) do
     update_current_figure_problem(fn problem ->
       c_left = Constraint.new(Sketch.bbox_left(contained), :>=, Sketch.bbox_left(container))
       c_top = Constraint.new(Sketch.bbox_top(contained), :>=, Sketch.bbox_top(container))
@@ -636,19 +561,21 @@ defmodule Quartz.Figure do
         c_bottom
       ]
 
-      updated_problem_1 = Problem.add_constraint(problem, c_left)
-      updated_problem_2 = Problem.add_constraint(updated_problem_1, c_top)
-      updated_problem_3 = Problem.add_constraint(updated_problem_2, c_right)
-      updated_problem_4 = Problem.add_constraint(updated_problem_3, c_bottom)
+      updated_problem_1 = Problem.add_constraint(problem, c_left, full_metadata)
+      updated_problem_2 = Problem.add_constraint(updated_problem_1, c_top, full_metadata)
+      updated_problem_3 = Problem.add_constraint(updated_problem_2, c_right, full_metadata)
+      updated_problem_4 = Problem.add_constraint(updated_problem_3, c_bottom, full_metadata)
 
       {updated_problem_4, {:ok, constraints}}
     end)
   end
 
-  def assert(left, operator, right) do
+  def assert(left, operator, right, metadata) do
+    full_metadata = ConstraintMetadata.update(metadata, tags: ["operator:#{operator}"])
+
     update_current_figure_problem(fn problem ->
       constraint = Constraint.new(left, operator, right)
-      updated_problem = Problem.add_constraint(problem, constraint)
+      updated_problem = Problem.add_constraint(problem, constraint, full_metadata)
       {updated_problem, {:ok, [constraint]}}
     end)
   end
@@ -683,11 +610,21 @@ defmodule Quartz.Figure do
     end
   end
 
-  defmacro assert(comparison) do
+  defmacro assert(comparison, extra \\ []) do
     {left, operator, right} = Constraint.arguments_from_comparison!(comparison)
 
+    # Should this be moved to the quoted experssion (i.e. at runtime?)
+    metadata = ConstraintMetadata.from_env(__CALLER__, [])
+
     quote do
-      unquote(__MODULE__).assert(unquote(left), unquote(operator), unquote(right))
+      # Needs to happen at runtime because `extra` may require runtime evaluation
+      metadata =
+        Dantzig.ConstraintMetadata.update(
+          unquote(Macro.escape(metadata)),
+          unquote(extra)
+        )
+
+      unquote(__MODULE__).assert(unquote(left), unquote(operator), unquote(right), metadata)
     end
   end
 
@@ -714,8 +651,13 @@ defmodule Quartz.Figure do
   defmacro minimize({:abs, _meta, [expression]}, opts) do
     transformed_expression = min_max_transform_expression_with_opts(expression, opts)
 
+    metadata = Dantzig.ConstraintMetadata.from_env(__CALLER__, [])
+
     quote do
       unquote(__MODULE__).update_current_figure_problem(fn problem ->
+        metadata = unquote(Macro.escape(metadata))
+        full_metadata = ConstraintMetadata.update(metadata, tags: ["operator:abs"])
+
         require Dantzig.Polynomial
 
         # Cache the expression because we'll be using it twice
@@ -740,8 +682,8 @@ defmodule Quartz.Figure do
 
         updated_problem =
           updated_problem
-          |> Dantzig.Problem.add_constraint(c1)
-          |> Dantzig.Problem.add_constraint(c2)
+          |> Dantzig.Problem.add_constraint(c1, full_metadata)
+          |> Dantzig.Problem.add_constraint(c2, full_metadata)
           |> Dantzig.Problem.decrement_objective(dummy_var)
 
         {updated_problem, :ok}
@@ -780,12 +722,12 @@ defmodule Quartz.Figure do
   """
   def place_in_canvas(sketch, canvas, opts) do
     KeywordSpec.validate!(opts,
-      x: :left,
-      y: :top,
+      x: :center,
+      y: :horizon,
       horizontal_alignment: :center,
       vertical_alignment: :horizon,
-      contained_horizontally_in_canvas: true,
-      contained_vertically_in_canvas: true
+      contained_horizontally_in_canvas: false,
+      contained_vertically_in_canvas: false
     )
 
     x_location =
@@ -821,17 +763,28 @@ defmodule Quartz.Figure do
         :bottom -> Sketch.bbox_bottom(sketch)
       end
 
-    if x_location, do: assert(x_handle == x_location)
-    if y_location, do: assert(y_handle == y_location)
+    if x_location, do: assert(x_handle == x_location, tags: ["placement_in_canvas"])
+    if y_location, do: assert(y_handle == y_location, tags: ["placement_in_canvas"])
 
     if contained_vertically_in_canvas do
-      assert(Sketch.bbox_top(sketch) >= Sketch.bbox_top(canvas))
-      assert(Sketch.bbox_bottom(sketch) <= Sketch.bbox_bottom(canvas))
+      assert(Sketch.bbox_top(sketch) >= Sketch.bbox_top(canvas),
+        tags: ["contained_vertically_in_canvas"]
+      )
+
+      assert(Sketch.bbox_bottom(sketch) <= Sketch.bbox_bottom(canvas),
+        tags: ["contained_vertically_in_canvas"]
+      )
     end
 
     if contained_horizontally_in_canvas do
-      assert(Sketch.bbox_left(sketch) >= Sketch.bbox_left(canvas))
-      assert(Sketch.bbox_right(sketch) <= Sketch.bbox_right(canvas))
+      assert(
+        Sketch.bbox_left(sketch) >= Sketch.bbox_left(canvas),
+        tags: ["contained_horizontally_in_canvas"]
+      )
+
+      assert(Sketch.bbox_right(sketch) <= Sketch.bbox_right(canvas),
+        tags: ["contained_horizontally_in_canvas"]
+      )
     end
   end
 
@@ -994,8 +947,8 @@ defmodule Quartz.Figure do
       assert_contains_horizontally(container, object)
     end
 
-    assert(Sketch.bbox_left(left_object), :==, Sketch.bbox_left(container))
-    assert(Sketch.bbox_right(right_object), :==, Sketch.bbox_right(container))
+    assert(Sketch.bbox_left(left_object) == Sketch.bbox_left(container))
+    assert(Sketch.bbox_right(right_object) == Sketch.bbox_right(container))
 
     :ok
   end
@@ -1008,31 +961,115 @@ defmodule Quartz.Figure do
   end
 
   def assert_contains_vertically(container, item) do
-    assert(Sketch.bbox_top(item), :>=, Sketch.bbox_top(container))
-    assert(Sketch.bbox_bottom(item), :<=, Sketch.bbox_bottom(container))
+    extra = [tags: ["horizontally_contains:#{container.id}:#{item.id}"]]
+
+    assert(Sketch.bbox_top(item) >= Sketch.bbox_top(container), extra)
+    assert(Sketch.bbox_bottom(item) <= Sketch.bbox_bottom(container), extra)
 
     :ok
   end
 
   def assert_contains_horizontally(container, item) do
-    assert(Sketch.bbox_right(item), :<=, Sketch.bbox_right(container))
-    assert(Sketch.bbox_left(item), :>=, Sketch.bbox_left(container))
+    extra = [tags: ["horizontally_contains:#{container.id}:#{item.id}"]]
+
+    assert(Sketch.bbox_right(item) <= Sketch.bbox_right(container), extra)
+    assert(Sketch.bbox_left(item) >= Sketch.bbox_left(container), extra)
 
     :ok
   end
 
   def assert_vertically_contained_in(item, container) do
-    assert(Sketch.bbox_top(item), :>=, Sketch.bbox_top(container))
-    assert(Sketch.bbox_bottom(item), :<=, Sketch.bbox_bottom(container))
+    assert(Sketch.bbox_top(item) >= Sketch.bbox_top(container))
+    assert(Sketch.bbox_bottom(item) <= Sketch.bbox_bottom(container))
 
     :ok
   end
 
   def assert_horizontally_contained_in(item, container) do
-    assert(Sketch.bbox_right(item), :<=, Sketch.bbox_right(container))
-    assert(Sketch.bbox_left(item), :>=, Sketch.bbox_left(container))
+    assert(
+      Sketch.bbox_right(item) <= Sketch.bbox_right(container)
+    )
+
+    assert(
+      Sketch.bbox_left(item) >= Sketch.bbox_left(container)
+    )
 
     :ok
+  end
+
+  @doc """
+  TODO: document this
+  """
+  def position_with_location_and_alignment(sketch, container, opts \\ []) do
+    KeywordSpec.validate!(opts,
+      x_location: :center,
+      y_location: :horizon,
+      x_alignment: x_location,
+      y_alignment: y_location,
+      x_offset: 0,
+      y_offset: 0,
+      contains_vertically?: false,
+      contains_horizontally?: false
+    )
+
+    x_left_hand_side =
+      case x_location do
+        :left ->
+          Sketch.bbox_left(sketch)
+
+        :center ->
+          Sketch.bbox_center(sketch)
+
+        :right ->
+          Sketch.bbox_right(sketch)
+      end
+
+    y_left_hand_side =
+      case y_location do
+        :top ->
+          Sketch.bbox_top(sketch)
+
+        :horizon ->
+          Sketch.bbox_horizon(sketch)
+
+        :bottom ->
+          Sketch.bbox_bottom(sketch)
+      end
+
+    x_right_hand_side =
+      case x_alignment do
+        :left ->
+          Sketch.bbox_left(container)
+
+        :center ->
+          Sketch.bbox_center(container)
+
+        :right ->
+          Sketch.bbox_right(container)
+      end
+
+    y_right_hand_side =
+      case y_alignment do
+        :top ->
+          Sketch.bbox_top(container)
+
+        :horizon ->
+          Sketch.bbox_horizon(container)
+
+        :bottom ->
+          Sketch.bbox_bottom(container)
+      end
+
+    assert(x_left_hand_side == Polynomial.add(x_right_hand_side, x_offset))
+    assert(y_left_hand_side == Polynomial.add(y_right_hand_side, y_offset))
+
+    if contains_vertically? do
+      assert_contains_vertically(container, sketch)
+    end
+
+    if contains_horizontally? do
+      assert_contains_horizontally(container, sketch)
+    end
   end
 
   defp finalize(figure) do
@@ -1095,12 +1132,14 @@ defmodule Quartz.Figure do
           c_in = Constraint.new(u_in, :==, Length.inch_to_px_conversion_factor())
           c_pt = Constraint.new(u_pt, :==, Length.pt_to_px_conversion_factor())
 
+          metadata = ConstraintMetadata.from_env(__ENV__, tags: ["length_constant"])
+
           updated_problem =
             problem
-            |> Problem.add_constraint(c_cm)
-            |> Problem.add_constraint(c_mm)
-            |> Problem.add_constraint(c_in)
-            |> Problem.add_constraint(c_pt)
+            |> Problem.add_constraint(c_cm, metadata)
+            |> Problem.add_constraint(c_mm, metadata)
+            |> Problem.add_constraint(c_in, metadata)
+            |> Problem.add_constraint(c_pt, metadata)
 
           {updated_problem, :ok}
         end)
@@ -1144,6 +1183,7 @@ defmodule Quartz.Figure do
       |> get_measurements()
       |> apply_scales_to_data()
       |> dynamically_apply_coefficients_to_figure_dimensions()
+      |> dump_to_debug_file()
       |> solve_problem()
       |> solve_figure_dimensions()
       |> solve_sketches()
@@ -1185,9 +1225,9 @@ defmodule Quartz.Figure do
     |> Plot2D.finalize()
   end
 
-  defp display_rounded_float(value) when is_integer(value), do: to_string(value)
+  defp rounded_length(value) when is_integer(value), do: to_string(value)
 
-  defp display_rounded_float(float) when is_float(float) do
+  defp rounded_length(float) when is_float(float) do
     :erlang.float_to_binary(float, decimals: 5)
   end
 end

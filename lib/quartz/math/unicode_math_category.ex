@@ -1,6 +1,7 @@
 defmodule Quartz.Math.UnicodeMathCategory do
   @moduledoc false
   defstruct name: nil,
+            slug: nil,
             unicode: nil,
             prefix: nil,
             groups: [],

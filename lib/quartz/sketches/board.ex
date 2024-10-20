@@ -67,12 +67,12 @@ defmodule Quartz.Board do
 
     cell_widths =
       for i <- 1..width_in_cells do
-        Figure.variable("cell_width_#{i}", min: 0.0)
+        Figure.variable("board_cell_width_#{i}", min: 0.0)
       end
 
     cell_heights =
       for i <- 1..height_in_cells do
-        Figure.variable("cell_height_#{i}", min: 0.0)
+        Figure.variable("board_cell_height_#{i}", min: 0.0)
       end
 
     mean_cell_width = algebra(Polynomial.sum(cell_widths) / width_in_cells)

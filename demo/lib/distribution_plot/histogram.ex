@@ -30,14 +30,4 @@ defmodule Quartz.Demo.DistributionPlot.Histogram do
 
     Demo.example_to_png_and_svg(figure, dir, "histogram")
   end
-
-  def run_incendium(dir) do
-    Benchee.run(%{
-      "box_plot" => fn -> draw(dir) end
-      },
-      time: 5,
-      memory_time: 3,
-      title: "Histogram"
-    )
-  end
 end

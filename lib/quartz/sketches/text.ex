@@ -68,19 +68,26 @@ defmodule Quartz.Text do
   def new(content, opts \\ []) do
     KeywordSpec.validate!(opts,
       id: Figure.get_id(),
+      debug: Figure.debug?(),
       prefix: nil,
       x: nil,
       y: nil,
-      debug: Figure.debug?()
+      rotation: nil
     )
+
+    unless is_nil(rotation) or is_number(rotation) do
+      raise ArgumentError, """
+      Text rotation should be a number (float or integer), not a polynomial.
+      """
+    end
 
     content = List.wrap(content)
 
     text_x = Figure.variable("text_x", prefix: prefix)
     text_y = Figure.variable("text_y", prefix: prefix)
-    text_width = Figure.variable("text_width", min: 0, prefix: prefix)
-    text_height = Figure.variable("text_height", min: 0, prefix: prefix)
-    text_depth = Figure.variable("text_depth", min: 0, prefix: prefix)
+    text_width = Figure.variable("text_width", prefix: prefix)
+    text_height = Figure.variable("text_height", prefix: prefix)
+    text_depth = Figure.variable("text_depth", prefix: prefix)
 
     if x, do: Figure.assert(text_x == x)
     if y, do: Figure.assert(text_y == y)
@@ -137,18 +144,25 @@ defmodule Quartz.Text do
   end
 
   defimpl Quartz.Sketch.Protocol do
-    require Dantzig.Polynomial, as: Polynomial
+    import Quartz.Operators, only: [algebra: 1]
+    import Quartz.Formatter, only: [rounded_length: 1]
+
+    alias Quartz.Rotations
     alias Quartz.Sketch
 
     @impl true
-    def bbox_bounds(text) do
+    def bbox_bounds(%{rotation: angle} = text) when angle in [nil, 0, 0.0] do
       %BBoxBounds{
         x_min: text.x,
-        x_max: Polynomial.algebra(text.x + text.width),
-        y_min: Polynomial.algebra(text.y - text.height),
-        y_max: Polynomial.algebra(text.y + text.depth),
+        x_max: algebra(text.x + text.width),
+        y_min: algebra(text.y - text.height),
+        y_max: algebra(text.y + text.depth),
         baseline: text.y
       }
+    end
+
+    def bbox_bounds(text) do
+      Rotations.rotated_text_bounds(text)
     end
 
     @impl true
@@ -171,7 +185,7 @@ defmodule Quartz.Text do
               text.debug_properties
               | height_stroke_width: fun.(text.debug_properties.height_stroke_width),
                 depth_stroke_width: fun.(text.debug_properties.depth_stroke_width),
-                baseline_stroke_width: fun.(text.debug_properties.baseline_stroke_width),
+                baseline_stroke_width: fun.(text.debug_properties.baseline_stroke_width)
             }
 
           other ->
@@ -191,14 +205,19 @@ defmodule Quartz.Text do
 
     @impl true
     def to_svg(text) do
-      transform_attrs = []
+      geometry_attrs =
+        if text.rotation in [nil, 0, 0.0] do
+          # Just add x and y
+          [x: text.x, y: text.y]
+        else
+          # Place the text at zero, and adjust the position using a transformation
+          [x: 0, y: 0, transform: rotate_translate(text.x, text.y, text.rotation)]
+        end
 
       # Attributes that are common to "normal mode" and "debug mode"
       common_attributes =
         [
           id: text.id,
-          x: text.x,
-          y: text.y,
           fill: text.fill,
           "font-family": text.font,
           "font-weight": text.weight,
@@ -207,16 +226,17 @@ defmodule Quartz.Text do
           "baseline-shift": text.baseline_shift,
           "text-anchor": "start",
           "alignment-baseline": "baseline"
-        ] ++ transform_attrs
+        ] ++ geometry_attrs
 
       if text.debug do
         tooltip_text = [
           "Text [#{text.id}] #{text.prefix} &#13;",
-          "&#160;↳&#160;x = #{pprint(text.x)}px&#13;",
-          "&#160;↳&#160;y = #{pprint(text.y)}px&#13;",
-          "&#160;↳&#160;width = #{pprint(text.width)}px&#13;",
-          "&#160;↳&#160;height = #{pprint(text.height)}px&#13;",
-          "&#160;↳&#160;depth = #{pprint(text.depth)}px&#13;&#13;",
+          "&#160;↳&#160;x = #{debug_pprint(text.x)}px&#13;",
+          "&#160;↳&#160;y = #{debug_pprint(text.y)}px&#13;",
+          "&#160;↳&#160;rotation = #{debug_pprint(text.y)}°&#13;",
+          "&#160;↳&#160;width = #{debug_pprint(text.width)}px&#13;",
+          "&#160;↳&#160;height = #{debug_pprint(text.height)}px&#13;",
+          "&#160;↳&#160;depth = #{debug_pprint(text.depth)}px&#13;&#13;",
           "&#160;&#160;font: #{text.font}&#13;",
           "&#160;&#160;font-weight: #{text.weight}&#13;",
           "&#160;&#160;font-size: #{text.size}&#13;"
@@ -226,18 +246,26 @@ defmodule Quartz.Text do
         depth_rect_attrs = debug_depth_rect_svg_properties(text)
         baseline_attrs = debug_baseline_svg_properties(text)
 
-        # SVG text element with extra debug data
-        SVG.g([], [
+        text_debug_bbox_components = [
           SVG.rect(height_rect_attrs),
           SVG.rect(depth_rect_attrs),
-          SVG.line(baseline_attrs),
-          SVG.text(common_attributes,
+          SVG.line(baseline_attrs)
+        ]
+
+        # SVG text element with extra debug data
+        SVG.g(
+          [],
+          text_debug_bbox_components ++
             [
-              SVG.title([], SVG.escaped_iodata(tooltip_text)) |
-              Enum.map(text.content, &Sketch.to_svg/1)
+              SVG.text(
+                common_attributes,
+                [
+                  SVG.title([], SVG.escaped_iodata(tooltip_text))
+                  | Enum.map(text.content, &Sketch.to_svg/1)
+                ]
+              )
             ]
-          )
-        ])
+        )
       else
         # SVG text element without extra debug data
         SVG.text(
@@ -247,35 +275,65 @@ defmodule Quartz.Text do
       end
     end
 
+    defp rotate_translate(x, y, angle) do
+      "translate(#{rounded_length(x)}, #{rounded_length(y)}) " <>
+        "rotate(#{rounded_length(angle)})"
+    end
+
     @impl true
     def assign_measurements_from_resvg_node(text, resvg_node) do
-      height = - resvg_node.y
-      _depth = resvg_node.height + resvg_node.y
+      height = -resvg_node.y
+      # Depths are never negative, even if the character doesn't touch
+      # the font's baseline. TODO: does this give us any problems?
+      depth = min(resvg_node.height + resvg_node.y, 0.0)
       width = resvg_node.width
 
-      Figure.assert(text.width == width)
-      Figure.assert(text.height == height)
-      Figure.assert(text.depth == 0.0)
+      Figure.assert(text.width == width, tags: ["measurement"])
+      Figure.assert(text.height == height, tags: ["measurement"])
+      Figure.assert(text.depth == depth, tags: ["measurement"])
 
-      text
+      %{text | height: height, depth: depth, width: width}
     end
 
     @impl true
     def to_unpositioned_svg(text) do
       # TODO: If we ever implement text stretching, we will
       # have to handle the width better.
-      to_svg(%{text |
-                x: 0, y: 0, width: nil, height: nil, depth: nil,
-                rotation: nil, debug: false})
+      to_svg(%{
+        text
+        | x: 0,
+          y: 0,
+          width: nil,
+          height: nil,
+          depth: nil,
+          rotation: nil,
+          debug: false
+      })
+    end
+
+    defp rotated?(text) do
+      text.rotation not in [0, 0.0, nil]
     end
 
     defp debug_height_rect_svg_properties(text) do
-      geom_properties = [
-        x: text.x,
-        y: text.y - text.height,
-        width: text.width,
-        height: text.height
-      ]
+      geom_properties =
+        if rotated?(text) do
+          [
+            x: 0,
+            y: -text.height,
+            width: text.width,
+            height: text.height,
+            # Rotate around the bottom-left corner of the rectangle
+            transform: rotate_translate(text.x, text.y, text.rotation)
+          ]
+        else
+          [
+            x: text.x,
+            y: text.y - text.height,
+            width: text.width,
+            height: text.height
+          ]
+        end
 
       style_properties = TextDebugProperties.to_height_svg_attributes(text.debug_properties)
 
@@ -283,12 +341,24 @@ defmodule Quartz.Text do
     end
 
     defp debug_depth_rect_svg_properties(text) do
-      geom_properties = [
-        x: text.x,
-        y: text.y,
-        width: text.width,
-        height: text.depth
-      ]
+      geom_properties =
+        if rotated?(text) do
+          [
+            x: 0,
+            y: 0,
+            width: text.width,
+            height: text.depth,
+            # Rotate around the bottom-left corner of the rectangle
+            transform: rotate_translate(text.x, text.y, text.rotation)
+          ]
+        else
+          [
+            x: text.x,
+            y: text.y,
+            width: text.width,
+            height: text.depth
+          ]
+        end
 
       style_properties = TextDebugProperties.to_depth_svg_attributes(text.debug_properties)
 
@@ -296,21 +366,33 @@ defmodule Quartz.Text do
     end
 
     defp debug_baseline_svg_properties(text) do
-      geom_properties = [
-        x1: text.x,
-        y1: text.y,
-        x2: text.x + text.width,
-        y2: text.y
-      ]
+      geom_properties =
+        if rotated?(text) do
+          [
+            x1: 0,
+            y1: 0,
+            x2: text.width,
+            y2: 0,
+            # Rotate around the bottom-left corner of the rectangle
+            transform: rotate_translate(text.x, text.y, text.rotation)
+          ]
+        else
+          [
+            x1: text.x,
+            y1: text.y,
+            x2: text.x + text.width,
+            y2: text.y
+          ]
+        end
 
       style_properties = TextDebugProperties.to_baseline_svg_attributes(text.debug_properties)
 
       geom_properties ++ style_properties
     end
 
-    defp pprint(number) when is_number(number) do
+    defp debug_pprint(number) do
       # Round to two decimal places
-      Formatter.rounded_float(number, 2)
+      Formatter.rounded_length(number, 2)
     end
   end
 end

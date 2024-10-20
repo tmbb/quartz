@@ -29,14 +29,4 @@ defmodule Quartz.Demo.PairwiseDataPlot.LinePlot do
 
     Demo.example_to_png_and_svg(figure, dir, "line_plot")
   end
-
-  def run_incendium(dir) do
-    Incendium.run(%{
-      "draw_line_plot" => fn -> draw(dir) end
-      },
-      time: 5,
-      memory_time: 3,
-      title: "Line plot"
-    )
-  end
 end

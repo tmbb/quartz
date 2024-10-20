@@ -5,7 +5,11 @@ defmodule Quartz.Demo.Layout.SideBySidePlots do
   alias Quartz.Plot2D
   alias Quartz.Length
   alias Quartz.Scale
+  alias Quartz.Text
+  alias Quartz.Math
   alias Quartz.Demo
+  alias Quartz.Config
+
 
   def draw(dir) do
     figure =
@@ -30,25 +34,28 @@ defmodule Quartz.Demo.Layout.SideBySidePlots do
           |> Plot2D.put_axis_label("x", "X-axis label (mg/m#super([-2]))", text: [escape: false])
           |> Plot2D.finalize()
 
+        task_B_label = Text.draw_new([
+          Text.tspan("X-label with math: "),
+          Math.italic_x(),
+          Text.sup("2"),
+          Text.tspan(" + "),
+          Math.italic_y(),
+          Text.sup("2"),
+          Text.tspan(" (log scale)")
+        ], Config.get_axis_label_text_attributes())
+
         _plot_task_B =
           Plot2D.new(id: "plot_task_B")
           |> Plot2D.put_bounds(bounds_B)
           |> Plot2D.draw_scatter_plot(x, y)
           |> Plot2D.put_title("B. Task B")
           |> Plot2D.put_axis_label("y", "Y-label")
-          |> Plot2D.put_axis_label("x", "X-label (with  math: $x^2 + y^2$)", text: [escape: false])
+          |> Plot2D.put_axis_label("x", task_B_label)
           |> Plot2D.put_axis_scale("x", Scale.log())
           |> Plot2D.put_axis_scale("y", Scale.log())
           |> Plot2D.finalize()
       end)
 
     Demo.example_to_png_and_svg(figure, dir, "side_by_side_plots")
-  end
-
-  def run_incendium(dir) do
-    Incendium.run(%{
-      "pair_of_plots" => fn -> draw(dir) end
-    },
-    title: "Side by side plots")
   end
 end

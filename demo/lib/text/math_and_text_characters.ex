@@ -2,11 +2,11 @@ defmodule Quartz.Demo.Text.MathAndTextCharacters do
   @moduledoc false
 
   require Quartz.Figure, as: Figure
-  alias Quartz.{Demo, Board, Panel, Length, Math, Text, Config, Sketch}
+  alias Quartz.{Demo, Board, Panel, Length, Math, Text, Config}
 
   def draw(dir) do
     figure =
-      Figure.new([width: Length.cm(10), height: Length.cm(2), debug: true], fn _fig ->
+      Figure.new([width: Length.cm(10), height: Length.cm(4), debug: true], fn _fig ->
         text_attrs = Config.get_legend_text_attributes(size: 10)
 
         sentence1 =
@@ -32,18 +32,34 @@ defmodule Quartz.Demo.Text.MathAndTextCharacters do
 
         sentence3 =
           Text.draw_new([
-            Text.tspan("C. "),
+            Text.tspan("C. Free energy will be refered to as "),
             Math.italic_pi(),
             Text.sub(Math.italic_E())
           ], text_attrs)
 
+        sentence4 =
+          Text.draw_new([
+            Text.tspan("D. For all "),
+            Math.italic_n(),
+            Text.tspan(" "),
+            Math.symbol_in(),
+            Text.tspan(" "),
+            Math.bb_N(),
+            Text.tspan(", "),
+            Math.italic_n(),
+            Text.tspan(" + 1 "),
+            Math.symbol_in(),
+            Text.tspan(" "),
+            Math.bb_N(),
+            Text.tspan(".")
+          ], text_attrs |> Keyword.put(:rotation, 10))
+
         sentences = [
           sentence1,
           sentence2,
-          sentence3
+          sentence3,
+          sentence4
         ]
-
-        # Figure.assert(Sketch.bbox_top(sentence1) == Length.pt(12))
 
         panels =
           for {sentence, i} <- Enum.with_index(sentences, 0) do
@@ -67,15 +83,5 @@ defmodule Quartz.Demo.Text.MathAndTextCharacters do
       end)
 
     Demo.example_to_png_and_svg(figure, dir, "math_and_text_characters")
-  end
-
-  def run_incendium(dir) do
-    Incendium.run(%{
-      "scatter_plot" => fn -> draw(dir) end
-      },
-      time: 5,
-      memory_time: 3,
-      title: "Scatter plot"
-    )
   end
 end

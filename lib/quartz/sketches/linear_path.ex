@@ -162,7 +162,7 @@ defmodule Quartz.LinearPath do
 
     @impl true
     def assign_measurements_from_resvg_node(linear_path, resvg_node) do
-      height = - resvg_node.height
+      height = resvg_node.height
       width = resvg_node.width
 
       Figure.assert(linear_path.width == width)

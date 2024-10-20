@@ -54,7 +54,6 @@ defmodule Quartz.Length do
   @spec pt_to_px_conversion_factor() :: number()
   def pt_to_px_conversion_factor(), do: @pt_factor
 
-
   @doc """
   Length in inches.
   """
