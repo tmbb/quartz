@@ -11,9 +11,21 @@ defmodule Quartz.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
+      package: package(),
+      name: "Quartz",
+      description: "Plotting library for Elixir",
+      source_url: "https://github.com/tmbb/quartz",
       docs: [
         assets: %{"assets" => "assets"}
       ]
+    ]
+  end
+
+  defp package() do
+    [
+      files: ~w(lib priv .formatter.exs mix.exs README* LICENSE* CHANGELOG*),
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/tmbb/quartz"}
     ]
   end
 
@@ -39,7 +51,6 @@ defmodule Quartz.MixProject do
       {:floki, "~> 0.36", runtime: false},
       {:benchee, "~> 1.3", only: [:dev, :test]},
       {:rustler_precompiled, "~> 0.8"},
-      # {:incendium, path: "../incendium", only: [:dev, :test]},
       {:statistics, "~> 0.6", only: [:dev, :test], runtime: false},
       {:approval, "~> 0.2", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.34", only: :dev}

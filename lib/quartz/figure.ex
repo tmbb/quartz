@@ -1,6 +1,11 @@
 defmodule Quartz.Figure do
   @moduledoc """
   Figure
+
+  The figure is the highest level entity that Quartz deals with.
+  Every drawing is a figure, and objects in a figure can interact
+  in stateful ways that break referential transparency.
+  However, figures can't interact with each other.
   """
 
   alias Dantzig.Problem
@@ -1122,11 +1127,13 @@ defmodule Quartz.Figure do
       # Add units of measurement
       :ok =
         update_current_figure_problem(fn problem ->
+          # Add variables that correspond to units of measurement.
           {problem, u_cm} = Problem.new_unmangled_variable(problem, "U_cm")
           {problem, u_mm} = Problem.new_unmangled_variable(problem, "U_mm")
           {problem, u_in} = Problem.new_unmangled_variable(problem, "U_in")
           {problem, u_pt} = Problem.new_unmangled_variable(problem, "U_pt")
 
+          # create constraints that specify the value of each unit of measurement in px
           c_cm = Constraint.new(u_cm, :==, Length.cm_to_px_conversion_factor())
           c_mm = Constraint.new(u_mm, :==, Length.mm_to_px_conversion_factor())
           c_in = Constraint.new(u_in, :==, Length.inch_to_px_conversion_factor())
@@ -1183,10 +1190,8 @@ defmodule Quartz.Figure do
       |> get_measurements()
       |> apply_scales_to_data()
       |> dynamically_apply_coefficients_to_figure_dimensions()
-      |> dump_to_debug_file()
       |> solve_problem()
       |> solve_figure_dimensions()
-      |> dump_to_debug_file()
       |> solve_sketches()
       |> finalize()
     after
@@ -1196,6 +1201,8 @@ defmodule Quartz.Figure do
 
   @doc false
   def dump_to_debug_file(figure) do
+    # This function is meant to be used in development only.
+    # TODO: find a better way to debug figures.
     File.write!("problem.lp", Dantzig.HiGHS.to_lp_iodata(figure.problem))
     figure
   end

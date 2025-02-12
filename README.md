@@ -1,16 +1,16 @@
 # Quartz
 
-**TODO: Add description**
+Plotting library for Elixir.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `quartz` to your list of dependencies in `mix.exs`:
+he package can be installed by adding `quartz` to your list
+of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:quartz, "~> 0.1.0"}
+    {:quartz, "~> x.y.z"}
   ]
 end
 ```

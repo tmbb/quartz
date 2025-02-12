@@ -23,6 +23,9 @@ defmodule Quartz.Formatter do
     :erlang.float_to_binary(float, decimals: decimals)
   end
 
+  @doc """
+  Display a float rounded to the given number of decimals.
+  """
   def rounded_float(float, nr_of_decimal_places, format \\ :normal) do
     (float * 1.0)
     |> Decimal.from_float()

@@ -1,6 +1,10 @@
 defmodule Quartz.SVG do
   @moduledoc """
   Utilities to work with SVG elements.
+
+  This is made public in case users want to create their
+  own sketches, as a sketch needs to know how to render
+  itself into SVG.
   """
 
   alias Quartz.Color.RGB

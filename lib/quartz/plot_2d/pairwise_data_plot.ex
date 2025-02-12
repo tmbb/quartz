@@ -14,6 +14,9 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
 
   alias Dantzig.Polynomial
 
+  @doc """
+  Draw a filled plot
+  """
   def draw_filled_between_y(plot, data_x, data_y, opts \\ []) do
     KeywordSpec.validate!(opts,
       bottom: 0.0,
@@ -91,6 +94,9 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
   def to_data(list) when is_list(list), do: list
   def to_data(%Series{} = series), do: Series.to_list(series)
 
+  @doc """
+  Draw a line plot.
+  """
   def draw_line_plot(%Plot2D{} = plot, data_x, data_y, opts \\ []) do
     # Assumes the color has been already selected
     KeywordSpec.validate!(opts,
@@ -112,8 +118,10 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
     data_x = to_data(data_x)
     data_y = to_data(data_y)
 
-    # Convert everything that might be a polynomial into a number
-    # TODO: do we want to allow polynomials here?
+    # Convert everything that might be a polynomial into a number.
+    # TODO:
+    # Should we expect polynomials now that we are soping the polynomial
+    # operations into `Polynomial.algebra/1`?
     data_x = Enum.map(data_x, &Polynomial.to_number!/1)
     data_y = Enum.map(data_y, &Polynomial.to_number!/1)
 
@@ -151,10 +159,14 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
     end
   end
 
-  def draw_bar_plot(plot, _data_x, _data_y, _opts \\ []) do
-    plot
+  @doc false
+  def draw_bar_plot(_plot, _data_x, _data_y, _opts \\ []) do
+    raise ArgumentError, "not implemented"
   end
 
+  @doc """
+  Draw a scatter plot.
+  """
   def draw_scatter_plot(plot, data_x, data_y, opts \\ []) do
     config = Config.get_config()
 

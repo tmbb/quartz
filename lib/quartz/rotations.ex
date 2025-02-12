@@ -107,6 +107,7 @@ defmodule Quartz.Rotations do
 
     # TODO: add visual diagram "proving" this
     # or do the math for all cases and put it in a
+    # file somehwere.
 
     %BBoxBounds{
       x_min: left.x,
