@@ -1,6 +1,11 @@
 # Changelog
 
 <!-- changes - write changes below -->
+
+## v0.4.0
+
+## v0.3.0
+
 Move the font files to a github archive and download them at compile-time
 to avoid Hex's package limits.
 

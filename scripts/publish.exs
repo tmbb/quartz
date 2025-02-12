@@ -1,11 +1,12 @@
 defmodule Publish do
-  # Change this line if you reuse the script in other app
-  @app :quartz
-
   @mix_path "mix.exs"
   @readme_path "README.md"
   @changelog_path "CHANGELOG.md"
   @changes_marker "<!-- changes - write changes below -->"
+
+  def otp_app() do
+    Mix.Project.config() |> Keyword.fetch!(:app)
+  end
 
   def run() do
     [version_type_string] = System.argv()
@@ -22,6 +23,11 @@ defmodule Publish do
       Mix.Shell.IO.info(">>> Add new title to CHANGELOG.md")
       update_changelog(@changelog_path, new_version)
 
+      Mix.Shell.IO.info(">>> Run git commands")
+      git_commands(new_version)
+
+      System.shell("mix hex.publish --dry-run", into: IO.stream())
+
       Mix.Shell.IO.info(">>> You must invoke 'mix hex.publish' manually")
     else
       Mix.Shell.IO.error("Can't publish because some tests fail")
@@ -32,8 +38,8 @@ defmodule Publish do
     content = File.read!(readme_path)
 
     new_content =
-      Regex.replace(~r/\{#{inspect(@app)}\s*,\s+"~>\s+(\d+\.\d+\.\d+)"/, content, fn _string, _old_vsn ->
-        "\{#{inspect(@app)}, \"~> #{Version.to_string(new_version)}\""
+      Regex.replace(~r/\{#{inspect(otp_app())}\s*,\s+"~>\s+(\d+\.\d+\.\d+)"/, content, fn _string, _old_vsn ->
+        "\{#{inspect(otp_app())}, \"~> #{Version.to_string(new_version)}\""
       end)
 
     File.write!(readme_path, new_content)
@@ -90,7 +96,7 @@ defmodule Publish do
     version_string = Version.to_string(new_version)
 
     if content =~ @changes_marker do
-      new_title = @changes_marker <> "\n## v#{version_string}\n"
+      new_title = @changes_marker <> "\n\n## v#{version_string}\n"
       new_content = String.replace(content, @changes_marker, new_title)
       File.write!(path, new_content)
     else
@@ -100,10 +106,9 @@ defmodule Publish do
 
   def git_commands(new_version) do
     version_string = Version.to_string(new_version)
-    Mix.Shell.IO.info(">>> Run git commands")
     System.shell(~s[git add .])
     System.shell(~s[git commit -m "bump version number to v#{version_string}"])
-    System.shell(~s[git tag -a "v#{version_string}" -m "Add v#{version_string} branch"])
+    System.shell(~s[git tag -a "v#{version_string}" -m "Add v#{version_string} tag"])
     System.shell(~s[git push -u origin])
   end
 end
