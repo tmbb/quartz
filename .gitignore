@@ -28,5 +28,8 @@ quartz-*.tar
 # Don't track the snapshots for the approval tests
 /test/**/*_snapshot.png
 
+# Don't track the HTML diffs
+*.diff.html
+
 # Ignore log files
 *.log

@@ -1,7 +1,7 @@
 defmodule Quartz.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.2.0"
 
   def project do
     [
@@ -11,7 +11,11 @@ defmodule Quartz.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: Mix.compilers() ++ [:download_fonts],
       package: package(),
+      aliases: [
+        "compile.download_fonts": &download_fonts/1
+      ],
       name: "Quartz",
       description: "Plotting library for Elixir",
       source_url: "https://github.com/tmbb/quartz",
@@ -21,9 +25,24 @@ defmodule Quartz.MixProject do
     ]
   end
 
+  defp download_fonts(_) do
+    Quartz.FontDownloader.maybe_download_fonts()
+  end
+
   defp package() do
     [
-      files: ~w(lib priv .formatter.exs mix.exs README* LICENSE* CHANGELOG*),
+      files: ~w(
+        lib
+        priv/demo
+        priv/typst-symbols.html
+        priv/UnicodeData.txt
+        priv/font_hashes.exs
+        .formatter.exs
+        mix.exs
+        README*
+        LICENSE*
+        CHANGELOG*
+      ),
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/tmbb/quartz"}
     ]
