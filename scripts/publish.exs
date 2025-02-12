@@ -8,8 +8,26 @@ defmodule Publish do
     Mix.Project.config() |> Keyword.fetch!(:app)
   end
 
+  def version_type_from_user_input!() do
+    case System.argv() do
+      [version_type_string] ->
+        version_type_string
+
+      [] ->
+        raise ArgumentError, """
+          No arguments given. Requires a version type ('major', 'minor', or 'patch').
+          """
+
+      _other ->
+        raise ArgumentError, """
+          Requires a single argument corresponding to a version type \
+          ('major', 'minor', or 'patch').
+          """
+    end
+  end
+
   def run() do
-    [version_type_string] = System.argv()
+    version_type_string = version_type_from_user_input!()
     version_type = parse_version_type(version_type_string)
 
     Mix.Shell.IO.info(">>> Run tests")
@@ -26,7 +44,7 @@ defmodule Publish do
       Mix.Shell.IO.info(">>> Run git commands")
       git_commands(new_version)
 
-      System.shell("mix hex.publish --dry-run", into: IO.stream())
+      System.shell("mix hex.publish --dry-run")
 
       Mix.Shell.IO.info(">>> You must invoke 'mix hex.publish' manually")
     else
