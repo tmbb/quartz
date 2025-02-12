@@ -45,7 +45,7 @@ defmodule Quartz.BoardTest do
   end
 
   test "labeller" do
-    figure =
+    _figure =
       Figure.new([width: Length.cm(10), height: Length.cm(8), debug: true], fn _fig ->
         text_attrs = Config.get_axis_label_text_attributes()
 
@@ -55,12 +55,10 @@ defmodule Quartz.BoardTest do
           {Text.new("Zzzz", text_attrs), Text.new("Z-factor (N=10)", text_attrs)}
         ])
       end)
-
-    Figure.render_to_svg_file!(figure, "example.svg")
   end
 
   test "example" do
-    figure =
+    _figure =
       Figure.new([width: Length.cm(10), height: Length.cm(8), debug: true], fn _fig ->
         p1 =
           Panel.new(
@@ -167,7 +165,5 @@ defmodule Quartz.BoardTest do
           panels: panels
         )
       end)
-
-    Figure.render_to_svg_file!(figure, "example1.svg")
   end
 end

@@ -285,7 +285,7 @@ defmodule Quartz.Text do
       height = -resvg_node.y
       # Depths are never negative, even if the character doesn't touch
       # the font's baseline. TODO: does this give us any problems?
-      depth = min(resvg_node.height + resvg_node.y, 0.0)
+      depth = resvg_node.height + resvg_node.y # min(resvg_node.height + resvg_node.y, 0.0)
       width = resvg_node.width
 
       Figure.assert(text.width == width, tags: ["measurement"])

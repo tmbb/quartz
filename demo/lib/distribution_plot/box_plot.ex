@@ -20,7 +20,7 @@ defmodule Quartz.Demo.DistributionPlot.BoxPlot do
     theta_4 = DataFrame.filter(samples, chain_id__ == 4)["theta"]
 
     groups = [theta_1, theta_2, theta_3, theta_4]
-    labels = ["C1", "C2", "C3", "C4"]
+    labels = ["Charin 1", "Chain 2", "Chain 3", "Chain 4"]
 
     figure =
       Figure.new([width: Length.cm(8), height: Length.cm(5)], fn _fig ->
@@ -35,7 +35,6 @@ defmodule Quartz.Demo.DistributionPlot.BoxPlot do
           |> Plot2D.finalize()
       end)
 
-
-    Demo.example_to_png_and_svg(figure, dir, "line_plot")
+    Figure.render_to_png_file!(figure, Path.join(dir, "line_plot.png"))
   end
 end

@@ -6,8 +6,9 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
   alias Quartz.LinearPath
   alias Quartz.Circle
   alias Quartz.Plot2D
-  alias Quartz.Length
   alias Quartz.Legend
+  alias Quartz.Color
+  alias Quartz.Config
 
   require Quartz.KeywordSpec, as: KeywordSpec
 
@@ -155,6 +156,8 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
   end
 
   def draw_scatter_plot(plot, data_x, data_y, opts \\ []) do
+    config = Config.get_config()
+
     KeywordSpec.validate!(opts,
       style: [],
       x_axis: "x",
@@ -166,12 +169,32 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
     KeywordSpec.validate!(style, [
       radii,
       !color,
-      opacity: 1,
-      stroke: nil,
-      stroke_paint: nil,
-      stroke_thickness: nil,
-      radius: Length.pt(2)
+      opacity: config.scatter_plot_marker_opacity,
+      stroke_dash: config.scatter_plot_marker_stroke_dash,
+      stroke_paint: config.scatter_plot_marker_stroke_paint,
+      stroke_thickness: config.scatter_plot_marker_stroke_thickness,
+      radius: config.scatter_plot_marker_size
     ])
+
+    case color do
+      name when is_binary(name) ->
+        raise ArgumentError, """
+          The :color option was given as #{inspect(name)}, a binary.
+          The color should be given as a %Quartz.Color.RGB{} struct.
+          The Quartz.Color.RBG module contains functions named after the supported colors.
+          """
+
+      nil ->
+        :ok
+
+      %Color.RGB{} ->
+        :ok
+
+      _other ->
+        raise ArgumentError, """
+          Unsupported color value: #{inspect(color)}
+          """
+    end
 
     # Convert everything that might be a polynomial into a number
     # TODO: do we want to allow polynomials here?
@@ -182,8 +205,8 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
       # There are multiple radii
       for {x, y, r} <- Enum.zip([data_x, data_y, radii]) do
         # Convert to data
-        center_x = AxisData.new(x, plot.id, x_axis) |> Polynomial.variable()
-        center_y = AxisData.new(y, plot.id, y_axis) |> Polynomial.variable()
+        center_x = AxisData.new_variable(x, plot.id, x_axis) #|> Polynomial.variable()
+        center_y = AxisData.new_variable(y, plot.id, y_axis) #|> Polynomial.variable()
 
         Circle.draw_new(
           center_x: center_x,
@@ -191,7 +214,7 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
           radius: r,
           fill: color,
           opacity: opacity,
-          stroke: stroke,
+          stroke_dash: stroke_dash,
           stroke_paint: stroke_paint,
           stroke_thickness: stroke_thickness
         )
@@ -200,8 +223,8 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
       # All circles have the same radius
       for {x, y} <- Enum.zip(data_x, data_y) do
         # Convert to data
-        center_x = AxisData.new(x, plot.id, x_axis) |> Polynomial.variable()
-        center_y = AxisData.new(y, plot.id, y_axis) |> Polynomial.variable()
+        center_x = AxisData.new_variable(x, plot.id, x_axis) #|> Polynomial.variable()
+        center_y = AxisData.new_variable(y, plot.id, y_axis) #|> Polynomial.variable()
 
         Circle.draw_new(
           center_x: center_x,
@@ -209,7 +232,7 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
           radius: radius,
           fill: color,
           opacity: opacity,
-          stroke: stroke,
+          stroke_dash: stroke_dash,
           stroke_paint: stroke_paint,
           stroke_thickness: stroke_thickness
         )
@@ -220,7 +243,8 @@ defmodule Quartz.Plot2D.PairwiseDataPlot do
       symbol_properties = [
         fill: color,
         stroke_thickness: stroke_thickness,
-        stroke_paint: color
+        stroke_paint: color,
+        opacity: opacity
       ]
 
       symbol = Legend.symbol_for_color(legend_symbol, symbol_properties)

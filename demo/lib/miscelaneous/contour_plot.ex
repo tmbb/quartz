@@ -3,7 +3,6 @@ defmodule Quartz.Demo.Miscelaneous.ContourPlot do
   require Quartz.Figure, as: Figure
   alias Quartz.Plot2D
   alias Quartz.Length
-  alias Quartz.Demo
 
   def draw(dir) do
     :rand.seed(:exsss, {42, 42, 42})
@@ -23,6 +22,6 @@ defmodule Quartz.Demo.Miscelaneous.ContourPlot do
           |> Plot2D.finalize()
       end)
 
-    Demo.example_to_png_and_svg(figure, dir, "contour_plot")
+    Figure.render_to_png_file!(figure, Path.join(dir, "contour_plot.png"))
   end
 end

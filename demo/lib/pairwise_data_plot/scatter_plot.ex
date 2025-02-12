@@ -3,8 +3,6 @@ defmodule Quartz.Demo.PairwiseDataPlot.ScatterPlot do
   require Quartz.Figure, as: Figure
   alias Quartz.Plot2D
   alias Quartz.Length
-  alias Quartz.ColorMap
-  alias Quartz.Demo
 
   alias Statistics.Distributions.Normal
 
@@ -24,29 +22,25 @@ defmodule Quartz.Demo.PairwiseDataPlot.ScatterPlot do
 
     figure =
       Figure.new([width: Length.cm(9), height: Length.cm(6)], fn _fig ->
-        Figure.add_plot_2d(fn plot ->
-          plot
-          # Plot the two datasets
-          |> Plot2D.draw_scatter_plot(x1, y1)
-          |> Plot2D.draw_scatter_plot(x2, y2, x_axis: "x2", y_axis: "y2")
-          # Use typst to explicitly style the title and labels ――――――――――――――――――――――――――――――――
-          |> Plot2D.put_title("A. Scatter plot (1 color per dataset) - linear scale")
-          |> Plot2D.put_major_tick_labels_style(["x", "y"], fill: ColorMap.tab10(0))
-          |> Plot2D.put_major_tick_labels_style(["x2", "y2"], fill: ColorMap.tab10(1))
-          # The axis labels must be explicitly given by the user.
-          # One can overwrite default properties such as text rotation.
-          # TODO: support non-text based labels
-          |> Plot2D.put_axis_label("x", "x-axis")
-          |> Plot2D.put_axis_label("y", "y-axis", text: [rotation: 0])
-          |> Plot2D.put_axis_label("x2", "x2-axis")
-          |> Plot2D.put_axis_label("y2", "y2-axis", text: [rotation: 0])
-          |> Plot2D.put_width_to_height_ratio(1.0)
-          # Specify lengths using "common" units such as cm or in instead of pt
-          |> Plot2D.put_axes_margins(Length.cm(0.2))
-          # Always finalize the plot so that it is added to the figure properly.
-          end)
+        Plot2D.new()
+        # Plot the two datasets
+        |> Plot2D.draw_scatter_plot(x1, y1, label: "Series 1")
+        |> Plot2D.draw_scatter_plot(x2, y2, label: "Series 2")
+        # Use typst to explicitly style the title and labels ――――――――――――――――――――――――――――――――
+        |> Plot2D.put_title("A. Scatter plot (1 color per dataset)")
+        # The axis labels must be explicitly given by the user.
+        # One can overwrite default properties such as text rotation.
+        # TODO: support non-text based labels
+        |> Plot2D.put_axis_label("x", "X-axis")
+        |> Plot2D.put_axis_label("y", "Y-axis")
+        # Specify lengths using "common" units such as cm or in instead of pt
+        |> Plot2D.put_axes_margins(Length.cm(0.2))
+        # Manually place the label
+        |> Plot2D.put_legend_location(:bottom_right)
+        # Always finalize the plot so that it is added to the figure properly.
+        |> Plot2D.finalize()
       end)
 
-    Demo.example_to_png_and_svg(figure, dir, "scatter_plot")
+    Figure.render_to_png_file!(figure, Path.join(dir, "scatter_plot.png"))
   end
 end

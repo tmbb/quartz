@@ -13,6 +13,7 @@ defmodule Quartz.Sketch do
   def draw(obj) do
     Figure.add_sketch(obj.id, obj)
 
+    # Put this in the protocol instead of hardcoding the case of %Text{}
     case obj do
       %Text{} ->
         Figure.add_unmeasured_item(obj)

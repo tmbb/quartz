@@ -11,6 +11,7 @@ defmodule Quartz.Legend do
   alias Quartz.LegendSymbolBuilder
   alias Quartz.Text
   alias Quartz.Config
+  alias Quartz.Rectangle
 
   import Quartz.Operators, only: [algebra: 1]
 
@@ -60,15 +61,32 @@ defmodule Quartz.Legend do
   @doc false
   @spec draw_legend(Plot2D.t()) :: Plot2D.t()
   def draw_legend(%Plot2D{} = plot) do
-    draw_vertically_stacked_label(plot)
+    draw_vertically_stacked_legend(plot)
   end
 
-  @spec draw_vertically_stacked_label(Plot2D.t()) :: Plot2D.t()
-  def draw_vertically_stacked_label(%Plot2D{} = plot) do
+  @spec draw_vertically_stacked_legend(Plot2D.t()) :: Plot2D.t()
+  def draw_vertically_stacked_legend(%Plot2D{} = plot) do
     legend_items = Enum.reverse(plot.legend_items)
 
-    padding = Length.pt(1.5)
-    gap = Length.pt(1.5)
+    padding = Length.pt(2)
+    gap = Length.pt(2)
+
+    legend_background =
+      if plot.legend_background do
+        # This rectangle must be drawn before the other items
+        # in the legend so that it is behind them in the figure.
+        # We can't give the x, y, width an height.
+        # We'll assign them later using constraints.
+        Rectangle.draw_new(
+          fill: plot.legend_background_color,
+          opacity: plot.legend_background_opacity,
+          stroke_paint: plot.legend_background_stroke_paint,
+          stroke_thickness: plot.legend_background_stroke_thickness,
+          stroke_dash: plot.legend_background_stroke_dash
+        )
+      else
+        nil
+      end
 
     panels =
       for {{symbol, label}, i} <- Enum.with_index(legend_items) do
@@ -121,10 +139,18 @@ defmodule Quartz.Legend do
 
     panels = List.flatten(panels)
 
-    absolute_x_offset = Length.pt(3)
-    absolute_y_offset = Length.pt(3)
-
     legend_board = Board.draw_new(width: 0.0, height: 0.0, panels: panels)
+
+    # Match the background to the dimensions of the legend
+    if plot.legend_background do
+      Figure.assert(legend_background.x == legend_board.x)
+      Figure.assert(legend_background.y == legend_board.y)
+      Figure.assert(legend_background.width == legend_board.width)
+      Figure.assert(legend_background.height == legend_board.height)
+    end
+
+    absolute_x_offset = algebra(0.025 * plot.data_area.width)
+    absolute_y_offset = algebra(0.025 * plot.data_area.height)
 
     {y_alignment, x_alignment, y_offset_sign, x_offset_sign} =
       case plot.legend_location do

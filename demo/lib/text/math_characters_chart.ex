@@ -127,24 +127,6 @@ defmodule Quartz.Demo.Text.MathCharactersChart do
         Figure.assert(fig.height >= final_y)
       end)
 
-    path = Path.join([dir, "math_characters_chart", "full_chart.png"])
-    Figure.render_to_png_file(full_chart_fig, path)
-
-    # for {lazy_cat, nr_of_columns} <- categories do
-    #   category_figure =
-    #     Figure.new([height: Length.cm(0), width: Length.cm(0)], fn fig ->
-    #       {category, sketches} = lazy_cat.()
-    #       final_y = character_table_with_title(fig, Length.pt(4), category, sketches, nr_of_columns)
-    #       Figure.assert(fig.height >= final_y)
-    #     end)
-
-
-    #   # Create a new figure so that we can access the category name
-    #   Figure.new([], fn _fig ->
-    #     {category, _sketches} = lazy_cat.()
-    #     path = Path.join([dir, "math_characters_chart", "#{category.slug}.png"])
-    #     Figure.render_to_png_file(category_figure, path)
-    #   end)
-    # end
+    Figure.render_to_png_file!(full_chart_fig, Path.join(dir, "math_characters_chart.png"))
   end
 end

@@ -26,7 +26,6 @@ defmodule Quartz.Demo.DistributionPlot.KDEPlot do
           |> Plot2D.finalize()
       end)
 
-
-    Demo.example_to_png_and_svg(figure, dir, "dist_plot")
+    Figure.render_to_png_file!(figure, Path.join(dir, "dist_plot.png"))
   end
 end

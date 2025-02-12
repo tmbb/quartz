@@ -16,6 +16,7 @@ defmodule Quartz.Plot2D do
   alias Quartz.Config
   alias Quartz.ColorMap
   alias Quartz.Legend
+  alias Quartz.Color.RGB
 
   alias Quartz.Plot2D.PairwiseDataPlot
   alias Quartz.Plot2D.DistributionPlot
@@ -81,6 +82,12 @@ defmodule Quartz.Plot2D do
             categorical_color_index: 0,
             width_to_aspect_ratio: nil,
             has_legend: true,
+            legend_background: false,
+            legend_background_color: RGB.white(),
+            legend_background_opacity: 1.0,
+            legend_background_stroke_paint: nil,
+            legend_background_stroke_thickness: nil,
+            legend_background_stroke_dash: nil,
             legend_location: :top_right,
             legend_items: []
 
@@ -931,6 +938,30 @@ defmodule Quartz.Plot2D do
 
   def no_legend(plot) do
     %{plot | has_legend: false}
+  end
+
+  def put_legend_style(plot, attributes) do
+    KeywordSpec.validate!(attributes, [
+      background_color,
+      background_opacity,
+      background_stroke_paint,
+      background_stroke_thickness,
+      background_stroke_dash
+    ])
+
+    plot
+    |> put_attr_if_not_nil(:legend_background_color, background_color)
+    |> put_attr_if_not_nil(:legend_background_opacity, background_opacity)
+    |> put_attr_if_not_nil(:legend_background_stroke_paint, background_stroke_paint)
+    |> put_attr_if_not_nil(:legend_background_stroke_thickness, background_stroke_thickness)
+    |> put_attr_if_not_nil(:legend_background_stroke_dash, background_stroke_dash)
+  end
+
+  defp put_attr_if_not_nil(plot, key, value) do
+    case value do
+      nil -> plot
+      _other -> %{plot | key => value}
+    end
   end
 
   @doc """

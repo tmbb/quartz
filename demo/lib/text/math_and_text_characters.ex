@@ -2,11 +2,11 @@ defmodule Quartz.Demo.Text.MathAndTextCharacters do
   @moduledoc false
 
   require Quartz.Figure, as: Figure
-  alias Quartz.{Demo, Board, Panel, Length, Math, Text, Config}
+  alias Quartz.{Board, Panel, Length, Math, Text, Config}
 
   def draw(dir) do
     figure =
-      Figure.new([width: Length.cm(10), height: Length.cm(4), debug: true], fn _fig ->
+      Figure.new([width: Length.cm(10), height: Length.cm(4)], fn _fig ->
         text_attrs = Config.get_legend_text_attributes(size: 10)
 
         sentence1 =
@@ -82,6 +82,6 @@ defmodule Quartz.Demo.Text.MathAndTextCharacters do
         Board.draw_new(x: 0, y: 0, height: 0, width: 0, panels: panels)
       end)
 
-    Demo.example_to_png_and_svg(figure, dir, "math_and_text_characters")
+    Figure.render_to_png_file!(figure, Path.join(dir, "math_and_text_characters.png"))
   end
 end

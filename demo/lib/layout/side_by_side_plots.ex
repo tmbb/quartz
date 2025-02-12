@@ -7,7 +7,6 @@ defmodule Quartz.Demo.Layout.SideBySidePlots do
   alias Quartz.Scale
   alias Quartz.Text
   alias Quartz.Math
-  alias Quartz.Demo
   alias Quartz.Config
 
 
@@ -56,6 +55,6 @@ defmodule Quartz.Demo.Layout.SideBySidePlots do
           |> Plot2D.finalize()
       end)
 
-    Demo.example_to_png_and_svg(figure, dir, "side_by_side_plots")
+    Figure.render_to_png_file!(figure, Path.join(dir, "side_by_side_plots.png"))
   end
 end

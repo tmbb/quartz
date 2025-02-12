@@ -1,20 +1,7 @@
 defmodule Quartz.Demo do
   # Extract the height and width from the SVG file
   insert_png_image = fn name ->
-    svg_path = Path.join(["assets", name, "example.svg"])
-    svg = File.read!(svg_path)
-
-    # Make sure we recompile the docstring when the SVG width changes.
-    # We don't need to recompile the docstring when the PNG file changes.
-    Module.put_attribute(__MODULE__, :external_resource, svg_path)
-
-    %{"width" => width, "height" => height} =
-      Regex.named_captures(
-        ~r/<svg\s+xmlns="[^"]+"\s+width="(?P<width>[^"]+)"\s+height="(?P<height>[^"]+)"/,
-        svg
-      )
-
-    ~s[<img width="#{width}" height="#{height}" src="assets/#{name}/example.png"/>]
+    ~s[<img width="75%" src="assets/#{name}.png"/>]
   end
 
   @moduledoc """
@@ -54,10 +41,21 @@ defmodule Quartz.Demo do
   Contour of a function
 
   #{insert_png_image.("contour_plot")}
+
+  ## Text and math support
+
+  Mix between normal text characters and math characters:
+
+  #{insert_png_image.("math_and_text_characters")}
+
+  Full list of supported symbols:
+
+  #{insert_png_image.("math_characters_chart")}
   """
 
   alias Quartz.Figure
 
+  @doc false
   def example_to_png_and_svg(figure, dir, subdir) do
     File.mkdir_p!(Path.join(dir, subdir))
 
@@ -70,6 +68,7 @@ defmodule Quartz.Demo do
     :ok
   end
 
+  @doc false
   def nuts_chains_path() do
     Path.join([:code.priv_dir(:quartz), "demo", "samples.parquet"])
   end
@@ -83,6 +82,7 @@ defmodule Quartz.Demo do
     Text
   }
 
+  @doc false
   def draw_demo_plots(demo_dir) do
     # Layout.AspectRatioScatterPlot.draw(demo_dir)
     Layout.SideBySidePlots.draw(demo_dir)

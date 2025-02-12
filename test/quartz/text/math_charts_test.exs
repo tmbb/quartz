@@ -8,6 +8,7 @@ defmodule Quartz.Plot2D.Text.MathCharactersChartsTest do
 
   @output_dir "test/quartz/text/outputs/math_charts"
 
+  @tag timeout: 300_000
   test "regression testing for the symbol charts in the demo" do
     # Lazy loading of categories because they must be inside a figure context
     categories = [

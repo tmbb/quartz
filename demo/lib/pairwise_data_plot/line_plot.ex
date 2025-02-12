@@ -5,7 +5,6 @@ defmodule Quartz.Demo.PairwiseDataPlot.LinePlot do
   alias Quartz.Plot2D
   alias Quartz.Length
   alias Quartz.Color.RGB
-  alias Quartz.Demo
 
   def draw(dir) do
     :rand.seed(:exsss, {42, 42, 42})
@@ -27,6 +26,6 @@ defmodule Quartz.Demo.PairwiseDataPlot.LinePlot do
           |> Plot2D.finalize()
       end)
 
-    Demo.example_to_png_and_svg(figure, dir, "line_plot")
+    Figure.render_to_png_file!(figure, Path.join(dir, "line_plot.png"))
   end
 end

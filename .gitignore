@@ -25,5 +25,7 @@ quartz-*.tar
 # Temporary files, for example, from tests.
 /tmp/
 
+/test/**/*_snapshot.png
+
 # Ignore log files
 *.log

@@ -40,15 +40,15 @@ defmodule Quartz.Rectangle do
       stroke_opacity: nil
     )
 
-    rect_x = Figure.variable("rectangle_x", min: 0, prefix: prefix)
-    rect_y = Figure.variable("rectangle_y", min: 0, prefix: prefix)
+    rect_x = Figure.variable("rectangle_x", prefix: prefix)
+    rect_y = Figure.variable("rectangle_y", prefix: prefix)
     rect_height = Figure.variable("rectangle_height", min: 0, prefix: prefix)
-    rect_width = Figure.variable("rectanle_width", min: 0, prefix: prefix)
+    rect_width = Figure.variable("rectangle_width", min: 0, prefix: prefix)
 
-    if rect_x, do: Figure.assert(rect_height == x)
-    if rect_y, do: Figure.assert(rect_width == y)
-    if rect_height, do: Figure.assert(rect_height == height)
-    if rect_width, do: Figure.assert(rect_width == width)
+    if x, do: Figure.assert(rect_x == x)
+    if y, do: Figure.assert(rect_y == y)
+    if height, do: Figure.assert(rect_height == height)
+    if width, do: Figure.assert(rect_width == width)
 
     # Create the actual rectangle
     rectangle = %__MODULE__{

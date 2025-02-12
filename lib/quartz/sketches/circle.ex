@@ -1,8 +1,8 @@
 defmodule Quartz.Circle do
   alias Quartz.Sketch
-  alias Quartz.Figure
-  alias Quartz.Variable
   alias Quartz.SVG
+
+  require Quartz.Figure, as: Figure
   require Quartz.KeywordSpec, as: KeywordSpec
 
   defstruct id: nil,
@@ -10,6 +10,7 @@ defmodule Quartz.Circle do
             center_y: nil,
             radius: nil,
             fill: nil,
+            opacity: nil,
             stroke_thickness: 1,
             stroke_paint: nil,
             stroke_dash: nil,
@@ -18,34 +19,25 @@ defmodule Quartz.Circle do
   def new(opts \\ []) do
     prefix = Keyword.get(opts, :prefix, nil)
     # Assign variables (= Dantzig monomials) to the parameters of the circle
-    center_x =
-      Variable.maybe_variable(
-        opts,
-        :center_x,
-        Variable.maybe_with_prefix(prefix, "circle_center_x"),
-        []
-      )
-
-    center_y =
-      Variable.maybe_variable(
-        opts,
-        :center_y,
-        Variable.maybe_with_prefix(prefix, "circle_center_y"),
-        []
-      )
-
-    radius =
-      Variable.maybe_variable(opts, :radius, Variable.maybe_with_prefix(prefix, "circle_radius"),
-        min: 0
-      )
+    circle_center_x = Figure.variable("circle_center_x", prefix: prefix)
+    circle_center_y = Figure.variable("circle_center_y", prefix: prefix)
+    circle_radius = Figure.variable("circle_radius", prefix: prefix)
 
     KeywordSpec.validate!(opts, [
       fill,
       stroke_paint,
       stroke_dash,
+      center_x,
+      center_y,
+      radius,
+      opacity: nil,
       z_index: 1.0,
       stroke_thickness: 1
     ])
+
+    if center_x, do: Figure.assert(circle_center_x == center_x)
+    if center_y, do: Figure.assert(circle_center_y == center_y)
+    if radius, do: Figure.assert(circle_radius == radius)
 
     # Get the next available ID from the figure
     id = Figure.get_id()
@@ -53,10 +45,11 @@ defmodule Quartz.Circle do
     # Create the actual circle
     circle = %__MODULE__{
       id: id,
-      center_x: center_x,
-      center_y: center_y,
-      radius: radius,
+      center_x: circle_center_x,
+      center_y: circle_center_y,
+      radius: circle_radius,
       fill: fill,
+      opacity: opacity,
       stroke_thickness: stroke_thickness,
       stroke_paint: stroke_paint,
       stroke_dash: stroke_dash,
@@ -119,6 +112,7 @@ defmodule Quartz.Circle do
         cy: circle.center_y,
         r: circle.radius,
         fill: circle.fill,
+        opacity: circle.opacity,
         stroke: circle.stroke_paint,
         "stroke-width": circle.stroke_thickness
       )

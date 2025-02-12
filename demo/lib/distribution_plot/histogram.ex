@@ -16,7 +16,7 @@ defmodule Quartz.Demo.DistributionPlot.Histogram do
     theta1 = chain1[:theta]
 
     figure =
-      Figure.new([width: Length.cm(8), height: Length.cm(4), debug: true], fn _fig ->
+      Figure.new([width: Length.cm(8), height: Length.cm(4)], fn _fig ->
         _plot =
           Plot2D.new(id: "plot_A")
           |> Plot2D.draw_histogram(theta1)
@@ -28,6 +28,6 @@ defmodule Quartz.Demo.DistributionPlot.Histogram do
           |> Plot2D.finalize()
       end)
 
-    Demo.example_to_png_and_svg(figure, dir, "histogram")
+    Figure.render_to_png_file!(figure, Path.join(dir, "histogram.png"))
   end
 end

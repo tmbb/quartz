@@ -1186,6 +1186,7 @@ defmodule Quartz.Figure do
       |> dump_to_debug_file()
       |> solve_problem()
       |> solve_figure_dimensions()
+      |> dump_to_debug_file()
       |> solve_sketches()
       |> finalize()
     after

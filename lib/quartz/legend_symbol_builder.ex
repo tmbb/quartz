@@ -18,10 +18,16 @@ defmodule Quartz.LegendSymbolBuilder do
 
   @derive {Inspect, only: [:name]}
 
+  @doc """
+  A symbol builder.
+  """
   defstruct name: nil,
             opts: [],
             builder: nil
 
+  @doc """
+  Creates a rectangle symbol builder for a legend.
+  """
   def rectangle(opts) do
     %__MODULE__{
       name: "rectangle",
@@ -49,6 +55,9 @@ defmodule Quartz.LegendSymbolBuilder do
     }
   end
 
+  @doc """
+  Creates a circle symbol builder for a legend.
+  """
   def circle(opts) do
     %__MODULE__{
       name: "circle",
@@ -59,7 +68,7 @@ defmodule Quartz.LegendSymbolBuilder do
           opacity: 1
         ])
 
-        radius = algebra(0.8 * get_label_height(label))
+        radius = algebra(0.3 * get_label_height(label))
 
         Circle.new(
           radius: radius,
@@ -70,6 +79,9 @@ defmodule Quartz.LegendSymbolBuilder do
     }
   end
 
+  @doc """
+  Creates a line symbol builder for a legend.
+  """
   def line(opts) do
     %__MODULE__{
       name: "line",
@@ -98,10 +110,16 @@ defmodule Quartz.LegendSymbolBuilder do
     }
   end
 
+  @doc """
+  Builds a symbol from a symbol builder and a concrete legend.
+  """
   def build(symbol, label, builder_opts) do
     symbol.builder.(label, symbol.opts, builder_opts)
   end
 
+  @doc """
+  Get the height of a label to draw a symbol marker.
+  """
   def get_label_height(label) do
     case label do
       %Text{} ->
