@@ -44,7 +44,7 @@ defmodule Publish do
       Mix.Shell.IO.info(">>> Run git commands")
       git_commands(new_version)
 
-      System.shell("mix hex.publish --dry-run")
+      System.shell("mix hex.publish --dry-run", into: IO.stream())
 
       Mix.Shell.IO.info(">>> You must invoke 'mix hex.publish' manually")
     else
