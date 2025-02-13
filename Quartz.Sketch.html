@@ -5,16 +5,16 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.34.2">
-    <meta name="project" content="quartz v0.1.0">
+    <meta name="project" content="Quartz v0.6.0">
 
 
-    <title>Quartz.Sketch — quartz v0.1.0</title>
+    <title>Quartz.Sketch — Quartz v0.6.0</title>
     <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
 
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
     <script src="dist/handlebars.templates-K7URE6B4.js"></script>
-    <script src="dist/sidebar_items-E031779F.js"></script>
+    <script src="dist/sidebar_items-0C91E033.js"></script>
     <script src="docs_config.js"></script>
     <script async src="dist/html-YIPIRHGU.js"></script>
 
@@ -47,10 +47,10 @@
 
       <div>
         <a href="api-reference.html" class="sidebar-projectName" translate="no">
-quartz
+Quartz
         </a>
         <div class="sidebar-projectVersion" translate="no">
-          v0.1.0
+          v0.6.0
         </div>
       </div>
     </div>
@@ -90,7 +90,7 @@ Pages
       <div class="search-settings">
         <form class="search-bar" action="search.html">
           <label class="search-label">
-            <span class="sr-only">Search documentation of quartz</span>
+            <span class="sr-only">Search documentation of Quartz</span>
             <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </label>
           <button type="submit" class="search-button" aria-label="Submit Search">
@@ -112,11 +112,20 @@ Pages
 <div id="top-content">
   <h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
     <span translate="no">Quartz.Sketch</span> 
-    <small class="app-vsn" translate="no">(quartz v0.1.0)</small>
+    <small class="app-vsn" translate="no">(Quartz v0.6.0)</small>
 
   </h1>
 
+
+    <section id="moduledoc">
+<p>Functions to work with objects that implement the <code class="inline">Sketch.Protocol</code>.</p>
+    </section>
 
 </div>
 
@@ -160,6 +169,12 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Given a rendered and measured Resvg node, assign measurements
+to the sketch from the measurements of the node.
+This is used to assign width, height and depth to text elements
+and to other elements for which the only way to measure them
+is to render the,.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -167,6 +182,8 @@ Pages
         <a href="#bbox_baseline/1" data-no-tooltip translate="no">bbox_baseline(obj)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Get the baseline of the bounding box of a sketch.</p></div>
 
     </div>
 
@@ -176,6 +193,8 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Get the bottom of the bounding box of a sketch.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -183,6 +202,8 @@ Pages
         <a href="#bbox_bounds/1" data-no-tooltip translate="no">bbox_bounds(obj)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Get the bounding box bounds of a sketch.</p></div>
 
     </div>
 
@@ -192,6 +213,8 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Get the (horizontal) center of the bounding box of a sketch.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -199,6 +222,8 @@ Pages
         <a href="#bbox_height/1" data-no-tooltip translate="no">bbox_height(obj)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Get the height of the bounding box of a sketch.</p></div>
 
     </div>
 
@@ -208,6 +233,8 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Get the horizon (vertical center) of the bounding box of a sketch.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -215,6 +242,8 @@ Pages
         <a href="#bbox_left/1" data-no-tooltip translate="no">bbox_left(obj)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Get the left limit of the bounding box of a sketch.</p></div>
 
     </div>
 
@@ -224,6 +253,8 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Get the right limit of the bounding box of a sketch.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -231,6 +262,8 @@ Pages
         <a href="#bbox_top/1" data-no-tooltip translate="no">bbox_top(obj)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Get the top of the bounding box of a sketch.</p></div>
 
     </div>
 
@@ -240,6 +273,8 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Get the width of the bounding box of a sketch.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -247,6 +282,8 @@ Pages
         <a href="#draw/1" data-no-tooltip translate="no">draw(obj)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Draw a sketch inside a figure.</p></div>
 
     </div>
 
@@ -256,6 +293,8 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Get all the lengths in a sketch.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -263,6 +302,8 @@ Pages
         <a href="#to_svg/1" data-no-tooltip translate="no">to_svg(obj)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Render an object into SVG.</p></div>
 
     </div>
 
@@ -272,6 +313,10 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Render a sketch while setting its position to zero.
+What exactly means setting the position to zero is
+implementation-dependent.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -279,6 +324,9 @@ Pages
         <a href="#transform_lengths/2" data-no-tooltip translate="no">transform_lengths(obj, fun)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Apply a transformation to the sketch's lengths.
+Which lengths must be transformed is implementation-dependent.</p></div>
 
     </div>
 
@@ -304,6 +352,11 @@ Pages
     </a>
     <h1 class="signature" translate="no">length()</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L12" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -311,7 +364,7 @@ Pages
 
       <div class="specs">
 
-          <pre translate="no"><span class="attribute">@type</span> length() :: <a href="https://hexdocs.pm/dantzig/0.1.0/Dantzig.Polynomial.html#t:t/0">Dantzig.Polynomial.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()</pre>
+          <pre translate="no"><span class="attribute">@type</span> length() :: <a href="https://hexdocs.pm/dantzig/0.2.0/Dantzig.Polynomial.html#t:t/0">Dantzig.Polynomial.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()</pre>
 
       </div>
 
@@ -326,6 +379,11 @@ Pages
       <span class="sr-only">Link to this type</span>
     </a>
     <h1 class="signature" translate="no">t()</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L11" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -362,6 +420,11 @@ Pages
     </a>
     <h1 class="signature" translate="no">assign_measurements_from_resvg_node(obj, resvg_node)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L182" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -379,7 +442,11 @@ Pages
 
       </div>
 
-
+<p>Given a rendered and measured Resvg node, assign measurements
+to the sketch from the measurements of the node.
+This is used to assign width, height and depth to text elements
+and to other elements for which the only way to measure them
+is to render the,.</p>
   </section>
 </section>
 <section class="detail" id="bbox_baseline/1">
@@ -390,6 +457,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bbox_baseline(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L37" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -402,7 +474,7 @@ Pages
 
       </div>
 
-
+<p>Get the baseline of the bounding box of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="bbox_bottom/1">
@@ -413,6 +485,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bbox_bottom(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L94" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -425,7 +502,7 @@ Pages
 
       </div>
 
-
+<p>Get the bottom of the bounding box of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="bbox_bounds/1">
@@ -436,6 +513,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bbox_bounds(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L122" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -448,7 +530,7 @@ Pages
 
       </div>
 
-
+<p>Get the bounding box bounds of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="bbox_center/1">
@@ -459,6 +541,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bbox_center(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L46" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -471,7 +558,7 @@ Pages
 
       </div>
 
-
+<p>Get the (horizontal) center of the bounding box of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="bbox_height/1">
@@ -482,6 +569,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bbox_height(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L104" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -494,7 +586,7 @@ Pages
 
       </div>
 
-
+<p>Get the height of the bounding box of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="bbox_horizon/1">
@@ -505,6 +597,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bbox_horizon(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L56" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -517,7 +614,7 @@ Pages
 
       </div>
 
-
+<p>Get the horizon (vertical center) of the bounding box of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="bbox_left/1">
@@ -528,6 +625,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bbox_left(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L85" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -540,7 +642,7 @@ Pages
 
       </div>
 
-
+<p>Get the left limit of the bounding box of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="bbox_right/1">
@@ -551,6 +653,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bbox_right(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L76" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -563,7 +670,7 @@ Pages
 
       </div>
 
-
+<p>Get the right limit of the bounding box of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="bbox_top/1">
@@ -574,6 +681,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bbox_top(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L66" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -586,7 +698,7 @@ Pages
 
       </div>
 
-
+<p>Get the top of the bounding box of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="bbox_width/1">
@@ -597,6 +709,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bbox_width(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L113" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -609,7 +726,7 @@ Pages
 
       </div>
 
-
+<p>Get the width of the bounding box of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="draw/1">
@@ -620,6 +737,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">draw(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L18" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -632,7 +754,7 @@ Pages
 
       </div>
 
-
+<p>Draw a sketch inside a figure.</p>
   </section>
 </section>
 <section class="detail" id="lengths/1">
@@ -643,6 +765,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">lengths(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L170" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -655,7 +782,7 @@ Pages
 
       </div>
 
-
+<p>Get all the lengths in a sketch.</p>
   </section>
 </section>
 <section class="detail" id="to_svg/1">
@@ -666,6 +793,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">to_svg(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L143" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -678,7 +810,7 @@ Pages
 
       </div>
 
-
+<p>Render an object into SVG.</p>
   </section>
 </section>
 <section class="detail" id="to_unpositioned_svg/1">
@@ -689,6 +821,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">to_unpositioned_svg(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L135" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -701,7 +838,10 @@ Pages
 
       </div>
 
-
+<p>Render a sketch while setting its position to zero.
+What exactly means setting the position to zero is
+implementation-dependent.</p><p>This function is used to get the size (bbox dimensions)
+of a sketch.</p>
   </section>
 </section>
 <section class="detail" id="transform_lengths/2">
@@ -712,6 +852,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">transform_lengths(obj, fun)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch.ex#L162" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -724,7 +869,10 @@ Pages
 
       </div>
 
-
+<p>Apply a transformation to the sketch's lengths.
+Which lengths must be transformed is implementation-dependent.</p><p>This function is used to substitute variables into their values
+in the lengths (position, size, etc.) of a sketch after solving
+for all the constraints.</p>
   </section>
 </section>
 
@@ -734,12 +882,19 @@ Pages
     <footer class="footer">
       <p>
 
+          <span class="line">
+            <a href="https://hex.pm/packages/quartz/0.6.0" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/quartz/0.6.0">Hex Preview</a>
+
+          </span>
+
         <span class="line">
           <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
             Search HexDocs
           </button>
 
-            <a href="quartz.epub" title="ePub version">
+            <a href="Quartz.epub" title="ePub version">
               Download ePub version
             </a>
 

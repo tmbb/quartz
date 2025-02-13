@@ -5,16 +5,16 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.34.2">
-    <meta name="project" content="quartz v0.1.0">
+    <meta name="project" content="Quartz v0.6.0">
 
 
-    <title>Quartz.Formatter — quartz v0.1.0</title>
+    <title>Quartz.Formatter — Quartz v0.6.0</title>
     <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
 
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
     <script src="dist/handlebars.templates-K7URE6B4.js"></script>
-    <script src="dist/sidebar_items-E031779F.js"></script>
+    <script src="dist/sidebar_items-0C91E033.js"></script>
     <script src="docs_config.js"></script>
     <script async src="dist/html-YIPIRHGU.js"></script>
 
@@ -47,10 +47,10 @@
 
       <div>
         <a href="api-reference.html" class="sidebar-projectName" translate="no">
-quartz
+Quartz
         </a>
         <div class="sidebar-projectVersion" translate="no">
-          v0.1.0
+          v0.6.0
         </div>
       </div>
     </div>
@@ -90,7 +90,7 @@ Pages
       <div class="search-settings">
         <form class="search-bar" action="search.html">
           <label class="search-label">
-            <span class="sr-only">Search documentation of quartz</span>
+            <span class="sr-only">Search documentation of Quartz</span>
             <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </label>
           <button type="submit" class="search-button" aria-label="Submit Search">
@@ -112,8 +112,13 @@ Pages
 <div id="top-content">
   <h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/formatter.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
     <span translate="no">Quartz.Formatter</span> 
-    <small class="app-vsn" translate="no">(quartz v0.1.0)</small>
+    <small class="app-vsn" translate="no">(Quartz v0.6.0)</small>
 
   </h1>
 
@@ -142,6 +147,18 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Display a float rounded to the given number of decimals.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#rounded_length/2" data-no-tooltip translate="no">rounded_length(float, decimals \\ 5)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>A function to display rounded length with a given number of decimals.</p></div>
+
     </div>
 
 </div>
@@ -168,12 +185,44 @@ Pages
     </a>
     <h1 class="signature" translate="no">rounded_float(float, nr_of_decimal_places, format \\ :normal)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/formatter.ex#L29" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
   <section class="docstring">
 
+<p>Display a float rounded to the given number of decimals.</p>
+  </section>
+</section>
+<section class="detail" id="rounded_length/2">
 
+    <span id="rounded_length/1"></span>
+
+  <div class="detail-header">
+    <a href="#rounded_length/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">rounded_length(float, decimals \\ 5)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/formatter.ex#L18" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>A function to display rounded length with a given number of decimals.</p><p>This is used mainly when rendering sketches to SVG.
+The goal of defining this function here is to centralize the default number
+of decimal places for floats that are used as part of drawing dimensions.</p><p>This function is public API and is meant to be used by end users
+who might want to implement new sketches.</p>
   </section>
 </section>
 
@@ -183,12 +232,19 @@ Pages
     <footer class="footer">
       <p>
 
+          <span class="line">
+            <a href="https://hex.pm/packages/quartz/0.6.0" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/quartz/0.6.0">Hex Preview</a>
+
+          </span>
+
         <span class="line">
           <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
             Search HexDocs
           </button>
 
-            <a href="quartz.epub" title="ePub version">
+            <a href="Quartz.epub" title="ePub version">
               Download ePub version
             </a>
 

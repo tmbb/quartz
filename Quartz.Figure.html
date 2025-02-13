@@ -5,16 +5,16 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.34.2">
-    <meta name="project" content="quartz v0.1.0">
+    <meta name="project" content="Quartz v0.6.0">
 
 
-    <title>Quartz.Figure — quartz v0.1.0</title>
+    <title>Quartz.Figure — Quartz v0.6.0</title>
     <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
 
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
     <script src="dist/handlebars.templates-K7URE6B4.js"></script>
-    <script src="dist/sidebar_items-E031779F.js"></script>
+    <script src="dist/sidebar_items-0C91E033.js"></script>
     <script src="docs_config.js"></script>
     <script async src="dist/html-YIPIRHGU.js"></script>
 
@@ -47,10 +47,10 @@
 
       <div>
         <a href="api-reference.html" class="sidebar-projectName" translate="no">
-quartz
+Quartz
         </a>
         <div class="sidebar-projectVersion" translate="no">
-          v0.1.0
+          v0.6.0
         </div>
       </div>
     </div>
@@ -90,7 +90,7 @@ Pages
       <div class="search-settings">
         <form class="search-bar" action="search.html">
           <label class="search-label">
-            <span class="sr-only">Search documentation of quartz</span>
+            <span class="sr-only">Search documentation of Quartz</span>
             <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </label>
           <button type="submit" class="search-button" aria-label="Submit Search">
@@ -112,14 +112,22 @@ Pages
 <div id="top-content">
   <h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
     <span translate="no">Quartz.Figure</span> 
-    <small class="app-vsn" translate="no">(quartz v0.1.0)</small>
+    <small class="app-vsn" translate="no">(Quartz v0.6.0)</small>
 
   </h1>
 
 
     <section id="moduledoc">
-<p>Figure</p>
+<p>Figure</p><p>The figure is the highest level entity that Quartz deals with.
+Every drawing is a figure, and objects in a figure can interact
+in stateful ways that break referential transparency.
+However, figures can't interact with each other.</p>
     </section>
 
 </div>
@@ -186,7 +194,7 @@ Pages
 
     <div class="summary-row">
       <div class="summary-signature">
-        <a href="#assert/1" data-no-tooltip translate="no">assert(comparison)</a>
+        <a href="#assert/1" data-no-tooltip translate="no">assert(arg)</a>
 
       </div>
 
@@ -194,7 +202,15 @@ Pages
 
     <div class="summary-row">
       <div class="summary-signature">
-        <a href="#assert/3" data-no-tooltip translate="no">assert(left, operator, right)</a>
+        <a href="#assert/2" data-no-tooltip translate="no">assert(comparison, extra \\ [])</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#assert/4" data-no-tooltip translate="no">assert(left, operator, right, metadata \\ nil)</a>
 
       </div>
 
@@ -529,6 +545,11 @@ Raises an error if it can't write to the file.</p></div>
     </a>
     <h1 class="signature" translate="no">bounds()</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L52" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -551,6 +572,11 @@ Raises an error if it can't write to the file.</p></div>
       <span class="sr-only">Link to this type</span>
     </a>
     <h1 class="signature" translate="no">t()</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L35" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -602,6 +628,11 @@ Raises an error if it can't write to the file.</p></div>
     </a>
     <h1 class="signature" translate="no">add_plot_2d(fun)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L1230" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -619,6 +650,11 @@ Raises an error if it can't write to the file.</p></div>
     </a>
     <h1 class="signature" translate="no">add_sketch(id, sketch)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L480" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -635,6 +671,11 @@ Raises an error if it can't write to the file.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">add_unmeasured_item(object)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L294" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -654,7 +695,12 @@ the unmeasured items and query the renderer for their dimensions.</p>
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this macro</span>
     </a>
-    <h1 class="signature" translate="no">assert(comparison)</h1>
+    <h1 class="signature" translate="no">assert(arg)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L588" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
       <span class="note">(macro)</span>
@@ -666,14 +712,45 @@ the unmeasured items and query the renderer for their dimensions.</p>
 
   </section>
 </section>
-<section class="detail" id="assert/3">
+<section class="detail" id="assert/2">
 
   <div class="detail-header">
-    <a href="#assert/3" class="detail-link" data-no-tooltip title="Link to this function">
+    <a href="#assert/2" class="detail-link" data-no-tooltip title="Link to this macro">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this macro</span>
+    </a>
+    <h1 class="signature" translate="no">assert(comparison, extra \\ [])</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L618" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+      <span class="note">(macro)</span>
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="assert/4">
+
+    <span id="assert/3"></span>
+
+  <div class="detail-header">
+    <a href="#assert/4" class="detail-link" data-no-tooltip title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">assert(left, operator, right)</h1>
+    <h1 class="signature" translate="no">assert(left, operator, right, metadata \\ nil)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L535" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -692,6 +769,11 @@ the unmeasured items and query the renderer for their dimensions.</p>
     </a>
     <h1 class="signature" translate="no">assert_contains(container, item)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L961" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -708,6 +790,11 @@ the unmeasured items and query the renderer for their dimensions.</p>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">assert_contains_horizontally(container, item)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L977" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -726,6 +813,11 @@ the unmeasured items and query the renderer for their dimensions.</p>
     </a>
     <h1 class="signature" translate="no">assert_contains_vertically(container, item)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L968" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -743,6 +835,11 @@ the unmeasured items and query the renderer for their dimensions.</p>
     </a>
     <h1 class="signature" translate="no">assert_horizontally_contained_in(item, container)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L993" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -759,6 +856,11 @@ the unmeasured items and query the renderer for their dimensions.</p>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">assert_vertically_contained_in(item, container)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L986" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -778,6 +880,11 @@ the unmeasured items and query the renderer for their dimensions.</p>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">bounds_for_plots_in_grid(opts \\ [])</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L71" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -805,6 +912,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
     </a>
     <h1 class="signature" translate="no">center_on(object, container)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L941" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -821,6 +933,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">current_figure_height()</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L501" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -839,6 +956,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
     </a>
     <h1 class="signature" translate="no">current_figure_width()</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L496" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -855,6 +977,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">debug?()</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L195" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -873,6 +1000,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
     </a>
     <h1 class="signature" translate="no">get_current_figure()</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L487" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -889,6 +1021,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">get_id()</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L473" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -908,6 +1045,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
       <span class="sr-only">Link to this macro</span>
     </a>
     <h1 class="signature" translate="no">maximize(expression, opts \\ [])</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L636" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
       <span class="note">(macro)</span>
@@ -930,6 +1072,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
     </a>
     <h1 class="signature" translate="no">minimize(expression, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L654" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
       <span class="note">(macro)</span>
 
@@ -949,6 +1096,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
     </a>
     <h1 class="signature" translate="no">new(args, fun)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L1087" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -965,6 +1117,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">place_in_canvas(sketch, canvas, opts)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L728" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -985,6 +1142,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
     </a>
     <h1 class="signature" translate="no">position_with_location_and_alignment(sketch, container, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L1008" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1001,6 +1163,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">put_current_figure(figure)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L506" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1019,6 +1186,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
     </a>
     <h1 class="signature" translate="no">put_plot_in_current_figure(plot)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L519" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1035,6 +1207,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">render_to_png_binary(figure)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L251" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1059,6 +1236,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
     </a>
     <h1 class="signature" translate="no">render_to_png_file(figure, path)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L241" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1081,6 +1263,11 @@ the vertical padding between plots</li></ul><p>Returns a neste list of bounds.</
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">render_to_png_file!(figure, path)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L233" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1106,6 +1293,11 @@ Raises an error if it can't write to the file.</p>
     </a>
     <h1 class="signature" translate="no">render_to_svg_binary(figure)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L222" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1129,6 +1321,11 @@ Raises an error if it can't write to the file.</p>
     </a>
     <h1 class="signature" translate="no">render_to_svg_file(figure, path)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L203" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1151,6 +1348,11 @@ Raises an error if it can't write to the file.</p>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">render_to_svg_file!(figure, path)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L213" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1176,6 +1378,11 @@ Raises an error if it can't write to the file.</p>
     </a>
     <h1 class="signature" translate="no">render_to_svg_iodata(figure)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L266" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1192,6 +1399,11 @@ Raises an error if it can't write to the file.</p>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">share_axes(axes)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L464" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1210,6 +1422,11 @@ Raises an error if it can't write to the file.</p>
     </a>
     <h1 class="signature" translate="no">solve!(expression)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L445" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1226,6 +1443,11 @@ Raises an error if it can't write to the file.</p>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">solve_sketch!(sketch)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L460" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1244,6 +1466,11 @@ Raises an error if it can't write to the file.</p>
     </a>
     <h1 class="signature" translate="no">stack_horizontally(objects)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L830" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1260,6 +1487,11 @@ Raises an error if it can't write to the file.</p>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">stack_horizontally(objects, list)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L945" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1278,6 +1510,11 @@ Raises an error if it can't write to the file.</p>
     </a>
     <h1 class="signature" translate="no">stack_vertically(objects)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L802" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1295,6 +1532,11 @@ Raises an error if it can't write to the file.</p>
     </a>
     <h1 class="signature" translate="no">stack_vertically(objects, list)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L814" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1311,6 +1553,11 @@ Raises an error if it can't write to the file.</p>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">update_current_figure(fun)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L512" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1331,6 +1578,11 @@ Raises an error if it can't write to the file.</p>
     </a>
     <h1 class="signature" translate="no">variable(name, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/figure.ex#L796" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1346,12 +1598,19 @@ Raises an error if it can't write to the file.</p>
     <footer class="footer">
       <p>
 
+          <span class="line">
+            <a href="https://hex.pm/packages/quartz/0.6.0" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/quartz/0.6.0">Hex Preview</a>
+
+          </span>
+
         <span class="line">
           <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
             Search HexDocs
           </button>
 
-            <a href="quartz.epub" title="ePub version">
+            <a href="Quartz.epub" title="ePub version">
               Download ePub version
             </a>
 

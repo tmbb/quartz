@@ -5,16 +5,16 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.34.2">
-    <meta name="project" content="quartz v0.1.0">
+    <meta name="project" content="Quartz v0.6.0">
 
 
-    <title>Quartz.Sketch.Protocol — quartz v0.1.0</title>
+    <title>Quartz.Sketch.Protocol — Quartz v0.6.0</title>
     <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
 
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
     <script src="dist/handlebars.templates-K7URE6B4.js"></script>
-    <script src="dist/sidebar_items-E031779F.js"></script>
+    <script src="dist/sidebar_items-0C91E033.js"></script>
     <script src="docs_config.js"></script>
     <script async src="dist/html-YIPIRHGU.js"></script>
 
@@ -47,10 +47,10 @@
 
       <div>
         <a href="api-reference.html" class="sidebar-projectName" translate="no">
-quartz
+Quartz
         </a>
         <div class="sidebar-projectVersion" translate="no">
-          v0.1.0
+          v0.6.0
         </div>
       </div>
     </div>
@@ -90,7 +90,7 @@ Pages
       <div class="search-settings">
         <form class="search-bar" action="search.html">
           <label class="search-label">
-            <span class="sr-only">Search documentation of quartz</span>
+            <span class="sr-only">Search documentation of Quartz</span>
             <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </label>
           <button type="submit" class="search-button" aria-label="Submit Search">
@@ -112,11 +112,21 @@ Pages
 <div id="top-content">
   <h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch/protocol.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
     <span translate="no">Quartz.Sketch.Protocol</span> <small>protocol</small>
-    <small class="app-vsn" translate="no">(quartz v0.1.0)</small>
+    <small class="app-vsn" translate="no">(Quartz v0.6.0)</small>
 
   </h1>
 
+
+    <section id="moduledoc">
+<p>A protocol that must be implemented by anything you want to draw on a figure.</p><p>Quartz defines a number of sketches, but nothing forbids you to add more
+as long as you implement this protocol on your struct.</p>
+    </section>
 
 </div>
 
@@ -178,6 +188,9 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Return lengths that are part of the sketch.
+These will usually be anything that can be measured in units of length.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -201,6 +214,8 @@ Pages
         <a href="#transform_lengths/2" data-no-tooltip translate="no">transform_lengths(obj, fun)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Transform lengths inside an object, given a length-transformation function.</p></div>
 
     </div>
 
@@ -226,6 +241,11 @@ Pages
     </a>
     <h1 class="signature" translate="no">length()</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch/protocol.ex#L11" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -233,7 +253,7 @@ Pages
 
       <div class="specs">
 
-          <pre translate="no"><span class="attribute">@type</span> length() :: <a href="https://hexdocs.pm/dantzig/0.1.0/Dantzig.Polynomial.html#t:t/0">Dantzig.Polynomial.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()</pre>
+          <pre translate="no"><span class="attribute">@type</span> length() :: <a href="https://hexdocs.pm/dantzig/0.2.0/Dantzig.Polynomial.html#t:t/0">Dantzig.Polynomial.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">number</a>()</pre>
 
       </div>
 
@@ -248,6 +268,11 @@ Pages
       <span class="sr-only">Link to this type</span>
     </a>
     <h1 class="signature" translate="no">t()</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch/protocol.ex#L1" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -284,6 +309,11 @@ Pages
     </a>
     <h1 class="signature" translate="no">assign_measurements_from_resvg_node(obj, resvg_node)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch/protocol.ex#L38" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -313,6 +343,11 @@ Pages
     </a>
     <h1 class="signature" translate="no">bbox_bounds(obj)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch/protocol.ex#L14" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -336,6 +371,11 @@ Pages
     </a>
     <h1 class="signature" translate="no">lengths(obj)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch/protocol.ex#L29" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -347,7 +387,8 @@ Pages
 
       </div>
 
-
+<p>Return lengths that are part of the sketch.
+These will usually be anything that can be measured in units of length.</p>
   </section>
 </section>
 <section class="detail" id="to_svg/1">
@@ -358,6 +399,11 @@ Pages
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">to_svg(obj)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch/protocol.ex#L35" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -382,6 +428,11 @@ Pages
     </a>
     <h1 class="signature" translate="no">to_unpositioned_svg(obj)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch/protocol.ex#L32" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -405,6 +456,11 @@ Pages
     </a>
     <h1 class="signature" translate="no">transform_lengths(obj, fun)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/sketch/protocol.ex#L22" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -416,7 +472,7 @@ Pages
 
       </div>
 
-
+<p>Transform lengths inside an object, given a length-transformation function.</p><p>This will be used to solve the constraints on your object, when needed.</p>
   </section>
 </section>
 
@@ -426,12 +482,19 @@ Pages
     <footer class="footer">
       <p>
 
+          <span class="line">
+            <a href="https://hex.pm/packages/quartz/0.6.0" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/quartz/0.6.0">Hex Preview</a>
+
+          </span>
+
         <span class="line">
           <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
             Search HexDocs
           </button>
 
-            <a href="quartz.epub" title="ePub version">
+            <a href="Quartz.epub" title="ePub version">
               Download ePub version
             </a>
 

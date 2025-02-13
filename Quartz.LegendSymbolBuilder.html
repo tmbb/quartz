@@ -5,16 +5,16 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.34.2">
-    <meta name="project" content="quartz v0.1.0">
+    <meta name="project" content="Quartz v0.6.0">
 
 
-    <title>Quartz.LegendSymbolBuilder — quartz v0.1.0</title>
+    <title>Quartz.LegendSymbolBuilder — Quartz v0.6.0</title>
     <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
 
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
     <script src="dist/handlebars.templates-K7URE6B4.js"></script>
-    <script src="dist/sidebar_items-E031779F.js"></script>
+    <script src="dist/sidebar_items-0C91E033.js"></script>
     <script src="docs_config.js"></script>
     <script async src="dist/html-YIPIRHGU.js"></script>
 
@@ -47,10 +47,10 @@
 
       <div>
         <a href="api-reference.html" class="sidebar-projectName" translate="no">
-quartz
+Quartz
         </a>
         <div class="sidebar-projectVersion" translate="no">
-          v0.1.0
+          v0.6.0
         </div>
       </div>
     </div>
@@ -90,7 +90,7 @@ Pages
       <div class="search-settings">
         <form class="search-bar" action="search.html">
           <label class="search-label">
-            <span class="sr-only">Search documentation of quartz</span>
+            <span class="sr-only">Search documentation of Quartz</span>
             <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </label>
           <button type="submit" class="search-button" aria-label="Submit Search">
@@ -112,8 +112,13 @@ Pages
 <div id="top-content">
   <h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/legend_symbol_builder.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
     <span translate="no">Quartz.LegendSymbolBuilder</span> 
-    <small class="app-vsn" translate="no">(quartz v0.1.0)</small>
+    <small class="app-vsn" translate="no">(Quartz v0.6.0)</small>
 
   </h1>
 
@@ -138,9 +143,21 @@ Pages
 
     <div class="summary-row">
       <div class="summary-signature">
+        <a href="#__struct__/0" data-no-tooltip translate="no">%Quartz.LegendSymbolBuilder{}</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>A symbol builder.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
         <a href="#build/3" data-no-tooltip translate="no">build(symbol, label, builder_opts)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Builds a symbol from a symbol builder and a concrete legend.</p></div>
 
     </div>
 
@@ -150,6 +167,8 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Creates a circle symbol builder for a legend.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -157,6 +176,8 @@ Pages
         <a href="#get_label_height/1" data-no-tooltip translate="no">get_label_height(label)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Get the height of a label to draw a symbol marker.</p></div>
 
     </div>
 
@@ -166,6 +187,8 @@ Pages
 
       </div>
 
+        <div class="summary-synopsis"><p>Creates a line symbol builder for a legend.</p></div>
+
     </div>
 
     <div class="summary-row">
@@ -173,6 +196,8 @@ Pages
         <a href="#rectangle/1" data-no-tooltip translate="no">rectangle(opts)</a>
 
       </div>
+
+        <div class="summary-synopsis"><p>Creates a rectangle symbol builder for a legend.</p></div>
 
     </div>
 
@@ -189,6 +214,30 @@ Pages
       <span class="text">Functions</span>
     </h1>
     <div class="functions-list">
+<section class="detail" id="__struct__/0">
+
+  <div class="detail-header">
+    <a href="#__struct__/0" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">%Quartz.LegendSymbolBuilder{}</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/legend_symbol_builder.ex#L24" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+      <span class="note">(struct)</span>
+
+  </div>
+
+  <section class="docstring">
+
+<p>A symbol builder.</p>
+  </section>
+</section>
 <section class="detail" id="build/3">
 
   <div class="detail-header">
@@ -198,12 +247,17 @@ Pages
     </a>
     <h1 class="signature" translate="no">build(symbol, label, builder_opts)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/legend_symbol_builder.ex#L116" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
   <section class="docstring">
 
-
+<p>Builds a symbol from a symbol builder and a concrete legend.</p>
   </section>
 </section>
 <section class="detail" id="circle/1">
@@ -215,12 +269,17 @@ Pages
     </a>
     <h1 class="signature" translate="no">circle(opts)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/legend_symbol_builder.ex#L61" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
   <section class="docstring">
 
-
+<p>Creates a circle symbol builder for a legend.</p>
   </section>
 </section>
 <section class="detail" id="get_label_height/1">
@@ -232,12 +291,17 @@ Pages
     </a>
     <h1 class="signature" translate="no">get_label_height(label)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/legend_symbol_builder.ex#L123" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
   <section class="docstring">
 
-
+<p>Get the height of a label to draw a symbol marker.</p>
   </section>
 </section>
 <section class="detail" id="line/1">
@@ -249,12 +313,17 @@ Pages
     </a>
     <h1 class="signature" translate="no">line(opts)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/legend_symbol_builder.ex#L85" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
   <section class="docstring">
 
-
+<p>Creates a line symbol builder for a legend.</p>
   </section>
 </section>
 <section class="detail" id="rectangle/1">
@@ -266,12 +335,17 @@ Pages
     </a>
     <h1 class="signature" translate="no">rectangle(opts)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/legend_symbol_builder.ex#L31" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
   <section class="docstring">
 
-
+<p>Creates a rectangle symbol builder for a legend.</p>
   </section>
 </section>
 
@@ -281,12 +355,19 @@ Pages
     <footer class="footer">
       <p>
 
+          <span class="line">
+            <a href="https://hex.pm/packages/quartz/0.6.0" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/quartz/0.6.0">Hex Preview</a>
+
+          </span>
+
         <span class="line">
           <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
             Search HexDocs
           </button>
 
-            <a href="quartz.epub" title="ePub version">
+            <a href="Quartz.epub" title="ePub version">
               Download ePub version
             </a>
 

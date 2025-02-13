@@ -5,16 +5,16 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.34.2">
-    <meta name="project" content="quartz v0.1.0">
+    <meta name="project" content="Quartz v0.6.0">
 
 
-    <title>Quartz.Plot2D — quartz v0.1.0</title>
+    <title>Quartz.Plot2D — Quartz v0.6.0</title>
     <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
 
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
     <script src="dist/handlebars.templates-K7URE6B4.js"></script>
-    <script src="dist/sidebar_items-E031779F.js"></script>
+    <script src="dist/sidebar_items-0C91E033.js"></script>
     <script src="docs_config.js"></script>
     <script async src="dist/html-YIPIRHGU.js"></script>
 
@@ -47,10 +47,10 @@
 
       <div>
         <a href="api-reference.html" class="sidebar-projectName" translate="no">
-quartz
+Quartz
         </a>
         <div class="sidebar-projectVersion" translate="no">
-          v0.1.0
+          v0.6.0
         </div>
       </div>
     </div>
@@ -90,7 +90,7 @@ Pages
       <div class="search-settings">
         <form class="search-bar" action="search.html">
           <label class="search-label">
-            <span class="sr-only">Search documentation of quartz</span>
+            <span class="sr-only">Search documentation of Quartz</span>
             <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </label>
           <button type="submit" class="search-button" aria-label="Submit Search">
@@ -112,8 +112,13 @@ Pages
 <div id="top-content">
   <h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
     <span translate="no">Quartz.Plot2D</span> 
-    <small class="app-vsn" translate="no">(quartz v0.1.0)</small>
+    <small class="app-vsn" translate="no">(Quartz v0.6.0)</small>
 
   </h1>
 
@@ -504,6 +509,14 @@ the total space given to the figure.</p></div>
 
     <div class="summary-row">
       <div class="summary-signature">
+        <a href="#put_legend_style/2" data-no-tooltip translate="no">put_legend_style(plot, attributes)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
         <a href="#put_major_tick_labels_style/3" data-no-tooltip translate="no">put_major_tick_labels_style(plot, axes_name, style)</a>
 
       </div>
@@ -622,6 +635,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">t()</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L94" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -653,6 +671,12 @@ the total space given to the figure.</p></div>
   left_content_padding: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
   left_decorations_area: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
   left_margin: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  legend_background: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  legend_background_color: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  legend_background_opacity: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  legend_background_stroke_dash: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  legend_background_stroke_paint: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
+  legend_background_stroke_thickness: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
   legend_items: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
   legend_location: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
   padding_bottom: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(),
@@ -708,6 +732,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">add_bottom_axis(plot, name, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L308" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -726,6 +755,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">add_left_axis(plot, name, opts \\ [])</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L332" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -746,6 +780,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">add_right_axis(plot, name, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L344" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -762,6 +801,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">add_to_legend(plot, symbol, label)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L993" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -782,6 +826,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">add_top_axis(plot, name, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L320" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -798,6 +847,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">align_bbox(elements, fun)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L369" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -822,6 +876,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">align_bottom(elements)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L387" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -844,6 +903,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">align_left(elements)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L381" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -868,6 +932,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">align_right(elements)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L384" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -890,6 +959,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">align_top(elements)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L378" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -916,6 +990,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">box_plot(plot, groups, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L702" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -933,6 +1012,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">default_bin_width_for_histogram(series)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L819" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -949,6 +1033,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">draw_bottom_content(plot, padding)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L588" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -969,6 +1058,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">draw_function_contour_plot(plot, fun, x_min, x_max, y_min, y_max, countour_levels, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L742" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -987,6 +1081,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">draw_histogram(plot, data, opts \\ [])</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L823" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1007,6 +1106,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">draw_kde_plot(plot, values, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L771" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1026,6 +1130,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">draw_kde_plot_groups_from_dataframe(plot, dataframe, group_column, values_column, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L781" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1042,6 +1151,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">draw_left_content(plot, padding)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L618" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1062,6 +1176,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">draw_line_plot(plot, data_x, data_y, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L732" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1078,6 +1197,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">draw_right_content(plot, padding)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L633" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1098,6 +1222,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">draw_scatter_plot(plot, data_x, data_y, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L722" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1116,6 +1245,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">draw_text(plot, text, opts \\ [])</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L839" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1140,6 +1274,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">draw_top_content(plot, padding)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L603" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1156,6 +1295,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">fetch_axis(plot, name)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L359" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1182,6 +1326,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">fetch_axis!(plot, name)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L364" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1198,6 +1347,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">finalize(plot)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L560" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1222,6 +1376,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">finalize_all(plots)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L582" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1244,6 +1403,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">get_axis(plot, name)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L354" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1268,6 +1432,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">maybe_add_color_to_opts_from_colormap(plot, opts)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L709" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1287,6 +1456,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">new(opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L96" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1303,6 +1477,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">no_legend(plot)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L939" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1323,6 +1502,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">put_axes_margins(plot, value, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L523" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1341,6 +1525,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">put_axis_label(plot, axis_name, text, opts \\ [])</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L441" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1365,6 +1554,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">put_axis_limits(plot, axis_name, min_value, max_value)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L434" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1387,6 +1581,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">put_axis_major_tick_labels(plot, axis_name, labels)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L469" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1411,6 +1610,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">put_axis_major_tick_locations(plot, axis_name, locations)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L462" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1433,6 +1637,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">put_axis_max_value(plot, axis_name, value)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L420" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1457,6 +1666,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">put_axis_min_value(plot, axis_name, value)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L427" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1479,6 +1693,11 @@ the total space given to the figure.</p></div>
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">put_axis_scale(plot, axis_name, scale)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L476" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1503,6 +1722,11 @@ the total space given to the figure.</p></div>
     </a>
     <h1 class="signature" translate="no">put_bounds(plot, bounds)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L260" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1522,12 +1746,39 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
     </a>
     <h1 class="signature" translate="no">put_legend_location(plot, location)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L979" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
   <section class="docstring">
 
 <p>Put legend location.</p><p>Valid locations:</p><ul><li><code class="inline">:top</code></li><li><code class="inline">:top_right</code></li><li><code class="inline">:right</code></li><li><code class="inline">:bottom_right</code></li><li><code class="inline">:bottom</code></li><li><code class="inline">:bottom_left</code></li><li><code class="inline">:left</code></li></ul>
+  </section>
+</section>
+<section class="detail" id="put_legend_style/2">
+
+  <div class="detail-header">
+    <a href="#put_legend_style/2" class="detail-link" data-no-tooltip title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">put_legend_style(plot, attributes)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L943" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+
   </section>
 </section>
 <section class="detail" id="put_major_tick_labels_style/3">
@@ -1538,6 +1789,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">put_major_tick_labels_style(plot, axes_name, style)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L297" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1556,6 +1812,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
     </a>
     <h1 class="signature" translate="no">put_minimum_axis_end_margin(plot, axis_name, value)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L501" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1572,6 +1833,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">put_minimum_axis_margins(plot, axis_name, common_margin_size)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L507" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1590,6 +1856,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
     </a>
     <h1 class="signature" translate="no">put_minimum_axis_margins(plot, axis_name, margin_start, margin_end)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L515" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1606,6 +1877,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">put_minimum_axis_start_margin(plot, axis_name, value)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L495" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1626,6 +1902,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
     </a>
     <h1 class="signature" translate="no">put_title(plot, title, opts \\ [])</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L535" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1642,6 +1923,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">put_width_to_height_ratio(plot, ratio)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L448" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1666,6 +1952,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
     </a>
     <h1 class="signature" translate="no">remove_axis_ticks(plot, axis_name)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L453" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1688,6 +1979,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
       <span class="sr-only">Link to this function</span>
     </a>
     <h1 class="signature" translate="no">stack_horizontally_inside_container(elements, container)</h1>
+
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L390" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
 
 
   </div>
@@ -1712,6 +2008,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
     </a>
     <h1 class="signature" translate="no">stack_vertically_inside_container(elements, container)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L405" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1735,6 +2036,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
     </a>
     <h1 class="signature" translate="no">update_axes(plot, axis_names, fun)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L489" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1752,6 +2058,11 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
     </a>
     <h1 class="signature" translate="no">update_axis(plot, axis_name, fun)</h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/lib/quartz/plot_2d.ex#L482" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
 
   </div>
 
@@ -1767,12 +2078,19 @@ the total space given to the figure.</p><p>Expects bounds given as a keyword lis
     <footer class="footer">
       <p>
 
+          <span class="line">
+            <a href="https://hex.pm/packages/quartz/0.6.0" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/quartz/0.6.0">Hex Preview</a>
+
+          </span>
+
         <span class="line">
           <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
             Search HexDocs
           </button>
 
-            <a href="quartz.epub" title="ePub version">
+            <a href="Quartz.epub" title="ePub version">
               Download ePub version
             </a>
 

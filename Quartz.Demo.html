@@ -5,16 +5,16 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.34.2">
-    <meta name="project" content="quartz v0.1.0">
+    <meta name="project" content="Quartz v0.6.0">
 
 
-    <title>Quartz.Demo — quartz v0.1.0</title>
+    <title>Quartz.Demo — Quartz v0.6.0</title>
     <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
 
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
     <script src="dist/handlebars.templates-K7URE6B4.js"></script>
-    <script src="dist/sidebar_items-E031779F.js"></script>
+    <script src="dist/sidebar_items-0C91E033.js"></script>
     <script src="docs_config.js"></script>
     <script async src="dist/html-YIPIRHGU.js"></script>
 
@@ -47,10 +47,10 @@
 
       <div>
         <a href="api-reference.html" class="sidebar-projectName" translate="no">
-quartz
+Quartz
         </a>
         <div class="sidebar-projectVersion" translate="no">
-          v0.1.0
+          v0.6.0
         </div>
       </div>
     </div>
@@ -90,7 +90,7 @@ Pages
       <div class="search-settings">
         <form class="search-bar" action="search.html">
           <label class="search-label">
-            <span class="sr-only">Search documentation of quartz</span>
+            <span class="sr-only">Search documentation of Quartz</span>
             <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </label>
           <button type="submit" class="search-button" aria-label="Submit Search">
@@ -112,8 +112,13 @@ Pages
 <div id="top-content">
   <h1>
 
+      <a href="https://github.com/tmbb/quartz/blob/main/demo/lib/demo.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
     <span translate="no">Quartz.Demo</span> 
-    <small class="app-vsn" translate="no">(quartz v0.1.0)</small>
+    <small class="app-vsn" translate="no">(Quartz v0.6.0)</small>
 
   </h1>
 
@@ -131,7 +136,7 @@ Pages
   </a>
   <span class="text">Scatter plot examples</span>
 </h3>
-<p>Simple scatter plot:</p><img width="255.11625pt" height="170.07750pt" src="assets/scatter_plot/example.png"/><p>Simple line plot:</p><img width="226.77000pt" height="141.73125pt" src="assets/line_plot/example.png"/><h2 id="module-distribution-plots" class="section-heading">
+<p>Simple scatter plot:</p><img width="75%" src="assets/scatter_plot.png"/><p>Simple line plot:</p><img width="75%" src="assets/line_plot.png"/><h2 id="module-distribution-plots" class="section-heading">
   <a href="#module-distribution-plots" class="hover-link">
     <i class="ri-link-m" aria-hidden="true"></i>
   </a>
@@ -143,19 +148,19 @@ Pages
   </a>
   <span class="text">KDE plot examples</span>
 </h3>
-<img width="226.77000pt" height="113.38500pt" src="assets/dist_plot/example.png"/><h3 id="module-histogram" class="section-heading">
+<img width="75%" src="assets/dist_plot.png"/><h3 id="module-histogram" class="section-heading">
   <a href="#module-histogram" class="hover-link">
     <i class="ri-link-m" aria-hidden="true"></i>
   </a>
   <span class="text">Histogram</span>
 </h3>
-<img width="226.77000pt" height="113.38500pt" src="assets/histogram/example.png"/><h2 id="module-layout-examples" class="section-heading">
+<img width="75%" src="assets/histogram.png"/><h2 id="module-layout-examples" class="section-heading">
   <a href="#module-layout-examples" class="hover-link">
     <i class="ri-link-m" aria-hidden="true"></i>
   </a>
   <span class="text">Layout examples</span>
 </h2>
-<p>Side by side plot, showing the use of different scales:</p><img width="453.54000pt" height="170.07750pt" src="assets/side_by_side_plots/example.png"/><h2 id="module-gridded-data" class="section-heading">
+<p>Side by side plot, showing the use of different scales:</p><img width="75%" src="assets/side_by_side_plots.png"/><h2 id="module-gridded-data" class="section-heading">
   <a href="#module-gridded-data" class="hover-link">
     <i class="ri-link-m" aria-hidden="true"></i>
   </a>
@@ -167,124 +172,34 @@ Pages
   </a>
   <span class="text">Countour plot</span>
 </h3>
-<p>Contour of a function</p><img width="226.77000pt" height="170.07750pt" src="assets/contour_plot/example.png"/>
+<p>Contour of a function</p><img width="75%" src="assets/contour_plot.png"/><h2 id="module-text-and-math-support" class="section-heading">
+  <a href="#module-text-and-math-support" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Text and math support</span>
+</h2>
+<p>Mix between normal text characters and math characters:</p><img width="75%" src="assets/math_and_text_characters.png"/><p>Full list of supported symbols:</p><img width="75%" src="assets/math_characters_chart.png"/>
     </section>
 
 </div>
 
-  <section id="summary" class="details-list">
-    <h1 class="section-heading">
-      <a class="hover-link" href="#summary">
-        <i class="ri-link-m" aria-hidden="true"></i>
-      </a>
-      <span class="text">Summary</span>
-    </h1>
-<div class="summary-functions summary">
-  <h2>
-    <a href="#functions">Functions</a>
-  </h2>
-
-    <div class="summary-row">
-      <div class="summary-signature">
-        <a href="#draw_demo_plots/1" data-no-tooltip translate="no">draw_demo_plots(demo_dir)</a>
-
-      </div>
-
-    </div>
-
-    <div class="summary-row">
-      <div class="summary-signature">
-        <a href="#example_to_png_and_svg/3" data-no-tooltip translate="no">example_to_png_and_svg(figure, dir, subdir)</a>
-
-      </div>
-
-    </div>
-
-    <div class="summary-row">
-      <div class="summary-signature">
-        <a href="#nuts_chains_path/0" data-no-tooltip translate="no">nuts_chains_path()</a>
-
-      </div>
-
-    </div>
-
-</div>
-
-  </section>
-
-
-  <section id="functions" class="details-list">
-    <h1 class="section-heading">
-      <a class="hover-link" href="#functions">
-        <i class="ri-link-m" aria-hidden="true"></i>
-      </a>
-      <span class="text">Functions</span>
-    </h1>
-    <div class="functions-list">
-<section class="detail" id="draw_demo_plots/1">
-
-  <div class="detail-header">
-    <a href="#draw_demo_plots/1" class="detail-link" data-no-tooltip title="Link to this function">
-      <i class="ri-link-m" aria-hidden="true"></i>
-      <span class="sr-only">Link to this function</span>
-    </a>
-    <h1 class="signature" translate="no">draw_demo_plots(demo_dir)</h1>
-
-
-  </div>
-
-  <section class="docstring">
-
-
-  </section>
-</section>
-<section class="detail" id="example_to_png_and_svg/3">
-
-  <div class="detail-header">
-    <a href="#example_to_png_and_svg/3" class="detail-link" data-no-tooltip title="Link to this function">
-      <i class="ri-link-m" aria-hidden="true"></i>
-      <span class="sr-only">Link to this function</span>
-    </a>
-    <h1 class="signature" translate="no">example_to_png_and_svg(figure, dir, subdir)</h1>
-
-
-  </div>
-
-  <section class="docstring">
-
-
-  </section>
-</section>
-<section class="detail" id="nuts_chains_path/0">
-
-  <div class="detail-header">
-    <a href="#nuts_chains_path/0" class="detail-link" data-no-tooltip title="Link to this function">
-      <i class="ri-link-m" aria-hidden="true"></i>
-      <span class="sr-only">Link to this function</span>
-    </a>
-    <h1 class="signature" translate="no">nuts_chains_path()</h1>
-
-
-  </div>
-
-  <section class="docstring">
-
-
-  </section>
-</section>
-
-    </div>
-  </section>
 
     <footer class="footer">
       <p>
+
+          <span class="line">
+            <a href="https://hex.pm/packages/quartz/0.6.0" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/quartz/0.6.0">Hex Preview</a>
+
+          </span>
 
         <span class="line">
           <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
             Search HexDocs
           </button>
 
-            <a href="quartz.epub" title="ePub version">
+            <a href="Quartz.epub" title="ePub version">
               Download ePub version
             </a>
 
