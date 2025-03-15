@@ -1,6 +1,9 @@
 # Changelog
 
 <!-- changes - write changes below -->
+
+## v0.7.0
+
 Minor tweaks.
 
 ## v0.6.0
