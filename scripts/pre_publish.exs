@@ -129,4 +129,4 @@
     end
   end
 
-  Publish.run()
+  PrePublish.run()
