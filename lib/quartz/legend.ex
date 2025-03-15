@@ -33,14 +33,35 @@ defmodule Quartz.Legend do
     end
   end
 
+  @doc """
+  Builder for a rectangle with the given options
+  that can be put in a legend.
+
+  Quartz uses this internally to build legend.
+  Users won't usually use this directly.
+  """
   def rectangle_symbol(opts) do
     LegendSymbolBuilder.rectangle(opts)
   end
 
+  @doc """
+  Builder for a line with the given options
+  that can be put in a legend.
+
+  Quartz uses this internally to build labels.
+  Users won't usually use this directly.
+  """
   def line_symbol(opts) do
     LegendSymbolBuilder.line(opts)
   end
 
+  @doc """
+  Builder for a circle with the given options
+  that can be put in a legend.
+
+  Quartz uses this internally to build labels.
+  Users won't usually use this directly.
+  """
   def circle_symbol(opts) do
     LegendSymbolBuilder.circle(opts)
   end
@@ -58,12 +79,18 @@ defmodule Quartz.Legend do
     end
   end
 
-  @doc false
+  @doc """
+  Draw the legend of a plot.
+  Users won't usually use this directly.
+  """
   @spec draw_legend(Plot2D.t()) :: Plot2D.t()
   def draw_legend(%Plot2D{} = plot) do
     draw_vertically_stacked_legend(plot)
   end
 
+  @doc """
+  Draw a legend by vertically stacking its components.
+  """
   @spec draw_vertically_stacked_legend(Plot2D.t()) :: Plot2D.t()
   def draw_vertically_stacked_legend(%Plot2D{} = plot) do
     legend_items = Enum.reverse(plot.legend_items)

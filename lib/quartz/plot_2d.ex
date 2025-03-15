@@ -816,6 +816,7 @@ defmodule Quartz.Plot2D do
     put_bounds(plot, bounds)
   end
 
+  @spec default_bin_width_for_histogram(%Explorer.Series{}) :: number()
   def default_bin_width_for_histogram(series) do
     DistributionPlot.default_bin_width_for_histogram(series)
   end
@@ -990,6 +991,10 @@ defmodule Quartz.Plot2D do
     %{plot | legend_location: location}
   end
 
+  @doc """
+  Add a new item to the label.
+  The item is identified by a symbol and a label.
+  """
   def add_to_legend(plot, symbol, label) do
     label_sketch =
       case label do

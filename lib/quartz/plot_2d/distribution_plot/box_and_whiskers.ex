@@ -1,4 +1,5 @@
 defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers do
+  @moduledoc false
   alias Quartz.LinearPath
   alias Quartz.Line
   alias Quartz.AxisData

@@ -1,4 +1,5 @@
 defmodule Quartz.Plot2D.DistributionPlots.BoxAndWhiskers.Options do
+  @moduledoc false
   alias Quartz.Length
   alias Quartz.Color.RGB
 

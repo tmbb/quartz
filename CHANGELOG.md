@@ -4,11 +4,15 @@
 
 ## v0.6.0
 
+Test release (not published to Hex)
 
 ## v0.5.0
 
+Test release (not published to Hex)
 
 ## v0.4.0
+
+Test release (not published to Hex)
 
 ## v0.3.0
 

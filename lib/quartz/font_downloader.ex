@@ -107,8 +107,6 @@ defmodule Quartz.FontDownloader do
       other ->
         raise """
         couldn't fetch #{url}: #{inspect(other)}
-
-        You may also install the "highs" executable manually.
         """
     end
   end

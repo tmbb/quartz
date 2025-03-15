@@ -1,4 +1,7 @@
 defmodule Quartz.Config do
+  @moduledoc """
+  Configuration for a given figure.
+  """
   alias Quartz.Figure
   alias Quartz.Length
   alias Quartz.Color.RGB
