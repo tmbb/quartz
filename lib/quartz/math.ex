@@ -6,7 +6,7 @@ defmodule Quartz.Math do
   together with the functions that return them can be
   seen in this chart:
 
-  ![Supported characters chart](assets/math_characters_chart/full_chart.png)
+  TODO: link to web page
   """
 
   # Pretty much everything in this module is generated at compile-time

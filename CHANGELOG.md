@@ -1,6 +1,23 @@
 # Changelog
 
 <!-- changes - write changes below -->
+Move all the images from the hexdocs to an external webpage.
+This way we don't hit the maximum space limits on hexdocs.
+The documentatino of Quartz is now divided in two parts:
+
+  1. The API documentation, which is kept on hexdocs.
+  2. The narrative documentation with examples, which is kept in the
+     [GitHub pages of the GitHub repository](https://tmbb.github.io/quartz/plot_types.html).
+     In the future, this will probably moved to its own domain.
+
+The webpage is heavily inspired by the
+[Matplotlib webpage](https://matplotlib.org/stable/).
+
+The webpage is built with a custom mix task based on
+[NimblePublisher](https://hexdocs.pm/nimble_publisher/NimblePublisher.html).
+Not that while it looks like the webpage generation depends on Phoenix,
+it only depends on the Phoenix utilities to generate HTML.
+The webpage is 100% static HTML.
 
 ## v0.7.0
 

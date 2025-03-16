@@ -7,10 +7,6 @@ defmodule Quartz.MathHelpers do
 
   require Logger
 
-  for path <- File.ls!("assets/math_characters_chart") do
-    @external_resource path
-  end
-
   @math_categories [
     %UnicodeMathCategory{
       name: "Italic",
@@ -311,7 +307,7 @@ defmodule Quartz.MathHelpers do
       @doc """
       Math characters belonging to the *#{unquote(human_category_name)}* category.
 
-      ![Characters chart for this category](assets/math_characters_chart/symbols.png)
+      TODO: Link to webpage.
       """
       @spec unquote(cat_function_name)(Keyword.t()) ::
               {Quartz.Math.UnicodeCatergory.t(), list(Quartz.Sketch.t())}
@@ -370,7 +366,7 @@ defmodule Quartz.MathHelpers do
           @doc """
           Math characters belonging to the *#{unquote(human_category_name)}* category.
 
-          ![Characters chart for this category](assets/math_characters_chart/#{unquote(category.slug)}.png)
+          TODO: linnk to category.
           """
           @spec unquote(cat_function_name)(Keyword.t()) ::
                   {Quartz.Math.UnicodeCatergory.t(), list(Quartz.Sketch.t())}

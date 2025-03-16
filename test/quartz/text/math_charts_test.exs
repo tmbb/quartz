@@ -4,12 +4,12 @@ defmodule Quartz.Plot2D.Text.MathCharactersChartsTest do
 
   require Quartz.Figure, as: Figure
   alias Quartz.Length
-  alias Quartz.Demo.Text.MathCharactersChart
+  alias Quartz.Webpage.Artifacts.Text.MathCharactersChart
 
   @output_dir "test/quartz/text/outputs/math_charts"
 
   @tag timeout: 300_000
-  test "regression testing for the symbol charts in the demo" do
+  test "regression testing for the symbol charts in the Artifacts" do
     # Lazy loading of categories because they must be inside a figure context
     categories = [
       {:mathematical_italic_sketches, 4, true},

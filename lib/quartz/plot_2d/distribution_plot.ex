@@ -179,7 +179,7 @@ defmodule Quartz.Plot2D.DistributionPlot do
 
     absolute_counts =
       series
-      |> Series.cut(cut_points)
+      |> Series.cut(cut_points, include_breaks: true)
       |> Access.get(:break_point)
       |> Series.frequencies()
       |> DataFrame.sort_by(values)
