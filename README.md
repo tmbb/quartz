@@ -10,7 +10,7 @@ of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:quartz, "~> 0.8.0"}
+    {:quartz, "~> 0.8.1"}
   ]
 end
 ```

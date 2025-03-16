@@ -1,6 +1,9 @@
 # Changelog
 
 <!-- changes - write changes below -->
+
+## v0.8.1
+
 Fix filenames
 
 ## v0.8.0
