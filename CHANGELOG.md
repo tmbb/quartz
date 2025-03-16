@@ -1,6 +1,9 @@
 # Changelog
 
 <!-- changes - write changes below -->
+
+## v0.8.0
+
 Move all the images from the hexdocs to an external webpage.
 This way we don't hit the maximum space limits on hexdocs.
 The documentatino of Quartz is now divided in two parts:
