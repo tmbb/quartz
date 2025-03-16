@@ -55,7 +55,6 @@ defmodule Quartz.MixProject do
     [
       files: ~w(
         lib
-        priv/Artifacts
         priv/typst-symbols.html
         priv/UnicodeData.txt
         priv/font_hashes.exs
